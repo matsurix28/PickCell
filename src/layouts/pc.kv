@@ -1,0 +1,230 @@
+<DetectWidget>:
+    BoxLayout:
+        BoxLayout:
+            size_hint_x: 0.5
+            orientation: 'vertical'
+            BoxLayout:
+                size_hint_y: 0.1
+                Label:
+                    text: 'Input image'
+                    size_hint_x: 0.9
+                Button:
+                    text: '▼'
+                    size_hint_x: 0.1
+            Label:
+                size_hint_y: 0.5
+            Label:
+                size_hint_y: 0.1
+            Label:
+                size_hint_y: 0.5
+        BoxLayout:
+            id: box2
+            size_hint_x: 0.5
+            orientation: 'vertical'
+            spacing: 10
+            padding: 10
+            Label:
+                font_size: 28
+                text: 'Method'
+                size_hint_y: None
+                height: self.texture_size[1]
+            Spinner:
+                font_size: 25
+                size_hint_y: None
+                height: self.texture_size[1]
+                text: 'erabe'
+            Label:
+                text: 'Detects contours from an image. If it does not work well, adjust the threshold value. (Threshold range is 0-255)'
+                text_size: self.width, None
+                size_hint_y: None
+                height: self.texture_size[1]
+                font_size: 25
+            Image:
+                size_hint_y: 0.3
+            BoxLayout:
+                orientation: 'vertical'
+                Label:
+                    font_size: 25
+                    text: 'Threshold'
+                    size_hint_y:None
+                    height: self.texture_size[1]
+                Image:
+                    size_hint_y:1
+                BoxLayout:
+                    size_hint_y: None
+                    height: button.texture_size[1]
+                    Slider:
+                        size_hint_y: None
+                        height: button.texture_size[1]
+                    Button:
+                        font_size: 25
+                        text: 'Reset'
+                        size_hint_x: None
+                        size_hint_y: None
+                        size: self.texture_size
+                AnchorLayout:
+                    anchor_x: 'center'
+                    size_hint_y: None
+                    height: button.texture_size[1] + 20
+                    Button:
+                        id: button
+                        font_size: 25
+                        text: 'RUN'
+                        size_hint_x: None
+                        size_hint_y: None
+                        size: self.texture_size
+                AnchorLayout:
+                    anchor_x: 'right'
+                    size_hint_y: None
+                    height: button.texture_size[1] + 20
+                    Button:
+                        font_size: 25
+                        text: 'Next'
+                        size_hint_x: None
+                        size_hint_y: None
+                        size: self.texture_size
+                        on_release: root.manager.current = 'fvfm'
+
+<FvFmWidget>:
+    BoxLayout:
+        BoxLayout:
+            size_hint_x: 0.4
+            orientation: 'vertical'
+            BoxLayout:
+                size_hint_y: 0.1
+                Label:
+                    text: 'Input image'
+                    size_hint_x: 0.9
+                Button:
+                    text: '▼'
+                    size_hint_x: 0.1
+            Label:
+                size_hint_y: 0.5
+            Label:
+                size_hint_y: 0.1
+            Label:
+                size_hint_y: 0.5
+        BoxLayout:
+            size_hint_x: 0.2
+            orientation: 'vertical'
+            Label:
+                font_size: 25
+                text: 'Fv/Fm value list'
+                size_hint_y: None
+                height: self.texture_size[1]
+            RecycleView:
+                id: rv
+                viewclass: 'RVBox'
+                bar_width: dp(10)
+                scroll_type: ["bars", "content"]
+                scroll_wheel_distance: sp(50)
+                RecycleBoxLayout:
+                    default_size: None, sp(50)
+                    default_size_hint: 1, None
+                    size_hint_y: None
+                    height: self.minimum_height
+                    orientation: 'vertical'
+                    spacing: dp(8)
+        BoxLayout:
+            size_hint_x: 0.4
+            orientation: 'vertical'
+            spacing: 10
+            padding: 10
+            Label:
+                font_size: 28
+                text: 'Method'
+                size_hint_y: None
+                height: self.texture_size[1]
+            Spinner:
+                font_size: 25
+                size_hint_y: None
+                height: self.texture_size[1]
+                text: 'erabe'
+            Label:
+                text: 'Detects contours from an image. If it does not work well, adjust the threshold value. (Threshold range is 0-255)'
+                text_size: self.width, None
+                size_hint_y: None
+                height: self.texture_size[1]
+                font_size: 25
+            Image:
+                size_hint_y: 0.3
+            BoxLayout:
+                orientation: 'vertical'
+                Label:
+                    font_size: 25
+                    text: 'Threshold'
+                    size_hint_y:None
+                    height: self.texture_size[1]
+                Image:
+                    size_hint_y:1
+                BoxLayout:
+                    size_hint_y: None
+                    height: button.texture_size[1]
+                    Slider:
+                        size_hint_y: None
+                        height: button.texture_size[1]
+                    Button:
+                        font_size: 25
+                        text: 'Reset'
+                        size_hint_x: None
+                        size_hint_y: None
+                        size: self.texture_size
+                AnchorLayout:
+                    anchor_x: 'center'
+                    size_hint_y: None
+                    height: button.texture_size[1] + 20
+                    Button:
+                        id: button
+                        font_size: 25
+                        text: 'RUN'
+                        size_hint_x: None
+                        size_hint_y: None
+                        size: self.texture_size
+                BoxLayout:
+                    AnchorLayout:
+                        anchor_x: 'left'
+                        size_hint_x: 0.5
+                        size_hint_y: None
+                        height: button.texture_size[1] + 20
+                        Button:
+                            font_size: 25
+                            text: 'Back'
+                            size_hint: None, None
+                            size: self.texture_size
+                            on_release: root.manager.current = 'detect'
+                    AnchorLayout:
+                        anchor_x: 'right'
+                        size_hint_y: None
+                        size_hint_x: 0.5
+                        height: button.texture_size[1] + 20
+                        Button:
+                            font_size: 25
+                            text: 'Next'
+                            size_hint_x: None
+                            size_hint_y: None
+                            size: self.texture_size
+                            on_release: root.manager.current = 'arrange'
+                    
+
+
+<RVBox@BoxLayout>:
+    text: ''
+    src: ''
+    Image:
+        source: root.src
+    Label:
+        text: root.text
+        
+
+<ArrangeWidget>:
+
+<AnalysisWidget>:
+
+<Widget>:
+    canvas.after:
+        Color:
+            rgba: 1,1,1,1
+        Line:
+            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+            dash_offset: 5
+            dash_length: 3

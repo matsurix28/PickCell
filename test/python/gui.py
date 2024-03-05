@@ -8,9 +8,10 @@ from arrange import Arrange
 from detect import Detect
 from fvfm import Fvfm
 from graph import Graph
-from pickcell import Pickcell
 from PIL import Image, ImageTk
 from result import show_sctter3d
+
+from pickcell import Pickcell
 
 
 def main():
@@ -932,7 +933,6 @@ class ColorExtrFrame(ttk.Frame):
     def __init(self,master):
         super().__init__(master)
 
-    def 
 
 # GUI module
 class ScrollList(tk.Canvas):
