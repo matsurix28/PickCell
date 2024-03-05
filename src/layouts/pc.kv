@@ -215,8 +215,28 @@
     Label:
         text: root.text
         
-
 <ArrangeWidget>:
+    BoxLayout:
+        BoxLayout:
+            size_hint_x: 0.8
+            orientation: 'vertical'
+            BoxLayout:
+                size_hint_y: 0.5
+                BoxLayout:
+                    size_hint_x: 0.45
+                AnchorLayout:
+                    size_hint_x: 0.1
+                    Label:
+                        size_hint: 1, None
+                        height: self.texture_size[1]
+                        font_size: 20
+                        text: '->'                
+                BoxLayout:
+                    size_hint_x: 0.45
+            BoxLayout:
+                size_hint_y: 0.5
+        BoxLayout:
+            size_hint_x: 0.2
 
 <AnalysisWidget>:
 

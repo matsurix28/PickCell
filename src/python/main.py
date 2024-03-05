@@ -63,11 +63,12 @@ class PickcellApp(App):
     
     def set_widgets(self):
         self.sm = ScreenManager(transition=NoTransition())
-        self.sm.add_widget(DetectWidget(name='detect'))
-        self.sm.add_widget(FvFmWidget(name='fvfm'))
+        
         self.sm.add_widget(ArrangeWidget(name='arrange'))
         self.sm.add_widget(AnalysisWidget(name='analysis'))
-        
+        self.sm.add_widget(DetectWidget(name='detect'))
+        self.sm.add_widget(FvFmWidget(name='fvfm'))
+
     def key_input(self, window, key, scancode, codepoint, modifier):
         if key == 27:
             return True
