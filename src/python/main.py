@@ -17,8 +17,18 @@ REQUEST_GALLERY = 1
 MediaStore_Images_Media_DATA = '_data'
 
 class DetectWidget(Screen):
+    def __init__(self, **kwargs):
+        super(DetectWidget, self).__init__(**kwargs)
+        self.d = None
+
     def move_to_fvfm(self):
         self.manager.current = "fvfm"
+
+    def run(self, img_path):
+        if self.d is None:
+            from detect import Detect
+            self.d = Detect()
+        
 
 class FvFmWidget(Screen):
     def __init__(self, **kwargs):
@@ -29,7 +39,11 @@ class FvFmWidget(Screen):
 
 
 class ArrangeWidget(Screen):
-    pass
+    def __init__(self, **kwargs):
+        super(ArrangeWidget, self).__init__(**kwargs)
+
+    def click(self):
+        print(self.ids.output_img.source)
 
 class AnalysisWidget(Screen):
     pass

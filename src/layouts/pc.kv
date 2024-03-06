@@ -218,27 +218,89 @@
 <ArrangeWidget>:
     BoxLayout:
         BoxLayout:
-            size_hint_x: 0.8
+            size_hint_x: 0.35
             orientation: 'vertical'
-            BoxLayout:
-                size_hint_y: 0.5
-                BoxLayout:
-                    size_hint_x: 0.45
-                AnchorLayout:
-                    size_hint_x: 0.1
-                    Label:
-                        size_hint: 1, None
-                        height: self.texture_size[1]
-                        font_size: 20
-                        text: '->'                
-                BoxLayout:
-                    size_hint_x: 0.45
-            BoxLayout:
-                size_hint_y: 0.5
+            padding: 20, 20,20,20
+            Label:
+                font_size: 28
+                text: 'Leaf'
+                size_hint_y: None
+                height: self.texture_size[1]
+            Image:
+            Label:
+                font_size: 20
+                text: 'v'
+                size_hint_y: None
+                height: self.texture_size[1] + 40
+            Image:
         BoxLayout:
-            size_hint_x: 0.2
-
+            size_hint_x: 0.35
+            orientation: 'vertical'
+            padding: 20, 20,20,20
+            Label:
+                font_size: 28
+                text: 'FvFm'
+                size_hint_y: None
+                height: self.texture_size[1]
+            Image:
+            Label:
+                font_size: 20
+                text: 'v'
+                size_hint_y: None
+                height: self.texture_size[1] + 40
+            Image:
+        BoxLayout:    # Method frame
+            size_hint_x: 0.3
+            orientation: 'vertical'
+            Label:
+                font_size: 28
+                text: 'Method'
+                size_hint_y: None
+                height: self.texture_size[1]
+            Label:
+                font_size: 25
+                text: 'setumeiiiiiiiiiiiiiiiiiiiiiiiiisurushfiashegihaifhaiefhaidbfuefhigagnahgiegkskdghiehgoslkdhhfieogkhoasgoieghoasfkiiiiiiiiiiii'
+                text_size: self.width, None
+                size_hint_y: None
+                height: self.texture_size[1]
+            Image:
+            AnchorLayout:
+                size_hint_y: None
+                height: button.height
+                anchor_x: 'center'
+                Button:
+                    id: button
+                    font_size: 25
+                    text: 'RUN'
+                    size_hint: None, None
+                    size: self.texture_size
+            BoxLayout:
+                size_hint_y: None
+                height: self.minimum_height
+                AnchorLayout:
+                    size_hint_y: None
+                    height: button.height
+                    anchor_x: 'left'
+                    Button:
+                        font_size: 25
+                        text: 'Back'
+                        size_hint: None, None
+                        size: self.texture_size
+                AnchorLayout:
+                    size_hint_y: None
+                    height: button.height
+                    anchor_x: 'right'
+                    Button:
+                        font_size: 25
+                        text: 'Next'
+                        size_hint: None, None
+                        size: self.texture_size
+    
 <AnalysisWidget>:
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+
 
 <Widget>:
     canvas.after:
