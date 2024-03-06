@@ -7,6 +7,8 @@ from kivy.properties import ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.screenmanager import NoTransition, Screen, ScreenManager
+from kivy.uix.tabbedpanel import TabbedPanel
+from kivy.uix.widget import Widget
 
 currentActivity = None
 CLS_Activity = None
@@ -28,11 +30,19 @@ class DetectWidget(Screen):
         if self.d is None:
             from detect import Detect
             self.d = Detect()
+
+    def click(self):
+        pass
+        rw = App.get_running_app().root
+        rw.switch_to(rw.ids.fvfm)
         
 
 class FvFmWidget(Screen):
     def __init__(self, **kwargs):
         super(FvFmWidget, self).__init__(**kwargs)
+        
+
+    def click(self):
         self.ids.rv.data = [
             {'text': str(i), 'src': 'src/img/icon.png'} for i in range(20)
         ]
@@ -45,7 +55,13 @@ class ArrangeWidget(Screen):
     def click(self):
         print(self.ids.output_img.source)
 
-class AnalysisWidget(Screen):
+class AnalyzeWidget(Screen):
+    pass
+
+class RootWidget(TabbedPanel):
+    pass
+
+class TabWidget(BoxLayout):
     pass
 
 class PickcellApp(App):
@@ -71,9 +87,9 @@ class PickcellApp(App):
         else:
             Window.size = (1280, 720)
             Builder.load_file('src/layouts/pc.kv')
-        self.set_widgets()
-        print('build')
-        return self.sm
+        return RootWidget()
+        #self.set_widgets()
+        #return self.sm
     
     def set_widgets(self):
         self.sm = ScreenManager(transition=NoTransition())

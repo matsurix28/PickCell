@@ -1,3 +1,22 @@
+<RootWidget>:
+    do_default_tab: False
+    TabbedPanelItem:
+        text: 'Detect'
+        id: detect
+        DetectWidget:
+    TabbedPanelItem:
+        text: 'Fv/Fm'
+        id: fvfm
+        FvFmWidget:
+    TabbedPanelItem:
+        text: 'Arrange'
+        id: arrange
+        ArrangeWidget:
+    TabbedPanelItem:
+        text: 'Analyze'
+        id: analyze
+        AnalyzeWidget:
+
 <DetectWidget>:
     BoxLayout:
         BoxLayout:
@@ -78,12 +97,13 @@
                     size_hint_y: None
                     height: button.texture_size[1] + 20
                     Button:
+                        id: next_btn
                         font_size: 25
                         text: 'Next'
                         size_hint_x: None
                         size_hint_y: None
                         size: self.texture_size
-                        on_release: root.manager.current = 'fvfm'
+                        on_release: app.root.switch_to(app.root.ids.fvfm)
 
 <FvFmWidget>:
     BoxLayout:
@@ -180,6 +200,7 @@
                         size_hint_x: None
                         size_hint_y: None
                         size: self.texture_size
+                        on_release: root.click()
                 BoxLayout:
                     AnchorLayout:
                         anchor_x: 'left'
@@ -296,7 +317,7 @@
                         size_hint: None, None
                         size: self.texture_size
     
-<AnalysisWidget>:
+<AnalyzeWidget>:
     BoxLayout:
         orientation: 'vertical'
         BoxLayout:
@@ -310,3 +331,9 @@
             rectangle: self.x+1, self.y+1, self.width-1, self.height-1
             dash_offset: 5
             dash_length: 3
+
+<TabWidget>:
+    orientation: 'vertical'
+    Label:
+        text: 'test text'
+
