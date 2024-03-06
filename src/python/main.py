@@ -18,52 +18,6 @@ ImagesMedia = None
 REQUEST_GALLERY = 1
 MediaStore_Images_Media_DATA = '_data'
 
-class DetectWidget(Screen):
-    def __init__(self, **kwargs):
-        super(DetectWidget, self).__init__(**kwargs)
-        self.d = None
-
-    def move_to_fvfm(self):
-        self.manager.current = "fvfm"
-
-    def run(self, img_path):
-        if self.d is None:
-            from detect import Detect
-            self.d = Detect()
-
-    def click(self):
-        pass
-        rw = App.get_running_app().root
-        rw.switch_to(rw.ids.fvfm)
-        
-
-class FvFmWidget(Screen):
-    def __init__(self, **kwargs):
-        super(FvFmWidget, self).__init__(**kwargs)
-        
-
-    def click(self):
-        self.ids.rv.data = [
-            {'text': str(i), 'src': 'src/img/icon.png'} for i in range(20)
-        ]
-
-
-class ArrangeWidget(Screen):
-    def __init__(self, **kwargs):
-        super(ArrangeWidget, self).__init__(**kwargs)
-
-    def click(self):
-        print(self.ids.output_img.source)
-
-class AnalyzeWidget(Screen):
-    pass
-
-class RootWidget(TabbedPanel):
-    pass
-
-class TabWidget(BoxLayout):
-    pass
-
 class PickcellApp(App):
     def build(self):
         if platform == 'android':
@@ -88,22 +42,37 @@ class PickcellApp(App):
             Window.size = (1280, 720)
             Builder.load_file('src/layouts/pc.kv')
         return RootWidget()
-        #self.set_widgets()
-        #return self.sm
-    
-    def set_widgets(self):
-        self.sm = ScreenManager(transition=NoTransition())
-        
-        self.sm.add_widget(ArrangeWidget(name='arrange'))
-        self.sm.add_widget(AnalysisWidget(name='analysis'))
-        self.sm.add_widget(DetectWidget(name='detect'))
-        self.sm.add_widget(FvFmWidget(name='fvfm'))
 
     def key_input(self, window, key, scancode, codepoint, modifier):
         if key == 27:
             return True
         else:
             return False
+
+class DetectWidget(BoxLayout):
+    def __init__(self, **kwargs):
+        super(DetectWidget, self).__init__(**kwargs)
+        self.d = None
+
+    def run(self, img_path):
+        if self.d is None:
+            from detect import Detect
+            self.d = Detect()
+
+class FvFmWidget(BoxLayout):
+    def __init__(self, **kwargs):
+        super(FvFmWidget, self).__init__(**kwargs)
+
+class ArrangeWidget(BoxLayout):
+    def __init__(self, **kwargs):
+        super(ArrangeWidget, self).__init__(**kwargs)
+
+class SplitColorWidget(BoxLayout):
+    def __init__(self, **kwargs):
+        super(SplitColorWidget, self).__init__(**kwargs)
+
+class RootWidget(TabbedPanel):
+    pass
 
 if __name__ == '__main__':
     PickcellApp().run()
