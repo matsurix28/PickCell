@@ -39,7 +39,7 @@ class PickcellApp(App):
             from android.permissions import Permission, request_permissions
             request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.MANAGE_DOCUMENTS])
         else:
-            Window.size = (1280, 720)
+            Window.size = (1280, 800)
             Builder.load_file('src/layouts/pc.kv')
         return RootWidget()
 
@@ -58,6 +58,9 @@ class DetectWidget(BoxLayout):
         if self.d is None:
             from detect import Detect
             self.d = Detect()
+
+    def set_default_value(self):
+        self.ids.thresh_slider.min
 
 class FvFmWidget(BoxLayout):
     def __init__(self, **kwargs):

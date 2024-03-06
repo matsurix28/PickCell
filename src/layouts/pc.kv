@@ -1,16 +1,61 @@
-#:set btn_size 40
+#:set std_height 40
+
+# Custom class ------------------------------
+<AnchorLayout>:
+    size_hint_y: None
+    height: std_height
 
 <Button>:
     font_size: 20
     size_hint: None, None
     width: self.texture_size[0] + 20
-    height: btn_size
+    height: std_height
+
+<InnerBox@BoxLayout>:
+    spacing: 10
+    size_hint_y: None
+    height: self.minimum_height
+
+<Label>:
+    size_hint_y: None
+    height: self.texture_size[1] + 10
+    font_size: 20
+
+<TextInput>:
+    font_size: 20
+    multiline: False
+    line_height: 1
+    size_hint: None, None
+    height: std_height
+    valign: 'center'
+    halign: 'center'
+
+<ScrollVIew>:
+    bar_width: 10
+    scroll_type: ['bars', 'content']
+
+<RVBox@BoxLayout>:
+    text: ''
+    src: ''
+    Image:
+        source: root.src
+    Label:
+        text: root.text
 
 <Sentence@Label>:
-    font_size: 25
+    font_size: 22
     text_size: self.width, None
     size_hint_y: None
-    height: self.texture_size[1]
+    height: self.texture_size[1] + 10
+
+<Space@Label>:
+    size_hint_y: None
+    height: 15
+    text: ''
+    canvas.after:
+        Line:
+            points: self.x, self.y + self.height / 2, self.x + self.width, self.y + self.height / 2   
+# --------------------------------------------
 
 <RootWidget>:
     do_default_tab: False
@@ -33,86 +78,75 @@
         SplitColorWidget:
 
 <DetectWidget>:
-    BoxLayout:  # Image frame
-        size_hint_x: 0.5
+    padding: 10
+    spacing: 20
+    InnerBox:  # Image frame
+        size_hint: 0.5, 1
         orientation: 'vertical'
-        BoxLayout:  # Input label frame
-            size_hint_y: 0.1
-            Label:
-                text: 'Input image'
-                size_hint_x: 0.9
-            Button:
-                text: '▼'
-                size_hint_x: 0.1
-        Label:
+        Image:  # Input image
             size_hint_y: 0.5
-        Label:
+        Image:  # Change arrow
             size_hint_y: 0.1
-        Label:
+        Image:  # Output image
             size_hint_y: 0.5
-    BoxLayout:    # Method frame
-        id: box2
-        size_hint_x: 0.5
+    InnerBox:  # Method frame
+        padding: 10, 0, 10, 10
+        size_hint: 0.5, 1
         orientation: 'vertical'
-        spacing: 10
-        padding: 10
-        Label:
-            font_size: 28
+        canvas.after:
+            Color:
+                rgba: 1,1,1,1
+            Line:
+                rectangle: self.x-2, self.y-2, self.width+2, self.height+2
+                width: 2
+        Label:  # Method title label
+            font_size: 25
             text: 'Method'
-            size_hint_y: None
-            height: self.texture_size[1]
-        Sentence:
-            text: 'Detects contours from an image. If it does not work well, adjust the threshold value. (Threshold range is 0-255)'
-            #text_size: self.width, None
-            #size_hint_y: None
-            #height: self.texture_size[1]
-            #font_size: 25
-        Image:
-            size_hint_y: 0.3
-        BoxLayout:
-            orientation: 'vertical'
-            Label:
-                font_size: 25
-                text: 'Threshold'
-                size_hint_y:None
-                height: self.texture_size[1]
-            Image:
-                size_hint_y:1
-            BoxLayout:
-                size_hint_y: None
-                height: button.texture_size[1]
-                Slider:
+        ScrollView:  # Method area
+            InnerBox:
+                orientation: 'vertical'
+                Sentence:
+                    text: 'Detects contours from an image.'
+                Image:
+                    height: 200
                     size_hint_y: None
-                    height: button.texture_size[1]
-                Button:
-                    font_size: 25
-                    text: 'Reset'
-                    size_hint_x: None
-                    size_hint_y: None
-                    size: self.texture_size
-            AnchorLayout:
-                anchor_x: 'center'
-                size_hint_y: None
-                height: button.texture_size[1] + 20
-                Button:
-                    id: button
-                    #font_size: 25
-                    text: 'RUN'
-                    #size_hint_x: None
-                    #size_hint_y: None
-                    #size: self.texture_size
-            AnchorLayout:
-                anchor_x: 'right'
-                size_hint_y: None
-                height: button.texture_size[1] + 20
-                Button:
-                    id: next_btn
-                    font_size: 25
-                    text: 'Next'
-                    size_hint_x: None
-                    size_hint_y: None
-                    size: self.texture_size
-                    on_release: app.root.switch_to(app.root.ids.fvfm)
+                Space:
+                InnerBox:  # Step 1 Input
+                    Sentence:
+                        text: 'Step 1. Select leaf image'
+                    Button:
+                        text: 'Select'
+                Space:
+                InnerBox:  # Step 2 Threshold
+                    orientation: 'vertical'
+                    Sentence:
+                        text: 'Step 2. Set threshold for extract'
+                    Image:
+                        size_hint_y: None
+                        height: 50
+                    InnerBox:
+                        Button:
+                            text: 'Reset'
+                        Slider:
+                            id: thresh_slider
+                            size_hint_y: None
+                            height: std_height
+                            min: 0
+                            max: 255
+                            step: 1
+                        TextInput:
+                Space:
+                InnerBox:  # Step 3 Run
+                    Sentence:
+                        text: 'Step 3. Extract leaf.'
+                    Button:
+                        text: 'RUN'
+                Space:
+                AnchorLayout:  # Next button
+                    anchor_x: 'right'
+                    Button:
+                        text: 'Next->'
+                        on_release: app.root.switch_to(app.root.ids.fvfm)         
 
 <FvFmWidget>:
     BoxLayout:
@@ -236,13 +270,7 @@
                 
 
 
-<RVBox@BoxLayout>:
-    text: ''
-    src: ''
-    Image:
-        source: root.src
-    Label:
-        text: root.text
+
         
 <ArrangeWidget>:
     BoxLayout:
@@ -328,13 +356,13 @@
     orientation: 'vertical'
     BoxLayout:
 
-<Widget>:
-    canvas.after:
-        Color:
-            rgba: 1,0,1,1
-        Line:
-            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
-            dash_offset: 5
-            dash_length: 3
+#<Widget>:
+#    canvas.after:
+#        Color:
+#            rgba: 1,0,1,1
+#        Line:
+#            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+#            dash_offset: 5
+#            dash_length: 3
 
 

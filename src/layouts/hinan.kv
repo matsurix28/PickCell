@@ -1,0 +1,110 @@
+BoxLayout:
+        BoxLayout:    # Image area
+            size_hint_x: 0.8
+            orientation: 'vertical'
+            BoxLayout:    # Leaf image area
+                size_hint_y: 0.5
+                BoxLayout:    # Input leaf image area
+                    size_hint_x: 0.45
+                    orientation: 'vertical'
+                    BoxLayout:    # Input label area
+                        size_hint_y: None
+                        height: self.minimum_height
+                        Label:
+                            text: ''
+                            font_size: 20
+                        Button:
+                            id: button
+                            text: 'sel'
+                            font_size: 20
+                            size_hint: None, None
+                            size: self.texture_size[0] + 20, self.texture_size[1] + 20
+                    Image:    # Input image
+                        source: ''
+                AnchorLayout:    # Leaf arrow
+                    size_hint_x: 0.1
+                    Label:    # Arrow
+                        size_hint: 1, None
+                        height: self.texture_size[1]
+                        font_size: 20
+                        text: '->'                
+                BoxLayout:    # Output leaf image area
+                    size_hint_x: 0.45
+                    orientation: 'vertical'
+                    Label:
+                        text: ''
+                        font_size: 20
+                        size_hint_y: None
+                        height: button.height
+                    Image:    # Output image
+                        id: output_img
+                        source: '/workspace/pickcell/src/img/icon.png'
+            BoxLayout:    # FvFm image area
+                size_hint_y: 0.5
+                BoxLayout:    # Input leaf image area
+                    size_hint_x: 0.45
+                    orientation: 'vertical'
+                    BoxLayout:    # Input label area
+                        size_hint_y: None
+                        height: self.minimum_height
+                        Label:
+                            text: ''
+                            font_size: 20
+                        Button:
+                            id: btn
+                            text: 'sel'
+                            font_size: 20
+                            size_hint: None, None
+                            size: self.texture_size[0] + 20, self.texture_size[1] + 20
+                    Image:    # Input image
+                        source: ''
+                AnchorLayout:    # Leaf arrow
+                    size_hint_x: 0.1
+                    Label:    # Arrow
+                        size_hint: 1, None
+                        height: self.texture_size[1]
+                        font_size: 20
+                        text: '->'                
+                BoxLayout:    # Output leaf image area
+                    size_hint_x: 0.45
+                    orientation: 'vertical'
+                    Label:
+                        text: ''
+                        font_size: 20
+                        size_hint_y: None
+                        height: button.height
+                    Image:    # Output image
+                        source: ''
+        BoxLayout:    # Method area
+            size_hint_x: 0.2
+            orientation: 'vertical'
+            Label:    # Method title
+                font_size: 28
+                text: 'Method'
+                size_hint_y: None
+                size: self.texture_size
+            Label:    # Explanation
+                font_size: 25
+                text: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+                text_size: self.width, None
+            Image:
+                source: ''
+            AnchorLayout:
+                anchor_x: 'center'
+                size_hint_y: None
+                height: button.height + 20
+                Button:
+                    text: 'RUN'
+                    font_size: 25
+                    size_hint: None,None
+                    size: self.texture_size
+            AnchorLayout:
+                anchor_x: 'right'
+                size_hint_y: None
+                height: button.height + 20
+                Button:
+                    text: 'Next'
+                    font_size: 25
+                    size_hint: None, None
+                    size: self.texture_size
+                    on_release: root.manager.current = 'analysis'
