@@ -1,3 +1,4 @@
+import os
 from os.path import expanduser
 
 from kivy import platform
@@ -13,6 +14,10 @@ from kivy.uix.screenmanager import NoTransition, Screen, ScreenManager
 from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.uix.widget import Widget
 
+src_dir = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        '../'))
 currentActivity = None
 CLS_Activity = None
 CLS_Intent = None
@@ -43,7 +48,7 @@ class PickcellApp(App):
             request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.MANAGE_DOCUMENTS])
         else:
             Window.size = (1280, 800)
-            Builder.load_file('/workspaces/pickcell/src/layouts/pc.kv')
+            Builder.load_file(src_dir + '/layouts/pc.kv')
             self.home_dir = expanduser('~')
         return Root()
 
@@ -56,6 +61,7 @@ class PickcellApp(App):
 class DetectWidget(BoxLayout):
     def __init__(self, **kwargs):
         super(DetectWidget, self).__init__(**kwargs)
+        self.src_dir = src_dir
         self.d = None
 
     def run(self, img_path):
