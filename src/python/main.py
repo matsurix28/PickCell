@@ -27,16 +27,10 @@ ImagesMedia = None
 REQUEST_GALLERY = 1
 MediaStore_Images_Media_DATA = '_data'
 
-class MyFileChooser(FileChooserIconView):
-    def on_submit(self, selected, touch=None):
-        print(selected[0])
-
-    def gebo(self, file):
-        print(file[0])
-
 class FileDialogPopup(Popup):
-    hiraku = ObjectProperty(None)
-
+    select = ObjectProperty(None)
+    cancel = ObjectProperty(None)
+    
 class PickcellApp(App):
     def build(self):
         if platform == 'android':
@@ -83,8 +77,11 @@ class DetectWidget(BoxLayout):
     def set_default_value(self):
         self.ids.thresh_slider.min
 
-    def gebo(self, file):
+    def input_img(self, file):
         print('Koreha Detect', file[0])
+    
+    def cancel(self):
+        pass
 
 class FvFmWidget(BoxLayout):
     def __init__(self, **kwargs):
