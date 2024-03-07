@@ -5,6 +5,7 @@ from kivy.graphics.texture import Texture
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.filechooser import FileChooserListView
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.screenmanager import NoTransition, Screen, ScreenManager
 from kivy.uix.tabbedpanel import TabbedPanel

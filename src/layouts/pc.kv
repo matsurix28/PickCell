@@ -1,6 +1,7 @@
+#:import Factory kivy.factory.Factory
 #:set std_height 40
 
-# Custom class ------------------------------
+# Basic custom class ------------------------------
 <AnchorLayout>:
     size_hint_y: None
     height: std_height
@@ -32,7 +33,7 @@
 
 <ScrollVIew>:
     bar_width: 10
-    scroll_type: ['bars', 'content']
+    scroll_type: ['bars']
 
 <RVBox@BoxLayout>:
     text: ''
@@ -77,6 +78,24 @@
         id: split_color
         SplitColorWidget:
 
+<FileDialogPopup@Popup>:
+    size_hint: None, None
+    size: app.root.size
+    width: app.root.width - 50
+    height: app.root.height - 50
+    BoxLayout:
+        orientation: 'vertical'
+        FileChooserIconView:
+            id: filechooser
+            path: './'
+        BoxLayout:
+            size_hint_y: None
+            height: self.minimum_height
+            Button:
+                text: 'Cancel'
+            Button:
+                text: 'OK'
+
 <DetectWidget>:
     padding: 10
     spacing: 20
@@ -116,6 +135,7 @@
                         text: 'Step 1. Select leaf image'
                     Button:
                         text: 'Select'
+                        on_release: Factory.FileDialogPopup().open()
                 Space:
                 InnerBox:  # Step 2 Threshold
                     orientation: 'vertical'
