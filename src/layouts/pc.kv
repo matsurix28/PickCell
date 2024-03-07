@@ -1,5 +1,9 @@
 #:import Factory kivy.factory.Factory
+
 #:set std_height 40
+#:set default_thresh 60
+#:set ext ['jpg', 'jpeg', 'png', 'tiff', 'bmp']
+#:set ext sum([['*.' + i.lower(), '*.' + i.upper()] for i in ext], [])
 
 # Basic custom class ------------------------------
 <AnchorLayout>:
@@ -59,31 +63,31 @@
 # --------------------------------------------
 
 <Root>:
-    TabbedPanel:
-        do_default_tab: False
-        tab_width: 120
-        TabbedPanelItem:
-            text: 'Detect'
-            id: detect
-            DetectWidget:
-        TabbedPanelItem:
-            text: 'Fv/Fm'
-            id: fvfm
-            FvFmWidget:
-        TabbedPanelItem:
-            text: 'Arrange'
-            id: arrange
-            ArrangeWidget:
-        TabbedPanelItem:
-            text: 'Split Color'
-            id: split_color
-            SplitColorWidget:
+    do_default_tab: False
+    tab_width: 120
+    TabbedPanelItem:
+        text: 'Detect'
+        id: detect
+        DetectWidget:
+    TabbedPanelItem:
+        text: 'Fv/Fm'
+        id: fvfm
+        FvFmWidget:
+    TabbedPanelItem:
+        text: 'Arrange'
+        id: arrange
+        ArrangeWidget:
+    TabbedPanelItem:
+        text: 'Split Color'
+        id: split_color
+        SplitColorWidget:
 
 <FileDialogPopup>:
     size_hint: 0.8, 0.8
     FileChooserIconView:
         id: filechooser
         path: app.home_dir
+        filters: ext
         on_submit: 
             root.select(self.selection)
             root.dismiss()
@@ -103,6 +107,16 @@
                         root.select(filechooser.selection)
                         root.dismiss()
 
+<ErrorPopup>:
+    size_hint: 0.4, 0.4
+    separator_height: 0
+    title: ''
+    BoxLayout:
+        height: self.minimum_height + 40
+        orientation: 'vertical'
+        Sentence:
+            id: err_msg
+
 <DetectWidget>:
     padding: 10
     spacing: 20
@@ -110,10 +124,12 @@
         size_hint: 0.5, 1
         orientation: 'vertical'
         Image:  # Input image
+            id: input_img
             size_hint_y: 0.5
         Image:  # Change arrow
             size_hint_y: 0.1
         Image:  # Output image
+            id: output_img
             size_hint_y: 0.5
     InnerBox:  # Method frame
         padding: 10, 0, 10, 10
@@ -155,20 +171,29 @@
                     InnerBox:
                         Button:
                             text: 'Reset'
+                            on_release: thresh_slider.value = default_thresh
                         Slider:
                             id: thresh_slider
                             size_hint_y: None
                             height: std_height
-                            min: 0
-                            max: 255
+                            range: 0, 255
                             step: 1
+                            value: default_thresh
                         TextInput:
+                            text: '{:.0f}'.format(thresh_slider.value)
+                            input_filter: 'int'
+                            on_text_validate: 
+                                if self.text == '': self.text = '0'
+                                elif int(self.text) > 255: self.text = '255'
+                                elif int(self.text) < 0: self.text = '0'
+                                thresh_slider.value = int(self.text)
                 Space:
                 InnerBox:  # Step 3 Run
                     Sentence:
                         text: 'Step 3. Extract leaf.'
                     Button:
                         text: 'RUN'
+                        on_press: root.run()
                 Space:
                 AnchorLayout:  # Next button
                     anchor_x: 'right'
