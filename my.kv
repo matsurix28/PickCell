@@ -1,0 +1,56 @@
+# Basic custom class ------------------------------
+<AnchorLayout>:
+    size_hint_y: None
+    height: std_height
+
+<Button>:
+    font_size: 20
+    size_hint: None, None
+    width: self.texture_size[0] + 20
+    height: std_height
+
+<InnerBox@BoxLayout>:
+    spacing: 10
+    size_hint_y: None
+    height: self.minimum_height
+
+<Label>:
+    size_hint_y: None
+    height: self.texture_size[1] + 10
+    font_size: 20
+
+<TextInput>:
+    font_size: 20
+    multiline: False
+    line_height: 1
+    size_hint: None, None
+    height: std_height
+    valign: 'center'
+    halign: 'center'
+
+<ScrollVIew>:
+    bar_width: 10
+    scroll_type: ['bars']
+
+<RVBox@BoxLayout>:
+    text: ''
+    src: ''
+    Image:
+        source: root.src
+    Label:
+        text: root.text
+
+<Sentence@Label>:
+    font_size: 22
+    text_size: self.width, None
+    size_hint_y: None
+    height: self.texture_size[1] + 10
+
+<Space@Label>:
+    size_hint_y: None
+    height: 15
+    text: ''
+    canvas.after:
+        Line:
+            points: self.x, self.y + self.height / 2, self.x + self.width, self.y + self.height / 2   
+# --------------------------------------------

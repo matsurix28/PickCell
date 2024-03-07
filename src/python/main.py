@@ -42,7 +42,7 @@ class PickcellApp(App):
         else:
             Window.size = (1280, 800)
             Builder.load_file('src/layouts/pc.kv')
-        return RootWidget()
+        return Root()
 
     def key_input(self, window, key, scancode, codepoint, modifier):
         if key == 27:
@@ -75,7 +75,7 @@ class SplitColorWidget(BoxLayout):
     def __init__(self, **kwargs):
         super(SplitColorWidget, self).__init__(**kwargs)
 
-class RootWidget(TabbedPanel):
+class Root(BoxLayout):
     pass
 
 if __name__ == '__main__':

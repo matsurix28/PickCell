@@ -17,7 +17,7 @@
     size_hint_y: None
     height: self.minimum_height
 
-<Label>:
+<Word@Label>:
     size_hint_y: None
     height: self.texture_size[1] + 10
     font_size: 20
@@ -40,7 +40,7 @@
     src: ''
     Image:
         source: root.src
-    Label:
+    Word:
         text: root.text
 
 <Sentence@Label>:
@@ -58,36 +58,32 @@
             points: self.x, self.y + self.height / 2, self.x + self.width, self.y + self.height / 2   
 # --------------------------------------------
 
-<RootWidget>:
-    do_default_tab: False
-    tab_width: 120
-    TabbedPanelItem:
-        text: 'Detect'
-        id: detect
-        DetectWidget:
-    TabbedPanelItem:
-        text: 'Fv/Fm'
-        id: fvfm
-        FvFmWidget:
-    TabbedPanelItem:
-        text: 'Arrange'
-        id: arrange
-        ArrangeWidget:
-    TabbedPanelItem:
-        text: 'Split Color'
-        id: split_color
-        SplitColorWidget:
+<Root>:
+    TabbedPanel:
+        do_default_tab: False
+        tab_width: 120
+        TabbedPanelItem:
+            text: 'Detect'
+            id: detect
+            DetectWidget:
+        TabbedPanelItem:
+            text: 'Fv/Fm'
+            id: fvfm
+            FvFmWidget:
+        TabbedPanelItem:
+            text: 'Arrange'
+            id: arrange
+            ArrangeWidget:
+        TabbedPanelItem:
+            text: 'Split Color'
+            id: split_color
+            SplitColorWidget:
 
 <FileDialogPopup@Popup>:
-    size_hint: None, None
-    size: app.root.size
-    width: app.root.width - 50
-    height: app.root.height - 50
-    BoxLayout:
-        orientation: 'vertical'
-        FileChooserIconView:
-            id: filechooser
-            path: './'
+    size_hint: 0.8, 0.8
+    FileChooserListView:
+        id: filechooser
+        path: '/workspaces/pickcell'
         AnchorLayout:
             size_hint_y: None
             height: std_height
@@ -119,7 +115,7 @@
             Line:
                 rectangle: self.x-2, self.y-2, self.width+2, self.height+2
                 width: 2
-        Label:  # Method title label
+        Word:  # Method title label
             font_size: 25
             text: 'Method'
         ScrollView:  # Method area
@@ -175,22 +171,22 @@
         orientation: 'vertical'
         BoxLayout:
             size_hint_y: 0.1
-            Label:
+            Word:
                 text: 'Input image'
                 size_hint_x: 0.9
             Button:
                 text: '▼'
                 size_hint_x: 0.1
-        Label:
+        Word:
             size_hint_y: 0.5
-        Label:
+        Word:
             size_hint_y: 0.1
-        Label:
+        Word:
             size_hint_y: 0.5
     BoxLayout:
         size_hint_x: 0.2
         orientation: 'vertical'
-        Label:
+        Word:
             font_size: 25
             text: 'Fv/Fm value list'
             size_hint_y: None
@@ -213,7 +209,7 @@
         orientation: 'vertical'
         spacing: 10
         padding: 10
-        Label:
+        Word:
             font_size: 28
             text: 'Method'
             size_hint_y: None
@@ -223,7 +219,7 @@
             size_hint_y: None
             height: self.texture_size[1]
             text: 'erabe'
-        Label:
+        Word:
             text: 'Detects contours from an image. If it does not work well, adjust the threshold value. (Threshold range is 0-255)'
             text_size: self.width, None
             size_hint_y: None
@@ -233,7 +229,7 @@
             size_hint_y: 0.3
         BoxLayout:
             orientation: 'vertical'
-            Label:
+            Word:
                 font_size: 25
                 text: 'Threshold'
                 size_hint_y:None
@@ -298,13 +294,13 @@
         size_hint_x: 0.35
         orientation: 'vertical'
         padding: 20, 20,20,20
-        Label:
+        Word:
             font_size: 28
             text: 'Leaf'
             size_hint_y: None
             height: self.texture_size[1]
         Image:
-        Label:
+        Word:
             font_size: 20
             text: 'v'
             size_hint_y: None
@@ -314,13 +310,13 @@
         size_hint_x: 0.35
         orientation: 'vertical'
         padding: 20, 20,20,20
-        Label:
+        Word:
             font_size: 28
             text: 'FvFm'
             size_hint_y: None
             height: self.texture_size[1]
         Image:
-        Label:
+        Word:
             font_size: 20
             text: 'v'
             size_hint_y: None
@@ -329,12 +325,12 @@
     BoxLayout:    # Method frame
         size_hint_x: 0.3
         orientation: 'vertical'
-        Label:
+        Word:
             font_size: 28
             text: 'Method'
             size_hint_y: None
             height: self.texture_size[1]
-        Label:
+        Word:
             font_size: 25
             text: 'setumeiiiiiiiiiiiiiiiiiiiiiiiiisurushfiashegihaifhaiefhaidbfuefhigagnahgiegkskdghiehgoslkdhhfieogkhoasgoieghoasfkiiiiiiiiiiii'
             text_size: self.width, None
