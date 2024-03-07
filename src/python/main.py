@@ -1,3 +1,5 @@
+from os.path import expanduser
+
 from kivy import platform
 from kivy.app import App
 from kivy.core.window import Window
@@ -5,7 +7,7 @@ from kivy.graphics.texture import Texture
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.filechooser import FileChooserListView
+from kivy.uix.filechooser import FileChooser
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.screenmanager import NoTransition, Screen, ScreenManager
 from kivy.uix.tabbedpanel import TabbedPanel
@@ -41,7 +43,8 @@ class PickcellApp(App):
             request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.MANAGE_DOCUMENTS])
         else:
             Window.size = (1280, 800)
-            Builder.load_file('src/layouts/pc.kv')
+            Builder.load_file('/workspaces/pickcell/src/layouts/pc.kv')
+            self.home_dir = expanduser('~')
         return Root()
 
     def key_input(self, window, key, scancode, codepoint, modifier):

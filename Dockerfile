@@ -18,6 +18,8 @@ RUN apt-get update && apt-get upgrade -y \
     libffi-dev \
     libssl-dev \
     libmtdev-dev \
+    xclip \
+    xsel \
     && pip install --upgrade pip \
     && pip install --user --upgrade \
     opencv-python \
