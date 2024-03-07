@@ -88,9 +88,10 @@
         FileChooserIconView:
             id: filechooser
             path: './'
-        BoxLayout:
+        AnchorLayout:
             size_hint_y: None
-            height: self.minimum_height
+            height: std_height
+            anchor_x: 'right'
             Button:
                 text: 'Cancel'
             Button:
