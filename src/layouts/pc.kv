@@ -79,11 +79,14 @@
             id: split_color
             SplitColorWidget:
 
-<FileDialogPopup@Popup>:
+<FileDialogPopup>:
     size_hint: 0.8, 0.8
-    MyFileChooser:
+    FileChooserIconView:
         id: filechooser
         path: app.home_dir
+        on_submit: 
+            root.select(self.selection)
+            root.dismiss()
         AnchorLayout:
             anchor_x: 'right'
             InnerBox:
@@ -91,10 +94,13 @@
                 width: self.minimum_width
                 Button:
                     text: 'Cancel'
+                    on_release: 
+                        root.cancel()
+                        root.dismiss()
                 Button:
                     text: 'OK'
-                    on_release: 
-                        root.hiraku(filechooser.selection) 
+                    on_release:
+                        root.select(filechooser.selection)
                         root.dismiss()
 
 <DetectWidget>:
@@ -137,7 +143,7 @@
                         text: 'Step 1. Select leaf image'
                     Button:
                         text: 'Select'
-                        on_release: Factory.FileDialogPopup(hiraku=root.gebo).open()
+                        on_release: Factory.FileDialogPopup(select=root.input_img, cancel=root.cancel).open()
                 Space:
                 InnerBox:  # Step 2 Threshold
                     orientation: 'vertical'
