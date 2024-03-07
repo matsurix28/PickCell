@@ -81,17 +81,21 @@
 
 <FileDialogPopup@Popup>:
     size_hint: 0.8, 0.8
-    FileChooserIconView:
-        id: FileChooserIconView
+    MyFileChooser:
+        id: filechooser
         path: app.home_dir
         AnchorLayout:
-            size_hint_y: None
-            height: std_height
             anchor_x: 'right'
-            Button:
-                text: 'Cancel'
-            Button:
-                text: 'OK'
+            InnerBox:
+                size_hint_x: None
+                width: self.minimum_width
+                Button:
+                    text: 'Cancel'
+                Button:
+                    text: 'OK'
+                    on_release: 
+                        root.hiraku(filechooser.selection) 
+                        root.dismiss()
 
 <DetectWidget>:
     padding: 10
@@ -133,7 +137,7 @@
                         text: 'Step 1. Select leaf image'
                     Button:
                         text: 'Select'
-                        on_release: Factory.FileDialogPopup().open()
+                        on_release: Factory.FileDialogPopup(hiraku=root.gebo).open()
                 Space:
                 InnerBox:  # Step 2 Threshold
                     orientation: 'vertical'
@@ -374,13 +378,13 @@
     orientation: 'vertical'
     BoxLayout:
 
-#<Widget>:
-#    canvas.after:
-#        Color:
-#            rgba: 1,0,1,1
-#        Line:
-#            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
-#            dash_offset: 5
-#            dash_length: 3
+<Widget>:
+    canvas.after:
+        Color:
+            rgba: 1,0,1,1
+        Line:
+            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+            dash_offset: 5
+            dash_length: 3
 
 

@@ -8,7 +8,8 @@ from kivy.graphics.texture import Texture
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.filechooser import FileChooser
+from kivy.uix.filechooser import FileChooserIconView
+from kivy.uix.popup import Popup
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.screenmanager import NoTransition, Screen, ScreenManager
 from kivy.uix.tabbedpanel import TabbedPanel
@@ -25,6 +26,16 @@ ImagesMedia = None
 
 REQUEST_GALLERY = 1
 MediaStore_Images_Media_DATA = '_data'
+
+class MyFileChooser(FileChooserIconView):
+    def on_submit(self, selected, touch=None):
+        print(selected[0])
+
+    def gebo(self, file):
+        print(file[0])
+
+class FileDialogPopup(Popup):
+    hiraku = ObjectProperty(None)
 
 class PickcellApp(App):
     def build(self):
@@ -71,6 +82,9 @@ class DetectWidget(BoxLayout):
 
     def set_default_value(self):
         self.ids.thresh_slider.min
+
+    def gebo(self, file):
+        print('Koreha Detect', file[0])
 
 class FvFmWidget(BoxLayout):
     def __init__(self, **kwargs):
