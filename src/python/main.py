@@ -31,6 +31,27 @@ class FileDialogPopup(Popup):
 
 class ErrorPopup(Popup):
     pass
+
+class MyBoxLayout(BoxLayout):
+    def __init__(self, **kwargs):
+        self.src_dir = src_dir
+        self.input_path = None
+
+    def input_img(self, file):
+        if file != []:
+            self.ids.input_img.source = file[0]
+            self.input_path = file[0]
+
+    def cv2_to_texture(self, cv2_img):
+        texture = Texture.create(size=(cv2_img.shape[1], cv2_img.shape[0]), colorfmt='bgr', bufferfmt='ubyte')
+        texture.blit_buffer(cv2_img.tostring(), colorfmt='bgr', bufferfmt='ubyte')
+        texture.flipvertical()
+        return texture
+
+    def error_popup(self, message):
+        popup = ErrorPopup()
+        popup.ids.err_msg.text = message
+        popup.open()
     
 class PickcellApp(App):
     leaf_img = None
@@ -74,9 +95,9 @@ class PickcellApp(App):
         else:
             return False
 
-class DetectWidget(BoxLayout):
+class DetectWidget(MyBoxLayout):
     def __init__(self, **kwargs):
-        super(DetectWidget, self).__init__(**kwargs)
+        BoxLayout(DetectWidget, self).__init__(**kwargs)
         self.src_dir = src_dir
         self.d = None
         self.input_path = None
@@ -101,27 +122,11 @@ class DetectWidget(BoxLayout):
             app.leaf_img = output_img
             app.leaf_obj = main_obj
         except Exception as e:
-            self.err_pop(e)
+            self.error_popup(e)
             print(e)
-
-    def input_img(self, file):
-        if file != []:
-            self.ids.input_img.source = file[0]
-            self.input_path = file[0]
-
-    def cv2_to_texture(self, cv2_img):
-        texture = Texture.create(size=(cv2_img.shape[1], cv2_img.shape[0]), colorfmt='bgr', bufferfmt='ubyte')
-        texture.blit_buffer(cv2_img.tostring(), colorfmt='bgr', bufferfmt='ubyte')
-        texture.flip_vertical()
-        return texture
     
     def cancel(self):
         pass
-
-    def err_pop(self, msg):
-        popup = ErrorPopup()
-        popup.ids.err_msg.text = msg
-        popup.open()
 
 class FvFmWidget(BoxLayout):
     def __init__(self, **kwargs):
