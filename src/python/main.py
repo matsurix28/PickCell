@@ -1,9 +1,11 @@
 import os
+import threading
 from os.path import expanduser
 
 import cv2
 import numpy as np
 import range_slider
+from detect import Detect
 from kivy import platform
 from kivy.app import App
 from kivy.clock import Clock
@@ -115,29 +117,35 @@ class DetectWidget(MyBoxLayout):
         self.d = None
         self.input_path = None
         Clock.schedule_once(self.set_default, 1.2)
+        self.app = App.get_running_app()
 
     def run(self):
-        app = App.get_running_app()
         if self.input_path is None:
             self.show_error_popup('Select leaf image.')
             return
         
-        if self.d is None:
-            from detect import Detect
-            self.d = Detect()
+        #if self.d is None:
+        #    self.d = Detect()
+        
+        
+        thread = threading.Thread(target=self.detect)
+        thread.start()
+
+    def detect(self):
+        print(self.input_path)
+        d = Detect()
         thr = self.ids.thresh_slider.value
-        print(thr)
-        self.d.set_param(bin_thr=thr)
+        d.set_param(bin_thr=thr)
+        
         try:
-            output_img, main_obj = self.d.extr_leaf(self.input_path)
+            output_img, main_obj = d.extr_leaf(self.input_path)
             out_texture = self.cv2_to_texture(output_img)
-            #self.ids.output_img.texture = out_texture
-            app.leaf_texture = out_texture
-            app.leaf_img = output_img
-            app.leaf_obj = main_obj
+            self.app.leaf_texture = out_texture
+            self.app.leaf_img = output_img
+            self.app.leaf_obj = main_obj
         except (ValueError, TypeError) as e:
             self.show_error_popup(str(e))
-            print(e)
+        print('owari')
 
     def set_default(self, dt):
         print('set default')
