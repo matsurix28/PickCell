@@ -1,6 +1,7 @@
 import os
 from os.path import expanduser
 
+import numpy as np
 from kivy import platform
 from kivy.app import App
 from kivy.core.window import Window
@@ -31,6 +32,10 @@ class ErrorPopup(Popup):
     pass
     
 class PickcellApp(App):
+    leaf_img = ObjectProperty(None)
+    fvfm_img = ObjectProperty(None)
+    leaf_obj = ObjectProperty(None)
+    fvfm_obj = ObjectProperty(None)
     def build(self):
         if platform == 'android':
             Window.fullscreen = 'auto'
@@ -84,6 +89,7 @@ class DetectWidget(BoxLayout):
             self.output_img, self.main_obj = self.d.extr_leaf(self.input_path)
             out_texture = self.cv2_to_texture(self.output_img)
             self.ids.output_img.texture = out_texture
+            App.get_running_app().leaf_img = out_texture
         except Exception as e:
             self.err_pop(e)
             print(e)
@@ -104,12 +110,67 @@ class DetectWidget(BoxLayout):
 
     def err_pop(self, msg):
         popup = ErrorPopup()
-        popup.ids.err_msg = msg
+        popup.ids.err_msg.text = msg
         popup.open()
 
 class FvFmWidget(BoxLayout):
     def __init__(self, **kwargs):
         super(FvFmWidget, self).__init__(**kwargs)
+        self.src_dir = src_dir
+        self.f = None
+        self.d = None
+        self.input_path = None
+
+    def run(self):
+        if self.input_path is None:
+            self.err_pop('Select Fv/Fm result image.')
+            return
+        if self.f is None:
+            from fvfm import Fvfm
+            self.f = Fvfm()
+        if self.d is None:
+            from detect import Detect
+            self.d = Detect()
+        thr = self.ids.thresh_slider.value
+        self.d.set_param(bin_thr=thr)
+        try:
+            self.output_img, self.main_obj = self.d.extr_leaf(self.input_path)
+            out_texture = self.cv2_to_texture(self.output_img)
+            self.ids.output_img.texture = out_texture
+            App.get_running_app().leaf_img = out_texture
+            self.fvfm_list = self.f.get(self.input_path)
+            self.show_fvfm_list(self.fvfm_list)
+        except Exception as e:
+            self.err_pop(e)
+
+    def input_img(self, file):
+        if file != []:
+            self.ids.input_img.source = file[0]
+            self.input_path = file[0]
+
+    def cv2_to_texture(self, cv2_img):
+        texture = Texture.create(size=(cv2_img.shape[1], cv2_img.shape[0]), colorfmt='bgr', bufferfmt='ubyte')
+        texture.blit_buffer(cv2_img.tostring(), colorfmt='bgr', bufferfmt='ubyte')
+        texture.flip_vertical()
+        return texture
+
+    def cancel(self):
+        pass
+
+    def err_pop(self, msg):
+        popup = ErrorPopup()
+        popup.ids.err_msg.text = msg
+        popup.open()
+
+    def show_fvfm_list(self, fvfm_list=None):
+        for f in fvfm_list:
+            color = f[0]
+            img = np.full((36,36,3), color, np.uint8)
+            texture = self.cv2_to_texture(img)
+            self.ids.rv.data.append({
+                'texture': texture,
+                'text': str(f[1])
+            })
 
 class ArrangeWidget(BoxLayout):
     def __init__(self, **kwargs):

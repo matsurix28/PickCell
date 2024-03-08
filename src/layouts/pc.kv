@@ -41,9 +41,9 @@
 
 <RVBox@BoxLayout>:
     text: ''
-    src: ''
+    texture: None
     Image:
-        source: root.src
+        texture: root.texture
     Word:
         text: root.text
 
@@ -107,15 +107,25 @@
                         root.select(filechooser.selection)
                         root.dismiss()
 
-<ErrorPopup>:
+<ErrorPopup@Popup>:
     size_hint: 0.4, 0.4
     separator_height: 0
     title: ''
     BoxLayout:
         height: self.minimum_height + 40
         orientation: 'vertical'
+        padding: 10
+        Word:
+            text: 'Error'
         Sentence:
-            id: err_msg
+            id: message
+            size_hint: 1, 1
+        AnchorLayout:
+            size_hint_y: 0.1
+            anchor_x: 'right'
+            Button:
+                text: 'OK'
+                on_release: root.dismiss()
 
 <DetectWidget>:
     padding: 10
@@ -199,34 +209,29 @@
                     anchor_x: 'right'
                     Button:
                         text: 'Next->'
-                        on_release: app.root.switch_to(app.root.ids.fvfm)         
+                        #on_release: app.root.switch_to(app.root.ids.fvfm)
+                        on_release: app.leaf_img = 'src/img/icon.png'
 
 <FvFmWidget>:
-    BoxLayout:
-        size_hint_x: 0.4
+    padding: 10
+    spacing: 20
+    InnerBox:  # Image frame
+        size_hint: 0.5, 1
         orientation: 'vertical'
-        BoxLayout:
-            size_hint_y: 0.1
-            Word:
-                text: 'Input image'
-                size_hint_x: 0.9
-            Button:
-                text: '▼'
-                size_hint_x: 0.1
-        Word:
+        Image:  # Input image
+            id: input_img
             size_hint_y: 0.5
-        Word:
+        Image:  # Change arrow
             size_hint_y: 0.1
-        Word:
+        Image:  # Output image
+            id: output_img
             size_hint_y: 0.5
-    BoxLayout:
+    BoxLayout:  # Fv/Fm list frame
         size_hint_x: 0.2
         orientation: 'vertical'
         Word:
             font_size: 25
             text: 'Fv/Fm value list'
-            size_hint_y: None
-            height: self.texture_size[1]
         RecycleView:
             id: rv
             viewclass: 'RVBox'
@@ -240,90 +245,75 @@
                 height: self.minimum_height
                 orientation: 'vertical'
                 spacing: dp(8)
-    BoxLayout:
-        size_hint_x: 0.4
+    InnerBox:  # Method frame
+        padding: 10, 0, 10, 10
+        size_hint: 0.5, 1
         orientation: 'vertical'
-        spacing: 10
-        padding: 10
-        Word:
-            font_size: 28
+        canvas.after:
+            Color:
+                rgba: 1,1,1,1
+            Line:
+                rectangle: self.x-2, self.y-2, self.width+2, self.height+2
+                width: 2
+        Word:  # Method title label
+            font_size: 25
             text: 'Method'
-            size_hint_y: None
-            height: self.texture_size[1]
-        Spinner:
-            font_size: 25
-            size_hint_y: None
-            height: self.texture_size[1]
-            text: 'erabe'
-        Word:
-            text: 'Detects contours from an image. If it does not work well, adjust the threshold value. (Threshold range is 0-255)'
-            text_size: self.width, None
-            size_hint_y: None
-            height: self.texture_size[1]
-            font_size: 25
-        Image:
-            size_hint_y: 0.3
-        BoxLayout:
-            orientation: 'vertical'
-            Word:
-                font_size: 25
-                text: 'Threshold'
-                size_hint_y:None
-                height: self.texture_size[1]
-            Image:
-                size_hint_y:1
-            BoxLayout:
-                size_hint_y: None
-                height: button.texture_size[1]
-                Slider:
+        ScrollView:  # Method area
+            InnerBox:
+                orientation: 'vertical'
+                Sentence:
+                    text: 'Reads the Fv/Fm scale bar from an image and creates its value and color correspondence table. Also, extract only the leaf area from an image.'
+                Image:
+                    height: 200
                     size_hint_y: None
-                    height: button.texture_size[1]
-                Button:
-                    font_size: 25
-                    text: 'Reset'
-                    size_hint_x: None
-                    size_hint_y: None
-                    size: self.texture_size
-            AnchorLayout:
-                anchor_x: 'center'
-                size_hint_y: None
-                height: button.texture_size[1] + 20
-                Button:
-                    id: button
-                    font_size: 25
-                    text: 'RUN'
-                    size_hint_x: None
-                    size_hint_y: None
-                    size: self.texture_size
-                    on_release: root.click()
-            BoxLayout:
-                AnchorLayout:
-                    anchor_x: 'left'
-                    size_hint_x: 0.5
-                    size_hint_y: None
-                    height: button.texture_size[1] + 20
+                    source: root.src_dir + '/img/icon.png'
+                Space:
+                InnerBox:  # Step 1 Input
+                    Sentence:
+                        text: 'Step 1. Select fvfm result image'
                     Button:
-                        font_size: 25
-                        text: 'Back'
-                        size_hint: None, None
-                        size: self.texture_size
-                        on_release: root.manager.current = 'detect'
-                AnchorLayout:
-                    anchor_x: 'right'
-                    size_hint_y: None
-                    size_hint_x: 0.5
-                    height: button.texture_size[1] + 20
-                    Button:
-                        font_size: 25
-                        text: 'Next'
-                        size_hint_x: None
+                        text: 'Select'
+                        on_release: Factory.FileDialogPopup(select=root.input_img, cancel=root.cancel).open()
+                Space:
+                InnerBox:  # Step 2 Threshold
+                    orientation: 'vertical'
+                    Sentence:
+                        text: 'Step 2. Set threshold for extract'
+                    Image:
                         size_hint_y: None
-                        size: self.texture_size
-                        on_release: root.manager.current = 'arrange'
-                
-
-
-
+                        height: 50
+                    InnerBox:
+                        Button:
+                            text: 'Reset'
+                            on_release: thresh_slider.value = default_thresh
+                        Slider:
+                            id: thresh_slider
+                            size_hint_y: None
+                            height: std_height
+                            range: 0, 255
+                            step: 1
+                            value: default_thresh
+                        TextInput:
+                            text: '{:.0f}'.format(thresh_slider.value)
+                            input_filter: 'int'
+                            on_text_validate: 
+                                if self.text == '': self.text = '0'
+                                elif int(self.text) > 255: self.text = '255'
+                                elif int(self.text) < 0: self.text = '0'
+                                thresh_slider.value = int(self.text)
+                Space:
+                InnerBox:  # Step 3 Run
+                    Sentence:
+                        text: 'Step 3. Extract leaf.'
+                    Button:
+                        text: 'RUN'
+                        on_press: root.run()
+                Space:
+                AnchorLayout:  # Next button
+                    anchor_x: 'right'
+                    Button:
+                        text: 'Next->'
+                        on_release: app.root.switch_to(app.root.ids.arrange)         
         
 <ArrangeWidget>:
     BoxLayout:
@@ -336,6 +326,8 @@
             size_hint_y: None
             height: self.texture_size[1]
         Image:
+            #source: app.leaf_img
+            texture: app.leaf_img
         Word:
             font_size: 20
             text: 'v'
