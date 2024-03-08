@@ -32,10 +32,16 @@ class ErrorPopup(Popup):
     pass
     
 class PickcellApp(App):
-    leaf_img = ObjectProperty(None)
-    fvfm_img = ObjectProperty(None)
-    leaf_obj = ObjectProperty(None)
-    fvfm_obj = ObjectProperty(None)
+    leaf_img = None
+    fvfm_img = None
+    leaf_texture = ObjectProperty(None)
+    fvfm_texture = ObjectProperty(None)
+    leaf_obj = None
+    fvfm_obj = None
+    res_leaf_img = None
+    res_fvfm_img = None
+    res_leaf_texture = ObjectProperty(None)
+    res_fvfm_texture = ObjectProperty(None)
     def build(self):
         if platform == 'android':
             Window.fullscreen = 'auto'
@@ -75,6 +81,7 @@ class DetectWidget(BoxLayout):
         self.input_path = None
 
     def run(self):
+        app = App.get_running_app()
         if self.input_path is None:
             self.err_pop('Select leaf image.')
             return
@@ -86,10 +93,12 @@ class DetectWidget(BoxLayout):
         print(thr)
         self.d.set_param(bin_thr=thr)
         try:
-            self.output_img, self.main_obj = self.d.extr_leaf(self.input_path)
-            out_texture = self.cv2_to_texture(self.output_img)
-            self.ids.output_img.texture = out_texture
-            App.get_running_app().leaf_img = out_texture
+            output_img, main_obj = self.d.extr_leaf(self.input_path)
+            out_texture = self.cv2_to_texture(output_img)
+            #self.ids.output_img.texture = out_texture
+            app.leaf_texture = out_texture
+            app.leaf_img = output_img
+            app.leaf_obj = main_obj
         except Exception as e:
             self.err_pop(e)
             print(e)
@@ -122,6 +131,7 @@ class FvFmWidget(BoxLayout):
         self.input_path = None
 
     def run(self):
+        app = App.get_running_app()
         if self.input_path is None:
             self.err_pop('Select Fv/Fm result image.')
             return
@@ -134,12 +144,14 @@ class FvFmWidget(BoxLayout):
         thr = self.ids.thresh_slider.value
         self.d.set_param(bin_thr=thr)
         try:
-            self.output_img, self.main_obj = self.d.extr_leaf(self.input_path)
-            out_texture = self.cv2_to_texture(self.output_img)
-            self.ids.output_img.texture = out_texture
-            App.get_running_app().leaf_img = out_texture
+            output_img, main_obj = self.d.extr_leaf(self.input_path)
+            out_texture = self.cv2_to_texture(output_img)
+            #self.ids.output_img.texture = out_texture
             self.fvfm_list = self.f.get(self.input_path)
             self.show_fvfm_list(self.fvfm_list)
+            app.fvfm_texture = out_texture
+            app.fvfm_img = output_img
+            app.fvfm_obj = main_obj
         except Exception as e:
             self.err_pop(e)
 
@@ -175,6 +187,41 @@ class FvFmWidget(BoxLayout):
 class ArrangeWidget(BoxLayout):
     def __init__(self, **kwargs):
         super(ArrangeWidget, self).__init__(**kwargs)
+        self.src_dir = src_dir
+        self.a = None
+
+    def run(self):
+        app = App.get_running_app()
+        leaf_img = app.leaf_img
+        fvfm_img = app.fvfm_img
+        leaf_obj = app.leaf_obj
+        fvfm_obj = app.fvfm_obj
+        args = [leaf_img, fvfm_img, leaf_obj, fvfm_obj]
+        #if None in args:
+        #    self.err_pop('There is no input.')
+        #    return
+        if self.a is None:
+            from arrange import Arrange
+            self.a = Arrange()
+        try:
+            arranged_leaf_img, arranged_fvfm_img = self.a.run(*args)
+            leaf_texture = self.cv2_to_texture(arranged_leaf_img)
+            fvfm_texture = self.cv2_to_texture(arranged_fvfm_img)
+            app.res_leaf_texture = leaf_texture
+            app.res_fvfm_texture = fvfm_texture
+        except:
+            pass
+
+    def cv2_to_texture(self, cv2_img):
+        texture = Texture.create(size=(cv2_img.shape[1], cv2_img.shape[0]), colorfmt='bgr', bufferfmt='ubyte')
+        texture.blit_buffer(cv2_img.tostring(), colorfmt='bgr', bufferfmt='ubyte')
+        texture.flip_vertical()
+        return texture
+    
+    def err_pop(self, msg):
+        popup = ErrorPopup()
+        popup.ids.err_msg.text = msg
+        popup.open()
 
 class SplitColorWidget(BoxLayout):
     def __init__(self, **kwargs):

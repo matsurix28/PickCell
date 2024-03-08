@@ -616,6 +616,7 @@ class FvFmFrame(ttk.Frame):
             img = Image.fromarray(img)
             img = ImageTk.PhotoImage(img)
             self.color_imgs.append(img)
+            self.ids.rv.data
         self.list_frm.set_list(self.color_imgs, value_list)
 
     def get(self):

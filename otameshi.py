@@ -1,5 +1,11 @@
-import re
+a = 00
 
-a= ['jpg', 'jpeg', 'png', 'tiff', 'bmp']
-b = sum([[i.lower(), i.upper()] for i in a], [])
-print(b)
+b = 7
+c = 'strrr'
+d = 9
+
+args = [a,b,c,d]
+if None in args:
+    print('Nooneee')
+else:
+    print('aruru')

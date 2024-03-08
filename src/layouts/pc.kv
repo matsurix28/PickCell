@@ -136,10 +136,11 @@
         Image:  # Input image
             id: input_img
             size_hint_y: 0.5
-        Image:  # Change arrow
-            size_hint_y: 0.1
+        Word:
+            font_size: 20
+            text: 'v'
         Image:  # Output image
-            id: output_img
+            texture: app.leaf_texture
             size_hint_y: 0.5
     InnerBox:  # Method frame
         padding: 10, 0, 10, 10
@@ -209,8 +210,7 @@
                     anchor_x: 'right'
                     Button:
                         text: 'Next->'
-                        #on_release: app.root.switch_to(app.root.ids.fvfm)
-                        on_release: app.leaf_img = 'src/img/icon.png'
+                        on_release: app.root.switch_to(app.root.ids.fvfm)
 
 <FvFmWidget>:
     padding: 10
@@ -221,10 +221,11 @@
         Image:  # Input image
             id: input_img
             size_hint_y: 0.5
-        Image:  # Change arrow
-            size_hint_y: 0.1
+        Word:
+            font_size: 20
+            text: 'v'
         Image:  # Output image
-            id: output_img
+            texture: app.fvfm_texture
             size_hint_y: 0.5
     BoxLayout:  # Fv/Fm list frame
         size_hint_x: 0.2
@@ -313,89 +314,76 @@
                     anchor_x: 'right'
                     Button:
                         text: 'Next->'
-                        on_release: app.root.switch_to(app.root.ids.arrange)         
+                        on_release: app.root.switch_to(app.root.ids.arrange)
         
 <ArrangeWidget>:
-    BoxLayout:
-        size_hint_x: 0.35
+    InnerBox:
+        size_hint: 0.35, 1
         orientation: 'vertical'
-        padding: 20, 20,20,20
+        padding: 10
         Word:
             font_size: 28
             text: 'Leaf'
             size_hint_y: None
             height: self.texture_size[1]
         Image:
-            #source: app.leaf_img
-            texture: app.leaf_img
+            texture: app.leaf_texture
         Word:
             font_size: 20
             text: 'v'
-            size_hint_y: None
-            height: self.texture_size[1] + 40
         Image:
-    BoxLayout:
-        size_hint_x: 0.35
+            texture: app.res_leaf_texture
+    InnerBox:
+        size_hint: 0.35, 1
         orientation: 'vertical'
-        padding: 20, 20,20,20
+        padding: 10
         Word:
             font_size: 28
-            text: 'FvFm'
+            text: 'Fv/Fm'
             size_hint_y: None
             height: self.texture_size[1]
         Image:
+            texture: app.fvfm_texture
         Word:
             font_size: 20
             text: 'v'
-            size_hint_y: None
-            height: self.texture_size[1] + 40
         Image:
-    BoxLayout:    # Method frame
-        size_hint_x: 0.3
+            texture: app.res_fvfm_texture
+    InnerBox:  # Method frame
+        padding: 10, 0, 10, 10
+        size_hint: 0.5, 1
         orientation: 'vertical'
-        Word:
-            font_size: 28
-            text: 'Method'
-            size_hint_y: None
-            height: self.texture_size[1]
-        Word:
+        canvas.after:
+            Color:
+                rgba: 1,1,1,1
+            Line:
+                rectangle: self.x-2, self.y-2, self.width+2, self.height+2
+                width: 2
+        Word:  # Method title label
             font_size: 25
-            text: 'setumeiiiiiiiiiiiiiiiiiiiiiiiiisurushfiashegihaifhaiefhaidbfuefhigagnahgiegkskdghiehgoslkdhhfieogkhoasgoieghoasfkiiiiiiiiiiii'
-            text_size: self.width, None
-            size_hint_y: None
-            height: self.texture_size[1]
-        Image:
-        AnchorLayout:
-            size_hint_y: None
-            height: button.height
-            anchor_x: 'center'
-            Button:
-                id: button
-                font_size: 25
-                text: 'RUN'
-                size_hint: None, None
-                size: self.texture_size
-        BoxLayout:
-            size_hint_y: None
-            height: self.minimum_height
-            AnchorLayout:
-                size_hint_y: None
-                height: button.height
-                anchor_x: 'left'
-                Button:
-                    font_size: 25
-                    text: 'Back'
-                    size_hint: None, None
-                    size: self.texture_size
-            AnchorLayout:
-                size_hint_y: None
-                height: button.height
-                anchor_x: 'right'
-                Button:
-                    font_size: 25
-                    text: 'Next'
-                    size_hint: None, None
-                    size: self.texture_size
+            text: 'Method'
+        ScrollView:  # Method area
+            InnerBox:
+                orientation: 'vertical'
+                Sentence:
+                    text: 'Reads the Fv/Fm scale bar from an image and creates its value and color correspondence table. Also, extract only the leaf area from an image.'
+                Image:
+                    height: 200
+                    size_hint_y: None
+                    source: root.src_dir + '/img/icon.png'
+                Space:
+                InnerBox:  # Step 3 Run
+                    Sentence:
+                        text: 'Step 1. Arrange'
+                    Button:
+                        text: 'RUN'
+                        on_press: root.run()
+                Space:
+                AnchorLayout:  # Next button
+                    anchor_x: 'right'
+                    Button:
+                        text: 'Next->'
+                        on_release: app.root.switch_to(app.root.ids.arrange)
     
 <AnalyzeWidget>:
     orientation: 'vertical'
