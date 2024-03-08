@@ -107,21 +107,42 @@
                         root.select(filechooser.selection)
                         root.dismiss()
 
-<ErrorPopup@Popup>:
-    size_hint: 0.4, 0.4
-    separator_height: 0
-    title: ''
+<ProgressPopup>:
+    title: root.title_text
+    title_size: 25
+    separator_height: 2
+    size_hint: 0.4, None
+    height: box.height + self.title_size + 40
     BoxLayout:
-        height: self.minimum_height + 40
+        id: box
+        size_hint_y: None
+        height: self.minimum_height
         orientation: 'vertical'
-        padding: 10
-        Word:
-            text: 'Error'
+        padding: 10, 20, 10, 10
+        spacing: 10
         Sentence:
-            id: message
-            size_hint: 1, 1
+            text: root.message
         AnchorLayout:
-            size_hint_y: 0.1
+            anchor_x: 'right'
+            Button:
+                text: 'Cancel'
+                on_press: root.dismiss()
+
+<ErrorPopup>:
+    size_hint: 0.4, None
+    height: box.height + self.title_size + 40
+    title_size: 25
+    title: root.title_text
+    BoxLayout:
+        id: box
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+        padding: 10, 20, 10, 10
+        spacing: 10
+        Sentence:
+            text: root.message
+        AnchorLayout:
             anchor_x: 'right'
             Button:
                 text: 'OK'
@@ -136,12 +157,15 @@
         Image:  # Input image
             id: input_img
             size_hint_y: 0.5
-        Word:
-            font_size: 20
-            text: 'v'
+            source: root.src_dir + '/img/input.png'
+        Image:
+            size_hint: 1, None
+            width: 
+            source: root.src_dir + '/img/arrow.png'
         Image:  # Output image
             texture: app.leaf_texture
             size_hint_y: 0.5
+            source: root.src_dir + '/img/output.png'
     InnerBox:  # Method frame
         padding: 10, 0, 10, 10
         size_hint: 0.5, 1
@@ -173,11 +197,13 @@
                         on_release: Factory.FileDialogPopup(select=root.input_img, cancel=root.cancel).open()
                 Space:
                 InnerBox:  # Step 2 Threshold
+                    id: inner
                     orientation: 'vertical'
                     Sentence:
                         text: 'Step 2. Set threshold for extract'
                     Image:
-                        size_hint_y: None
+                        id: thresh_img
+                        size_hint: 1, None
                         height: 50
                     InnerBox:
                         Button:
@@ -189,8 +215,9 @@
                             height: std_height
                             range: 0, 255
                             step: 1
-                            value: default_thresh
+                            value: 0 if textin.text == '' else int(textin.text)
                         TextInput:
+                            id: textin
                             text: '{:.0f}'.format(thresh_slider.value)
                             input_filter: 'int'
                             on_text_validate: 
@@ -446,11 +473,11 @@
     orientation: 'vertical'
     BoxLayout:
 
-#<Widget>:
-#    canvas.after:
-#        Color:
-#            rgba: 1,0,1,1
-#        Line:
-#            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
-#           dash_offset: 5
-#            dash_length: 3
+<Widget>:
+    canvas.after:
+        Color:
+            rgba: 1,0,1,1
+        Line:
+            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+            dash_offset: 5
+            dash_length: 3

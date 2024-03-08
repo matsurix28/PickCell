@@ -1,14 +1,16 @@
 import os
 from os.path import expanduser
 
+import cv2
 import numpy as np
 import range_slider
 from kivy import platform
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics.texture import Texture
 from kivy.lang import Builder
-from kivy.properties import ObjectProperty
+from kivy.properties import ObjectProperty, StringProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.uix.tabbedpanel import TabbedPanel
@@ -25,15 +27,23 @@ ImagesMedia = None
 REQUEST_GALLERY = 1
 MediaStore_Images_Media_DATA = '_data'
 
+default_threshold = 60
+
 class FileDialogPopup(Popup):
     select = ObjectProperty(None)
     cancel = ObjectProperty(None)
 
 class ErrorPopup(Popup):
-    pass
+    title_text = StringProperty('Error')
+    message = StringProperty('')
+
+class ProgressPopup(Popup):
+    title_text = StringProperty('')
+    message = StringProperty('')
 
 class MyBoxLayout(BoxLayout):
     def __init__(self, **kwargs):
+        super(MyBoxLayout, self).__init__(**kwargs)
         self.src_dir = src_dir
         self.input_path = None
 
@@ -44,13 +54,16 @@ class MyBoxLayout(BoxLayout):
 
     def cv2_to_texture(self, cv2_img):
         texture = Texture.create(size=(cv2_img.shape[1], cv2_img.shape[0]), colorfmt='bgr', bufferfmt='ubyte')
-        texture.blit_buffer(cv2_img.tostring(), colorfmt='bgr', bufferfmt='ubyte')
-        texture.flipvertical()
+        texture.blit_buffer(cv2_img.tobytes(), colorfmt='bgr', bufferfmt='ubyte')
+        texture.flip_vertical()
         return texture
+    
+    def show_progress_popup(self, title, message):
+        popup = ProgressPopup(title_text=title, message=message)
+        popup.open()
 
-    def error_popup(self, message):
-        popup = ErrorPopup()
-        popup.ids.err_msg.text = message
+    def show_error_popup(self, message, title='Error'):
+        popup = ErrorPopup(message=message, title_text=title)
         popup.open()
     
 class PickcellApp(App):
@@ -97,15 +110,16 @@ class PickcellApp(App):
 
 class DetectWidget(MyBoxLayout):
     def __init__(self, **kwargs):
-        BoxLayout(DetectWidget, self).__init__(**kwargs)
+        super(DetectWidget, self).__init__(**kwargs)
         self.src_dir = src_dir
         self.d = None
         self.input_path = None
+        Clock.schedule_once(self.set_default, 1.5)
 
     def run(self):
         app = App.get_running_app()
         if self.input_path is None:
-            self.err_pop('Select leaf image.')
+            self.show_error_popup('Select leaf image.')
             return
         
         if self.d is None:
@@ -121,9 +135,28 @@ class DetectWidget(MyBoxLayout):
             app.leaf_texture = out_texture
             app.leaf_img = output_img
             app.leaf_obj = main_obj
-        except Exception as e:
-            self.error_popup(e)
+        except (ValueError, TypeError) as e:
+            self.show_error_popup(str(e))
             print(e)
+
+    def set_default(self, dt):
+        print('set default')
+        self.ids.thresh_slider.bind(value=lambda slider, value: self.update_thresh_img(value))
+        self.ids.thresh_slider.value = default_threshold
+        
+
+    def update_thresh_img(self, thresh):
+        print('update')
+        width = int(self.ids.thresh_img.size[0])
+        height = int(self.ids.thresh_img.size[1])
+        img = np.zeros((height, width, 1), np.uint8)
+        color_range = np.linspace(thresh, 255, width)
+        for i in range(width):
+            for j in range(height):
+                img[j,i,0] = color_range[i]
+        img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+        texture = self.cv2_to_texture(img)
+        self.ids.thresh_img.texture = texture
     
     def cancel(self):
         pass
