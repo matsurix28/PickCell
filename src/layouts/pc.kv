@@ -383,19 +383,74 @@
                     anchor_x: 'right'
                     Button:
                         text: 'Next->'
-                        on_release: app.root.switch_to(app.root.ids.arrange)
-    
+                        on_release: app.root.switch_to(app.root.ids.split_color)
+
+<SplitColorWidget>:
+    InnerBox:  # Image frame
+        size_hint: 0.5, 1
+        orientation: 'vertical'
+        InnerBox:
+            orientation: 'vertical'
+            size_hint_y: 0.5
+            Word:
+                text: 'Original image'
+            Image:
+                texture: app.res_leaf_texture
+        InnerBox:  #Split color images frame
+            size_hint_y: 0.6
+            orientation: 'vertical'
+            InnerBox:  # Color 1
+                size_hint_y: 1
+                orientation: 'vertical'
+                Word:
+                    text: 'Color 1'
+                Image:
+            InnerBox:  # Color 2
+                size_hint_y: 1
+                orientation: 'vertical'
+                Word:
+                    text: 'Color 1'
+                Image:
+    InnerBox:  # Method frame
+        padding: 10, 0, 10, 10
+        size_hint: 0.5, 1
+        orientation: 'vertical'
+        Word:  # Method title label
+            font_size: 25
+            text: 'Method'
+        ScrollView:  # Method area
+            InnerBox:
+                orientation: 'vertical'
+                Sentence:
+                    text: 'Split color to compare.'
+                InnerBox:  # Step 3 Run
+                    Sentence:
+                        text: 'Step 1. Select color range 1.'
+                    Image:
+                        size_hint_y: std_height
+                        texture: root.color1_texture
+                    RangeSlider:
+                        step: 1
+                        value: 0, 255
+                    Button:
+                        text: 'RUN'
+                        on_press: root.run()
+                Space:
+                AnchorLayout:  # Next button
+                    anchor_x: 'right'
+                    Button:
+                        text: 'Analyze'
+                        on_release: root.analyze()
+
 <AnalyzeWidget>:
     orientation: 'vertical'
     BoxLayout:
 
-<Widget>:
-    canvas.after:
-        Color:
-            rgba: 1,0,1,1
-        Line:
-            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
-            dash_offset: 5
-            dash_length: 3
-
-
+#<Widget>:
+#    canvas.after:
+#        Color:
+#            rgba: 1,0,1,1
+#        Line:
+#            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+#           dash_offset: 5
+#            dash_length: 3

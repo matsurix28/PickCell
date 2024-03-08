@@ -1,17 +1,19 @@
 import glob
 import tempfile
-from test.python.ppp import Pickcell
 
 import cv2
 import numpy as np
-from matplotlib import colors
-from matplotlib import pyplot as plt
+#from matplotlib import colors
+#from matplotlib import pyplot as plt
 from PIL import Image
 from plotly import graph_objects as go
-from plotly_resampler import register_plotly_resampler
+#from test.python.ppp import Pickcell
+from ppp import Pickcell
 
-img1 = cv2.imread('0220/1_arranged.png')
-img2 = cv2.imread('0220/2_arranged.png')
+#from plotly_resampler import register_plotly_resampler
+
+img1 = cv2.imread('/workspaces/pickcell/test/img/1_arranged.png')
+img2 = cv2.imread('/workspaces/pickcell/test/img/6_arranged.png')
 
 #img1 = cv2.imread('0220/1_arranged.png')
 #img2 = cv2.imread('0220/2_arranged.png')
@@ -75,7 +77,7 @@ ma = max(va)
 #plt.show()
 
 # ------------------------------------
-normal = colors.Normalize(vmin=mi, vmax=ma)
+#normal = colors.Normalize(vmin=mi, vmax=ma)
 array_px = [[i,j,k] for (i,j,k) in zip(r,g,bl)]
 #array_px = normal(va).tolist()
 vvv = 1

@@ -2,6 +2,7 @@ import os
 from os.path import expanduser
 
 import numpy as np
+import range_slider
 from kivy import platform
 from kivy.app import App
 from kivy.core.window import Window
@@ -224,11 +225,16 @@ class ArrangeWidget(BoxLayout):
         popup.open()
 
 class SplitColorWidget(BoxLayout):
+    color1_texture = ObjectProperty(None)
     def __init__(self, **kwargs):
         super(SplitColorWidget, self).__init__(**kwargs)
 
+    def analyze(self):
+        pass
+
 class Root(TabbedPanel):
     pass
+
 
 if __name__ == '__main__':
     PickcellApp().run()

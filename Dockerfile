@@ -29,4 +29,5 @@ RUN apt-get update && apt-get upgrade -y \
     kivy \
     Cython==0.29.33 \
     virtualenv \
+    pandas \
     && echo 'export PATH=$PATH:~/.local/bin/' >> ~/.bashrc
