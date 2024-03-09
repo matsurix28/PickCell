@@ -151,6 +151,7 @@
                 on_release: root.dismiss()
 
 <DetectWidget>:
+    auto_dismiss: False
     padding: dp(10)
     spacing: dp(20)
     InnerBox:  # Image frame
@@ -238,9 +239,10 @@
                         on_release: app.root.switch_to(app.root.ids.fvfm)
 
 <FvFmWidget>:
+    auto_dismiss: False
     padding: dp(10)
     spacing: dp(20)
-    InnerBox:
+    InnerBox:  #Result frame
         size_hint: 0.6, 1
         InnerBox:  # Image frame
             size_hint: 0.4, 1
@@ -304,7 +306,7 @@
                         text: 'Step 1. Select leaf image'
                     Button:
                         text: 'Select'
-                        on_release: Factory.FileDialogPopup(select=root.input_img, cancel=root.cancel).open()
+                        on_release: Factory.FileDialogPopup(select=root.input_img).open()
                 Space:
                 InnerBox:  # Step 2 Threshold
                     id: inner
@@ -339,11 +341,15 @@
                         text: 'RUN'
                         on_press: root.run()
                 Space:
-                AnchorLayout:  # Next button
-                    anchor_x: 'right'
+                InnerBox:
                     Button:
-                        text: 'Next->'
-                        on_release: app.root.switch_to(app.root.ids.arrange)
+                        text: '<-Back'
+                        on_press: app.root.switch_to(app.root.ids.detect)
+                    AnchorLayout:  # Next button
+                        anchor_x: 'right'
+                        Button:
+                            text: 'Next->'
+                            on_release: app.root.switch_to(app.root.ids.arrange)
                             
 <ArrangeWidget>:
     InnerBox:
