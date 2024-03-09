@@ -74,6 +74,10 @@ class MyBoxLayout(BoxLayout):
 
     def cancel_process(self):
         self.thread.raise_exception()
+
+    def thread_error(self, dt):
+        self.show_error_popup(self.err_msg)
+        self.err_msg = None
     
 class PickcellApp(App):
     leaf_img = None
@@ -167,9 +171,7 @@ class DetectWidget(MyBoxLayout):
             Clock.schedule_once(self.thread_error, 0)
         self.popup.dismiss()
 
-    def thread_error(self, dt):
-        self.show_error_popup(self.err_msg)
-        self.err_msg = None
+    
 
     def set_default(self, dt):
         self.ids.thresh_slider.value = default_threshold
@@ -221,10 +223,6 @@ class FvFmWidget(MyBoxLayout):
             Clock.schedule_once(self.thread_error, 0)
         self.popup.dismiss()
 
-    def thread_error(self, dt):
-        self.show_error_popup(self.err_msg)
-        self.err_msg = None
-
     def update_texture(self, dt):
         self.app.fvfm_texture = self.cv2_to_texture(self.app.fvfm_img)
         self.show_fvfm_list()
@@ -243,6 +241,8 @@ class FvFmWidget(MyBoxLayout):
             })
 
 class AlignWidget(MyBoxLayout):
+    res_leaf_texture = ObjectProperty(None)
+    res_fvfm_texture = ObjectProperty(None)
     overlay_texture = ObjectProperty(None)
     def __init__(self, **kwargs):
         super(AlignWidget, self).__init__(**kwargs)
@@ -270,15 +270,22 @@ class AlignWidget(MyBoxLayout):
         self.thread = WorkingThread(target=self.run_process)
         self.thread.start()
         
-    
     def run_process(self):
         if self.a is None:
             from align import Align
             self.a = Align()
         try:
             self.app.res_leaf_img, self.app.res_fvfm_img, self.overlay_img = self.a.run(*self.args)
-        except:
-            pass
+            Clock.schedule_once(self.update_texture, 0)
+        except Exception as e:
+            self.err_msg = str(e)
+            Clock.schedule_once(self.thread_error, 0)
+        self.popup.dismiss()
+
+    def update_texture(self, dt):
+        self.res_leaf_texture = self.cv2_to_texture(self.app.res_leaf_img)
+        self.res_fvfm_texture = self.cv2_to_texture(self.app.res_fvfm_img)
+        self.overlay_texture = self.cv2_to_texture(self.overlay_img)
 
 class SplitColorWidget(BoxLayout):
     color1_texture = ObjectProperty(None)

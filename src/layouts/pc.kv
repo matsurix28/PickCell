@@ -374,10 +374,10 @@
                 texture: app.fvfm_texture
         InnerBox:  # Aligned image frame
             size_hint: 1, 0.3
-            Image:  # putput leaf image
-                texture: app.res_leaf_texture
+            Image:  # Output leaf image
+                texture: root.res_leaf_texture
             Image:  # Output fvfm image
-                texture: app.res_fvfm_texture
+                texture: root.res_fvfm_texture
         InnerBox:  # Overlay image frame
             size_hint: 1, 0.3
             Image:
@@ -412,11 +412,15 @@
                         text: 'RUN'
                         on_press: root.run()
                 Space:
-                AnchorLayout:  # Next button
-                    anchor_x: 'right'
+                InnerBox:
                     Button:
-                        text: 'Next->'
-                        on_release: app.root.switch_to(app.root.ids.split_color)
+                        text: '<-Back'
+                        on_release: app.root.switch_to(app.root.ids.fvfm)
+                    AnchorLayout:  # Next button
+                        anchor_x: 'right'
+                        Button:
+                            text: 'Next->'
+                            on_release: app.root.switch_to(app.root.ids.split_color)
 
 <SplitColorWidget>:
     InnerBox:  # Image frame
@@ -476,11 +480,11 @@
     orientation: 'vertical'
     BoxLayout:
 
-<Widget>:
-    canvas.after:
-        Color:
-            rgba: 1,0,1,1
-        Line:
-            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
-            dash_offset: 5
-            dash_length: 3
+#<Widget>:
+#    canvas.after:
+#        Color:
+#            rgba: 1,0,1,1
+#        Line:
+#            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+#            dash_offset: 5
+#            dash_length: 3
