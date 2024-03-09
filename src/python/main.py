@@ -1,3 +1,4 @@
+import ctypes
 import os
 import threading
 from os.path import expanduser
@@ -114,6 +115,25 @@ class PickcellApp(App):
         else:
             return False
 
+class WorkingThread(threading.Thread):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def get_id(self):
+        if hasattr(self, '_thread_id'):
+            return self._thread_id
+        for id, thread in threading._active.items():
+            if thread is self:
+                return id
+
+    def raise_exception(self):
+        print('tochu syuryo')
+        thread_id = self.get_id()
+        resu = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread_id), ctypes.py_object(SystemExit))
+        if resu > 1:
+            ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread_id), 0)
+            
+
 class DetectWidget(MyBoxLayout):
     def __init__(self, **kwargs):
         super(DetectWidget, self).__init__(**kwargs)
@@ -135,8 +155,8 @@ class DetectWidget(MyBoxLayout):
         thr = self.ids.thresh_slider.value
         self.d.set_param(bin_thr=thr)
 
-        thread = threading.Thread(target=self.detect)
-        thread.start()
+        self.thread = WorkingThread(target=self.detect)
+        self.thread.start()
 
     def detect(self):
         try:
@@ -153,7 +173,7 @@ class DetectWidget(MyBoxLayout):
         self.ids.thresh_slider.value = default_threshold
     
     def cancel(self):
-        print('cancel')
+        self.thread.raise_exception()
 
 class FvFmWidget(BoxLayout):
     def __init__(self, **kwargs):
