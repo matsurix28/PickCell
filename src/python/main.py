@@ -1,12 +1,9 @@
 import ctypes
 import os
 import threading
-from functools import partial
 from os.path import expanduser
 
-import cv2
 import numpy as np
-import range_slider
 from detect import Detect
 from kivy import platform
 from kivy.app import App
@@ -162,7 +159,8 @@ class DetectWidget(MyBoxLayout):
             self.app.leaf_obj = main_obj
             Clock.schedule_once(self.update_texture, 0)
         except (ValueError, TypeError) as e:
-            self.show_error_popup(str(e))
+            #self.show_error_popup(str(e))
+            print(e)
         self.popup.dismiss()
 
     def set_default(self, dt):
