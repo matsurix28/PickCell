@@ -81,6 +81,14 @@ class MyBoxLayout(BoxLayout):
         self.show_error_popup(self.err_msg)
         self.err_msg = None
     
+    def int_input(self, input, target=None):
+        if (input.text == '') or (int(input.text) < 0):
+            input.text = '0'
+        elif int(input.text) > 255:
+            input.text = '255'
+        if target is not None:
+            target = int(input.text)
+
 class PickcellApp(App):
     leaf_img = None
     fvfm_img = None

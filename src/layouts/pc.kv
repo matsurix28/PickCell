@@ -37,11 +37,6 @@
 
 <IntInput@TextInput>:
     input_filter: 'int'
-    on_text_validate:
-        if self.text == '': self.text = '0'
-        elif int(self.text) > 255: self.text = '255'
-        elif int(self.text) < 0: self.text = '0'
-        print('henkou')
 
 <Word@Label>:
     size_hint_y: None
@@ -348,15 +343,11 @@
                             range: 0, 255
                             step: 1
                             value: 0 if textin.text == '' else int(textin.text)
-                            value: root.default_thresh
+                            #value: root.default_thresh
                         IntInput:
                             id: textin
                             text: '{:.0f}'.format(thresh_slider.value)
-                            input_filter: 'int'
-                            on_text_validate: thresh_slider.value = int(self.text)
-                                #if self.text == '': self.text = '0'
-                                #elif int(self.text) > 255: self.text = '255'
-                                #elif int(self.text) < 0: self.text = '0'
+                            on_text_validate: root.int_input(self, thresh_slider.value)
                                 
                 Space:
                 InnerBox:  # Step 3 Run
