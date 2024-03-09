@@ -356,39 +356,32 @@
     padding: dp(10)
     spacing: dp(20)
     InnerBox:  # Image framge
+        padding: dp(10), dp(0), dp(10), dp(10)
         size_hint: 0.6, 1
-        InnerBox:  # Leaf image frame
-            size_hint: 0.5, 1
-            orientation: 'vertical'
-            padding: 10
+        orientation: 'vertical'
+        InnerBox:  # Label frame
+            size_hint: 1, None
+            height: self.minimum_height
             Word:
-                font_size: 28
                 text: 'Leaf'
-                size_hint_y: None
-                height: self.texture_size[1]
-            Image:
-                texture: app.leaf_texture
             Word:
-                font_size: 20
-                text: 'v'
-            Image:
-                texture: app.res_leaf_texture
-        InnerBox:  # Fvfm image frame
-            size_hint: 0.5, 1
-            orientation: 'vertical'
-            padding: 10
-            Word:
-                font_size: 28
                 text: 'Fv/Fm'
-                size_hint_y: None
-                height: self.texture_size[1]
-            Image:
+        InnerBox:  # Input image frame
+            size_hint: 1, 0.3
+            Image:  # Input leaf image
+                texture: app.leaf_texture
+            Image:  # Input fvfm image
                 texture: app.fvfm_texture
-            Word:
-                font_size: 20
-                text: 'v'
-            Image:
+        InnerBox:  # Arranged image frame
+            size_hint: 1, 0.3
+            Image:  # putput leaf image
+                texture: app.res_leaf_texture
+            Image:  # Output fvfm image
                 texture: app.res_fvfm_texture
+        InnerBox:  # Overlay image frame
+            size_hint: 1, 0.3
+            Image:
+                texture: root.overlay_texture
     InnerBox:  # Method frame
         padding: dp(10), dp(0), dp(10), dp(10)
         size_hint: 0.4, 1

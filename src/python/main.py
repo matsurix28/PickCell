@@ -248,7 +248,8 @@ class FvFmWidget(MyBoxLayout):
                 'text': str(f[1])
             })
 
-class ArrangeWidget(BoxLayout):
+class ArrangeWidget(MyBoxLayout):
+    overlay_texture = ObjectProperty(None)
     def __init__(self, **kwargs):
         super(ArrangeWidget, self).__init__(**kwargs)
         self.src_dir = src_dir
