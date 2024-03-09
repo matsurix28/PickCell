@@ -162,7 +162,7 @@
         orientation: 'vertical'
         Image:  # Input image
             id: input_img
-            size_hint_y: 0.5
+            size_hint_y: 1
             source: root.src_dir + '/img/input.png'
         Image:
             size_hint: 1, None
@@ -170,7 +170,7 @@
             source: root.src_dir + '/img/arrow.png'
         Image:  # Output image
             texture: app.leaf_texture
-            size_hint_y: 0.5
+            size_hint_y: 1
             source: root.src_dir + '/img/output.png'
     InnerBox:  # Method frame
         padding: dp(10), dp(0), dp(10), dp(10)
