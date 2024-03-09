@@ -226,7 +226,6 @@ class Detect:
         cv2.drawContours(res_img, [main_obj], -1, (0,0,255), 3)
         #self.__save(res_img, 'leaf-cnts', outdir=output_path)
         img = self.__extr(img, main_obj)
-        cv2.imwrite('test_res.png', img)
         return img, main_obj
 
     def extr_green(self, input_path: str, output_path: str = './'):
