@@ -102,7 +102,6 @@ class PickcellApp(App):
             from android.permissions import Permission, request_permissions
             request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.MANAGE_DOCUMENTS])
         else:
-            print(Window.dpi)
             Window.size = (1280, 800)
             Builder.load_file(src_dir + '/layouts/pc.kv')
             self.home_dir = expanduser('~')
