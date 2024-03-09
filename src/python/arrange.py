@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 """Align the size and tilt of images with each other."""
 
-import cv2
-import numpy as np
-import detect
 import argparse
-import sys
 import os
+import sys
+
+import cv2
+import detect
+import numpy as np
+
 
 def main():
     in1, in2, m1, m2, out = args()
@@ -83,6 +85,8 @@ class Arrange:
         img1 = self.__crop(img1, size, best[2])
         img2 = self.__rotate(img2, angle2, center2)
         img2 = self.__crop(img2, size)
+        img_overlay = cv2.addWeighted(src1=img1, alpha=1, src2=img2, beta=0.3, gamma=0)
+        cv2.imwrite('test_res.png', img_overlay)
         return img1, img2
         
 

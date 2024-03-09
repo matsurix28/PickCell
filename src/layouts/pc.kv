@@ -154,7 +154,6 @@
                 on_release: root.dismiss()
 
 <DetectWidget>:
-    auto_dismiss: False
     padding: dp(10)
     spacing: dp(20)
     InnerBox:  # Image frame
@@ -162,7 +161,7 @@
         orientation: 'vertical'
         Image:  # Input image
             id: input_img
-            size_hint_y: 1
+            size_hint_y: 0.5
             source: root.src_dir + '/img/input.png'
         Image:
             size_hint: 1, None
@@ -170,7 +169,7 @@
             source: root.src_dir + '/img/arrow.png'
         Image:  # Output image
             texture: app.leaf_texture
-            size_hint_y: 1
+            size_hint_y: 0.5
             source: root.src_dir + '/img/output.png'
     InnerBox:  # Method frame
         padding: dp(10), dp(0), dp(10), dp(10)
@@ -242,7 +241,6 @@
                         on_release: app.root.switch_to(app.root.ids.fvfm)
 
 <FvFmWidget>:
-    auto_dismiss: False
     padding: dp(10)
     spacing: dp(20)
     InnerBox:  #Result frame
@@ -355,48 +353,52 @@
                             on_release: app.root.switch_to(app.root.ids.arrange)
                             
 <ArrangeWidget>:
-    InnerBox:
-        size_hint: 0.35, 1
-        orientation: 'vertical'
-        padding: 10
-        Word:
-            font_size: 28
-            text: 'Leaf'
-            size_hint_y: None
-            height: self.texture_size[1]
-        Image:
-            texture: app.leaf_texture
-        Word:
-            font_size: 20
-            text: 'v'
-        Image:
-            texture: app.res_leaf_texture
-    InnerBox:
-        size_hint: 0.35, 1
-        orientation: 'vertical'
-        padding: 10
-        Word:
-            font_size: 28
-            text: 'Fv/Fm'
-            size_hint_y: None
-            height: self.texture_size[1]
-        Image:
-            texture: app.fvfm_texture
-        Word:
-            font_size: 20
-            text: 'v'
-        Image:
-            texture: app.res_fvfm_texture
+    padding: dp(10)
+    spacing: dp(20)
+    InnerBox:  # Image framge
+        size_hint: 0.6, 1
+        InnerBox:  # Leaf image frame
+            size_hint: 0.5, 1
+            orientation: 'vertical'
+            padding: 10
+            Word:
+                font_size: 28
+                text: 'Leaf'
+                size_hint_y: None
+                height: self.texture_size[1]
+            Image:
+                texture: app.leaf_texture
+            Word:
+                font_size: 20
+                text: 'v'
+            Image:
+                texture: app.res_leaf_texture
+        InnerBox:  # Fvfm image frame
+            size_hint: 0.5, 1
+            orientation: 'vertical'
+            padding: 10
+            Word:
+                font_size: 28
+                text: 'Fv/Fm'
+                size_hint_y: None
+                height: self.texture_size[1]
+            Image:
+                texture: app.fvfm_texture
+            Word:
+                font_size: 20
+                text: 'v'
+            Image:
+                texture: app.res_fvfm_texture
     InnerBox:  # Method frame
-        padding: 10, 0, 10, 10
-        size_hint: 0.5, 1
+        padding: dp(10), dp(0), dp(10), dp(10)
+        size_hint: 0.4, 1
         orientation: 'vertical'
         canvas.after:
             Color:
                 rgba: 1,1,1,1
             Line:
-                rectangle: self.x-2, self.y-2, self.width+2, self.height+2
-                width: 2
+                rectangle: self.x-dp(2), self.y-dp(2), self.width+dp(2), self.height+dp(2)
+                width: dp(2)
         Word:  # Method title label
             font_size: 25
             text: 'Method'
