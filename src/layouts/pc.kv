@@ -77,9 +77,9 @@
         id: fvfm
         FvFmWidget:
     TabbedPanelItem:
-        text: 'Arrange'
-        id: arrange
-        ArrangeWidget:
+        text: 'Align'
+        id: align
+        AlignWidget:
     TabbedPanelItem:
         text: 'Split Color'
         id: split_color
@@ -350,9 +350,9 @@
                         anchor_x: 'right'
                         Button:
                             text: 'Next->'
-                            on_release: app.root.switch_to(app.root.ids.arrange)
+                            on_release: app.root.switch_to(app.root.ids.align)
                             
-<ArrangeWidget>:
+<ALignWidget>:
     padding: dp(10)
     spacing: dp(20)
     InnerBox:  # Image framge
@@ -372,7 +372,7 @@
                 texture: app.leaf_texture
             Image:  # Input fvfm image
                 texture: app.fvfm_texture
-        InnerBox:  # Arranged image frame
+        InnerBox:  # Aligned image frame
             size_hint: 1, 0.3
             Image:  # putput leaf image
                 texture: app.res_leaf_texture
@@ -407,7 +407,7 @@
                 Space:
                 InnerBox:  # Step 3 Run
                     Sentence:
-                        text: 'Step 1. Arrange'
+                        text: 'Step 1. Align'
                     Button:
                         text: 'RUN'
                         on_press: root.run()

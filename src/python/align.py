@@ -28,7 +28,7 @@ def main():
     except (TypeError, ValueError) as e:
         print(e)
         sys.exit()
-    a = Arrange()
+    a = Align()
     try:
         img1, img2 = a.run(img1, img2, cnt1, cnt2)
         a.save(img1, name1, out)
@@ -54,7 +54,7 @@ def args():
     args = parser.parse_args()
     return args.in1, args.in2, args.m1, args.m2, args.output
 
-class Arrange:
+class Align:
     """Align the size and tilt of images with each other."""
 
     def __init__(self) -> None:
@@ -86,8 +86,8 @@ class Arrange:
         img2 = self.__rotate(img2, angle2, center2)
         img2 = self.__crop(img2, size)
         img_overlay = cv2.addWeighted(src1=img1, alpha=1, src2=img2, beta=0.3, gamma=0)
-        cv2.imwrite('test_res.png', img_overlay)
-        return img1, img2
+        #cv2.imwrite('test_res.png', img_overlay)
+        return img1, img2, img_overlay
         
 
     def __tilt(self, img, cnts):

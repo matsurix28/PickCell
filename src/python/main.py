@@ -159,10 +159,7 @@ class DetectWidget(MyBoxLayout):
         thr = self.ids.thresh_slider.value
         self.d.set_param(bin_thr=thr)
         try:
-            output_img, main_obj = self.d.extr_leaf(self.input_path)
-            self.output_img = output_img
-            self.app.leaf_img = output_img
-            self.app.leaf_obj = main_obj
+            self.app.leaf_img, self.app.leaf_obj = self.d.extr_leaf(self.input_path)
             Clock.schedule_once(self.update_texture, 0)
         except (ValueError, TypeError) as e:
             self.err_msg = str(e)
@@ -177,7 +174,7 @@ class DetectWidget(MyBoxLayout):
         self.ids.thresh_slider.value = default_threshold
 
     def update_texture(self, dt):
-        texture = self.cv2_to_texture(self.output_img)
+        texture = self.cv2_to_texture(self.app.leaf_img)
         self.app.leaf_texture = texture
         
 class FvFmWidget(MyBoxLayout):
@@ -248,45 +245,36 @@ class FvFmWidget(MyBoxLayout):
                 'text': str(f[1])
             })
 
-class ArrangeWidget(MyBoxLayout):
+class AlignWidget(MyBoxLayout):
     overlay_texture = ObjectProperty(None)
     def __init__(self, **kwargs):
-        super(ArrangeWidget, self).__init__(**kwargs)
+        super(AlignWidget, self).__init__(**kwargs)
         self.src_dir = src_dir
         self.a = None
+        self.app = App.get_running_app()
 
     def run(self):
-        app = App.get_running_app()
-        leaf_img = app.leaf_img
-        fvfm_img = app.fvfm_img
-        leaf_obj = app.leaf_obj
-        fvfm_obj = app.fvfm_obj
-        args = [leaf_img, fvfm_img, leaf_obj, fvfm_obj]
-        #if None in args:
-        #    self.err_pop('There is no input.')
-        #    return
+        leaf_img = self.app.leaf_img
+        fvfm_img = self.app.fvfm_img
+        leaf_obj = self.app.leaf_obj
+        fvfm_obj = self.app.fvfm_obj
+        self.args = [leaf_img, fvfm_img, leaf_obj, fvfm_obj]
+        if None in self.args:
+            self.show_error_popup('Not enough input.')
+            return
+        self.popup = self.show_progress_popup(self.cancel_process, 'Align two images', 'Running...')
+        self.thread = WorkingThread(target=self.run_process)
+        self.thread.start()
+        
+    
+    def run_process(self):
         if self.a is None:
-            from arrange import Arrange
-            self.a = Arrange()
+            from python.align import Align
+            self.a = Align()
         try:
-            arranged_leaf_img, arranged_fvfm_img = self.a.run(*args)
-            leaf_texture = self.cv2_to_texture(arranged_leaf_img)
-            fvfm_texture = self.cv2_to_texture(arranged_fvfm_img)
-            app.res_leaf_texture = leaf_texture
-            app.res_fvfm_texture = fvfm_texture
+            self.app.res_leaf_img, self.app.res_fvfm_img, self.overlay_img = self.a.run(*self.args)
         except:
             pass
-
-    def cv2_to_texture(self, cv2_img):
-        texture = Texture.create(size=(cv2_img.shape[1], cv2_img.shape[0]), colorfmt='bgr', bufferfmt='ubyte')
-        texture.blit_buffer(cv2_img.tostring(), colorfmt='bgr', bufferfmt='ubyte')
-        texture.flip_vertical()
-        return texture
-    
-    def err_pop(self, msg):
-        popup = ErrorPopup()
-        popup.ids.err_msg.text = msg
-        popup.open()
 
 class SplitColorWidget(BoxLayout):
     color1_texture = ObjectProperty(None)
