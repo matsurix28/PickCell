@@ -1,6 +1,7 @@
 import ctypes
 import os
 import threading
+from functools import partial
 from os.path import expanduser
 
 import cv2
@@ -127,7 +128,6 @@ class WorkingThread(threading.Thread):
                 return id
 
     def raise_exception(self):
-        print('tochu syuryo')
         thread_id = self.get_id()
         resu = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread_id), ctypes.py_object(SystemExit))
         if resu > 1:
@@ -148,23 +148,19 @@ class DetectWidget(MyBoxLayout):
             self.show_error_popup('Select leaf image.')
             return
         self.popup = self.show_progress_popup(self.cancel, 'Detect leaf', 'Running...')
-
         if self.d is None:
             self.d = Detect()
-
         thr = self.ids.thresh_slider.value
         self.d.set_param(bin_thr=thr)
-
         self.thread = WorkingThread(target=self.detect)
         self.thread.start()
 
     def detect(self):
         try:
             output_img, main_obj = self.d.extr_leaf(self.input_path)
-            out_texture = self.cv2_to_texture(output_img)
-            self.app.leaf_texture = out_texture
             self.app.leaf_img = output_img
             self.app.leaf_obj = main_obj
+            Clock.schedule_once(self.update_texture, 0)
         except (ValueError, TypeError) as e:
             self.show_error_popup(str(e))
         self.popup.dismiss()
@@ -175,6 +171,10 @@ class DetectWidget(MyBoxLayout):
     def cancel(self):
         self.thread.raise_exception()
 
+    def update_texture(self, dt):
+        texture = self.cv2_to_texture(self.app.leaf_img)
+        self.app.leaf_texture = texture
+        
 class FvFmWidget(BoxLayout):
     def __init__(self, **kwargs):
         super(FvFmWidget, self).__init__(**kwargs)
