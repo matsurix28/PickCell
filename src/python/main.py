@@ -16,6 +16,8 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.uix.tabbedpanel import TabbedPanel
 
+from range_slider import RangeSlider
+
 src_dir = os.path.normpath(
     os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
@@ -289,8 +291,12 @@ class AlignWidget(MyBoxLayout):
 
 class SplitColorWidget(BoxLayout):
     color1_texture = ObjectProperty(None)
+    color2_texture = ObjectProperty(None)
+    img_color1_texture = ObjectProperty(None)
+    img_color2_texture = ObjectProperty(None)
     def __init__(self, **kwargs):
         super(SplitColorWidget, self).__init__(**kwargs)
+        self.src_dir = src_dir
 
     def analyze(self):
         pass

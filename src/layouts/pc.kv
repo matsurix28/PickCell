@@ -16,6 +16,14 @@
     width: self.texture_size[0] + dp(20)
     height: std_height
 
+<ImageArea@Image>:
+    canvas.after:
+        Color:
+            rgba: 1,1,1,1
+        Line:
+            rectangle: self.x, self.y, self.width, self.height
+            width: dp(1)
+
 <InnerBox@BoxLayout>:
     spacing: dp(10)
     size_hint_y: None
@@ -42,7 +50,7 @@
 <RVBox@BoxLayout>:
     text: ''
     texture: None
-    Image:
+    ImageArea:
         id: img
         texture: root.texture
     Word:
@@ -159,7 +167,7 @@
     InnerBox:  # Image frame
         size_hint: 0.6, 1
         orientation: 'vertical'
-        Image:  # Input image
+        ImageArea:  # Input image
             id: input_img
             size_hint_y: 0.5
             source: root.src_dir + '/img/input.png'
@@ -167,7 +175,7 @@
             size_hint: 1, None
             width: 
             source: root.src_dir + '/img/arrow.png'
-        Image:  # Output image
+        ImageArea:  # Output image
             texture: app.leaf_texture
             size_hint_y: 0.5
             source: root.src_dir + '/img/output.png'
@@ -248,7 +256,7 @@
         InnerBox:  # Image frame
             size_hint: 0.4, 1
             orientation: 'vertical'
-            Image:  # Input image
+            ImageArea:  # Input image
                 id: input_img
                 size_hint_y: 0.5
                 source: root.src_dir + '/img/input.png'
@@ -256,7 +264,7 @@
                 size_hint: 1, None
                 width: 
                 source: root.src_dir + '/img/arrow.png'
-            Image:  # Output image
+            ImageArea:  # Output image
                 texture: app.fvfm_texture
                 size_hint_y: 0.5
                 source: root.src_dir + '/img/output.png'
@@ -368,20 +376,25 @@
                 text: 'Fv/Fm'
         InnerBox:  # Input image frame
             size_hint: 1, 0.3
-            Image:  # Input leaf image
+            ImageArea:  # Input leaf image
                 texture: app.leaf_texture
-            Image:  # Input fvfm image
+                source: root.src_dir + '/img/input.png'
+            ImageArea:  # Input fvfm image
                 texture: app.fvfm_texture
+                source: root.src_dir + '/img/input.png'
         InnerBox:  # Aligned image frame
             size_hint: 1, 0.3
-            Image:  # Output leaf image
+            ImageArea:  # Output leaf image
                 texture: root.res_leaf_texture
-            Image:  # Output fvfm image
+                source: root.src_dir + '/img/output.png'
+            ImageArea:  # Output fvfm image
                 texture: root.res_fvfm_texture
+                source: root.src_dir + '/img/output.png'
         InnerBox:  # Overlay image frame
             size_hint: 1, 0.3
-            Image:
+            ImageArea:
                 texture: root.overlay_texture
+                source: root.src_dir + '/img/output.png'
     InnerBox:  # Method frame
         padding: dp(10), dp(0), dp(10), dp(10)
         size_hint: 0.4, 1
@@ -393,7 +406,7 @@
                 rectangle: self.x-dp(2), self.y-dp(2), self.width+dp(2), self.height+dp(2)
                 width: dp(2)
         Word:  # Method title label
-            font_size: 25
+            font_size: sp(25)
             text: 'Method'
         ScrollView:  # Method area
             InnerBox:
@@ -401,7 +414,7 @@
                 Sentence:
                     text: 'Reads the Fv/Fm scale bar from an image and creates its value and color correspondence table. Also, extract only the leaf area from an image.'
                 Image:
-                    height: 200
+                    height: dp(200)
                     size_hint_y: None
                     source: root.src_dir + '/img/icon.png'
                 Space:
@@ -423,49 +436,78 @@
                             on_release: app.root.switch_to(app.root.ids.split_color)
 
 <SplitColorWidget>:
+    padding: dp(10)
+    spacing: dp(20)
     InnerBox:  # Image frame
-        size_hint: 0.5, 1
+        size_hint: 0.6, 1
         orientation: 'vertical'
         InnerBox:
             orientation: 'vertical'
             size_hint_y: 0.5
             Word:
                 text: 'Original image'
-            Image:
+            ImageArea:
                 texture: app.res_leaf_texture
+                source: root.src_dir + '/img/input.png'
         InnerBox:  #Split color images frame
-            size_hint_y: 0.6
-            orientation: 'vertical'
+            size_hint_y: 0.5
             InnerBox:  # Color 1
-                size_hint_y: 1
+                size_hint: 0.5, 1
                 orientation: 'vertical'
                 Word:
                     text: 'Color 1'
-                Image:
+                ImageArea:
+                    texture: root.img_color1_texture
+                    source: root.src_dir + '/img/output.png'
             InnerBox:  # Color 2
-                size_hint_y: 1
+                size_hint: 0.5, 1
                 orientation: 'vertical'
                 Word:
-                    text: 'Color 1'
-                Image:
+                    text: 'Color 2'
+                ImageArea:
+                    texture: root.img_color2_texture
+                    source: root.src_dir + '/img/output.png'
     InnerBox:  # Method frame
-        padding: 10, 0, 10, 10
-        size_hint: 0.5, 1
+        padding: dp(10), dp(0), dp(10), dp(10)
+        size_hint: 0.4, 1
         orientation: 'vertical'
+        canvas.after:
+            Color:
+                rgba: 1,1,1,1
+            Line:
+                rectangle: self.x-dp(2), self.y-dp(2), self.width+dp(2), self.height+dp(2)
+                width: dp(2)
         Word:  # Method title label
-            font_size: 25
+            font_size: sp(25)
             text: 'Method'
         ScrollView:  # Method area
             InnerBox:
                 orientation: 'vertical'
                 Sentence:
                     text: 'Split color to compare.'
-                InnerBox:  # Step 3 Run
+                InnerBox:  # Step 1 select range of color1
+                    orientation: 'vertical'
                     Sentence:
                         text: 'Step 1. Select color range 1.'
-                    Image:
-                        size_hint_y: std_height
+                    ImageArea:
+                        size_hint_y: None
+                        height: std_height
                         texture: root.color1_texture
+                    RangeSlider:
+                        value: 30,60
+                    Button:
+                        text: 'RUN'
+                        on_press: root.run()
+                InnerBox:  # Step 1 select range of color1
+                    orientation: 'vertical'
+                    Sentence:
+                        text: 'Step 2. Select color range 2.'
+                    ImageArea:
+                        size_hint_y: None
+                        height: std_height
+                        texture: root.color1_texture
+                    RangeSlider:
+                        value: 60,90
                     Button:
                         text: 'RUN'
                         on_press: root.run()
@@ -476,9 +518,6 @@
                         text: 'Analyze'
                         on_release: root.analyze()
 
-<AnalyzeWidget>:
-    orientation: 'vertical'
-    BoxLayout:
 
 #<Widget>:
 #    canvas.after:
