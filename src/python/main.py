@@ -148,7 +148,6 @@ class DetectWidget(MyBoxLayout):
         self.src_dir = src_dir
         self.d = None
         self.input_path = None
-        Clock.schedule_once(self.set_default, 0)
         self.app = App.get_running_app()
 
     def run(self):

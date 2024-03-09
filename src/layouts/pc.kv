@@ -16,6 +16,12 @@
     width: self.texture_size[0] + dp(20)
     height: std_height
 
+<RangeSlider>:
+    range: 0, 255
+    step: 1
+    size_hint_y: None
+    height: std_height
+
 <ImageArea@Image>:
     canvas.after:
         Color:
@@ -80,14 +86,14 @@
         text: 'Detect'
         id: detect
         DetectWidget:
-    TabbedPanelItem:
-        text: 'Fv/Fm'
-        id: fvfm
-        FvFmWidget:
-    TabbedPanelItem:
-        text: 'Align'
-        id: align
-        AlignWidget:
+#    TabbedPanelItem:
+#        text: 'Fv/Fm'
+#        id: fvfm
+#        FvFmWidget:
+#    TabbedPanelItem:
+#        text: 'Align'
+#        id: align
+#        AlignWidget:
     TabbedPanelItem:
         text: 'Split Color'
         id: split_color
@@ -225,6 +231,7 @@
                             range: 0, 255
                             step: 1
                             value: 0 if textin.text == '' else int(textin.text)
+                            value: 30
                         TextInput:
                             id: textin
                             text: '{:.0f}'.format(thresh_slider.value)
@@ -493,8 +500,22 @@
                         size_hint_y: None
                         height: std_height
                         texture: root.color1_texture
-                    RangeSlider:
-                        value: 30,60
+                    InnerBox:  # Slider frame
+                        size_hint: 1, None
+                        height: std_height
+                        TextInput:
+                            id: color1_text1
+                            text: '{:.0f}'.format(color1_slider.value1)
+                            input_filter: 'int'
+                            on_text_validate: 
+                                if self.text == '': self.text = '0'
+                                elif int(self.text) > 255: self.text = '255'
+                                elif int(self.text) < 0: self.text = '0'
+                                thresh_slider.value = int(self.text)
+                        RangeSlider:
+                            id: color1_slider
+                            value1: 0 if color1_text1.text == '' else int(color1_text1.text)
+                            value: 30, 60
                     Button:
                         text: 'RUN'
                         on_press: root.run()
