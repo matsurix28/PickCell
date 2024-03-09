@@ -188,6 +188,8 @@ class FvFmWidget(MyBoxLayout):
         self.d = None
         self.input_path = None
         self.app = App.get_running_app()
+        self.setup_thread = threading.Thread(target=self.setup_analysis)
+        self.setup_thread.start()
         Clock.schedule_once(self.set_default, 0)
 
     def run(self):
@@ -202,13 +204,14 @@ class FvFmWidget(MyBoxLayout):
         self.thread = WorkingThread(target=self.run_process)
         self.thread.start()
 
+    def setup_analysis(self):
+        from detect import Detect
+        from fvfm import Fvfm
+        self.d = Detect()
+        self.f = Fvfm()
+
     def run_process(self):
-        if self.f is None:
-            from fvfm import Fvfm
-            self.f = Fvfm()
-        if self.d is None:
-            from detect import Detect
-            self.d = Detect()
+        self.setup_thread.join()
         thr = self.ids.thresh_slider.value
         self.d.set_param(bin_thr=thr)
         try:
