@@ -144,7 +144,7 @@ class DetectWidget(MyBoxLayout):
         if self.input_path is None:
             self.show_error_popup('Select leaf image.')
             return
-        self.popup = self.show_progress_popup(self.cancel, 'Detect leaf', 'Running...')
+        self.popup = self.show_progress_popup(self.cancel_proc, 'Detect leaf', 'Running...')
         if self.d is None:
             self.d = Detect()
         thr = self.ids.thresh_slider.value
@@ -155,11 +155,11 @@ class DetectWidget(MyBoxLayout):
     def detect(self):
         try:
             output_img, main_obj = self.d.extr_leaf(self.input_path)
+            self.leaf_img = output_img
             self.app.leaf_img = output_img
             self.app.leaf_obj = main_obj
             Clock.schedule_once(self.update_texture, 0)
         except (ValueError, TypeError) as e:
-            #self.show_error_popup(str(e))
             self.err = str(e)
             Clock.schedule_once(self.thread_err, 0)
             print(e)
@@ -172,11 +172,11 @@ class DetectWidget(MyBoxLayout):
     def set_default(self, dt):
         self.ids.thresh_slider.value = default_threshold
     
-    def cancel(self):
+    def cancel_proc(self):
         self.thread.raise_exception()
 
     def update_texture(self, dt):
-        texture = self.cv2_to_texture(self.app.leaf_img)
+        texture = self.cv2_to_texture(self.leaf_img)
         self.app.leaf_texture = texture
         
 class FvFmWidget(BoxLayout):
