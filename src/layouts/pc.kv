@@ -134,7 +134,7 @@
 <ErrorPopup>:
     size_hint: 0.4, 1
     height: box.height + self.title_size + 40
-    title_size: 25
+    title_size: dp(25)
     title: root.title_text
     BoxLayout:
         id: box
@@ -144,6 +144,7 @@
         padding: 10, 20, 10, 10
         spacing: 10
         Sentence:
+            font_size: sp(25)
             text: root.message
         AnchorLayout:
             anchor_x: 'right'
