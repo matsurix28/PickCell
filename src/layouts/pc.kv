@@ -43,8 +43,11 @@
     text: ''
     texture: None
     Image:
+        id: img
         texture: root.texture
     Word:
+        size_hint_y: None
+        height: img.height
         text: root.text
 
 <Sentence@Label>:
@@ -277,7 +280,7 @@
                     size_hint_y: None
                     height: self.minimum_height
                     orientation: 'vertical'
-                    spacing: dp(8)
+                    spacing: dp(2)
     InnerBox:  # Method frame
         padding: dp(10), dp(0), dp(10), dp(10)
         size_hint: 0.4, 1
