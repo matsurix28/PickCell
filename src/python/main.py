@@ -160,8 +160,14 @@ class DetectWidget(MyBoxLayout):
             Clock.schedule_once(self.update_texture, 0)
         except (ValueError, TypeError) as e:
             #self.show_error_popup(str(e))
+            self.err = str(e)
+            Clock.schedule_once(self.thread_err, 0)
             print(e)
         self.popup.dismiss()
+
+    def thread_err(self, dt):
+        self.show_error_popup(self.err)
+        self.err = None
 
     def set_default(self, dt):
         self.ids.thresh_slider.value = default_threshold
