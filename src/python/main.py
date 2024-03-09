@@ -1,9 +1,10 @@
+import ctypes
 import os
+import threading
 from os.path import expanduser
 
-import cv2
 import numpy as np
-import range_slider
+from detect import Detect
 from kivy import platform
 from kivy.app import App
 from kivy.clock import Clock
@@ -40,6 +41,9 @@ class ErrorPopup(Popup):
 class ProgressPopup(Popup):
     title_text = StringProperty('')
     message = StringProperty('')
+    def __init__(self, cancel_func, **kwargs):
+        super(ProgressPopup, self).__init__(**kwargs)
+        self.cancel = cancel_func
 
 class MyBoxLayout(BoxLayout):
     def __init__(self, **kwargs):
@@ -58,9 +62,10 @@ class MyBoxLayout(BoxLayout):
         texture.flip_vertical()
         return texture
     
-    def show_progress_popup(self, title, message):
-        popup = ProgressPopup(title_text=title, message=message)
+    def show_progress_popup(self,cancel_func, title, message):
+        popup = ProgressPopup(cancel_func, title_text=title, message=message)
         popup.open()
+        return popup
 
     def show_error_popup(self, message, title='Error'):
         popup = ErrorPopup(message=message, title_text=title)
@@ -108,45 +113,73 @@ class PickcellApp(App):
         else:
             return False
 
+class WorkingThread(threading.Thread):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def get_id(self):
+        if hasattr(self, '_thread_id'):
+            return self._thread_id
+        for id, thread in threading._active.items():
+            if thread is self:
+                return id
+
+    def raise_exception(self):
+        thread_id = self.get_id()
+        resu = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread_id), ctypes.py_object(SystemExit))
+        if resu > 1:
+            ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread_id), 0)
+            
+
 class DetectWidget(MyBoxLayout):
     def __init__(self, **kwargs):
         super(DetectWidget, self).__init__(**kwargs)
         self.src_dir = src_dir
         self.d = None
         self.input_path = None
-        #Clock.schedule_once(self.set_default, 0)
-        Clock.schedule_once(self.set_default, 2)
+        Clock.schedule_once(self.set_default, 1.2)
 
     def run(self):
-        app = App.get_running_app()
         if self.input_path is None:
             self.show_error_popup('Select leaf image.')
             return
-        
+        self.popup = self.show_progress_popup(self.cancel, 'Detect leaf', 'Running...')
         if self.d is None:
-            from detect import Detect
             self.d = Detect()
         thr = self.ids.thresh_slider.value
-        print(thr)
         self.d.set_param(bin_thr=thr)
+        self.thread = WorkingThread(target=self.detect)
+        self.thread.start()
+
+    def detect(self):
         try:
             output_img, main_obj = self.d.extr_leaf(self.input_path)
-            out_texture = self.cv2_to_texture(output_img)
-            #self.ids.output_img.texture = out_texture
-            app.leaf_texture = out_texture
-            app.leaf_img = output_img
-            app.leaf_obj = main_obj
+            self.app.leaf_img = output_img
+            self.app.leaf_obj = main_obj
+            Clock.schedule_once(self.update_texture, 0)
         except (ValueError, TypeError) as e:
-            self.show_error_popup(str(e))
+            #self.show_error_popup(str(e))
+            self.err = str(e)
+            Clock.schedule_once(self.thread_err, 0)
             print(e)
+        self.popup.dismiss()
+
+    def thread_err(self, dt):
+        self.show_error_popup(self.err)
+        self.err = None
 
     def set_default(self, dt):
         print('set default')
+        self.ids.thresh_slider.bind(value=lambda slider, value: self.update_thresh_img(value))
         self.ids.thresh_slider.value = default_threshold
     
     def cancel(self):
-        pass
+        self.thread.raise_exception()
 
+    def update_texture(self, dt):
+        texture = self.cv2_to_texture(self.app.leaf_img)
+        self.app.leaf_texture = texture
+        
 class FvFmWidget(BoxLayout):
     def __init__(self, **kwargs):
         super(FvFmWidget, self).__init__(**kwargs)

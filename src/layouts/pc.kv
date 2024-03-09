@@ -1,6 +1,6 @@
 #:import Factory kivy.factory.Factory
 
-#:set std_height 40
+#:set std_height dp(40)
 #:set default_thresh 60
 #:set ext ['jpg', 'jpeg', 'png', 'tiff', 'bmp']
 #:set ext sum([['*.' + i.lower(), '*.' + i.upper()] for i in ext], [])
@@ -11,23 +11,23 @@
     height: std_height
 
 <Button>:
-    font_size: 20
+    font_size: sp(20)
     size_hint: None, None
-    width: self.texture_size[0] + 20
+    width: self.texture_size[0] + dp(20)
     height: std_height
 
 <InnerBox@BoxLayout>:
-    spacing: 10
+    spacing: dp(10)
     size_hint_y: None
     height: self.minimum_height
 
 <Word@Label>:
     size_hint_y: None
-    height: self.texture_size[1] + 10
-    font_size: 20
+    height: self.texture_size[1] + dp(10)
+    font_size: sp(20)
 
 <TextInput>:
-    font_size: 20
+    font_size: sp(20)
     multiline: False
     line_height: 1
     size_hint: None, None
@@ -36,7 +36,7 @@
     halign: 'center'
 
 <ScrollVIew>:
-    bar_width: 10
+    bar_width: dp(10)
     scroll_type: ['bars']
 
 <RVBox@BoxLayout>:
@@ -48,14 +48,14 @@
         text: root.text
 
 <Sentence@Label>:
-    font_size: 22
+    font_size: sp(22)
     text_size: self.width, None
     size_hint_y: None
-    height: self.texture_size[1] + 10
+    height: self.texture_size[1] + dp(10)
 
 <Space@Label>:
     size_hint_y: None
-    height: 15
+    height: dp(15)
     text: ''
     canvas.after:
         Line:
@@ -64,7 +64,7 @@
 
 <Root>:
     do_default_tab: False
-    tab_width: 120
+    tab_width: dp(120)
     TabbedPanelItem:
         text: 'Detect'
         id: detect
@@ -108,39 +108,43 @@
                         root.dismiss()
 
 <ProgressPopup>:
+    on_dismiss: False
     title: root.title_text
-    title_size: 25
+    title_size: dp(25)
     separator_height: 2
     size_hint: 0.4, None
-    height: box.height + self.title_size + 40
+    height: box.height + self.title_size + dp(40)
     BoxLayout:
         id: box
         size_hint_y: None
         height: self.minimum_height
         orientation: 'vertical'
-        padding: 10, 20, 10, 10
-        spacing: 10
+        padding: dp(10), dp(20), dp(10), dp(10)
+        spacing: dp(10)
         Sentence:
             text: root.message
         AnchorLayout:
             anchor_x: 'right'
             Button:
                 text: 'Cancel'
-                on_press: root.dismiss()
+                on_press: 
+                    root.cancel()
+                    root.dismiss()
 
 <ErrorPopup>:
-    size_hint: 0.4, None
-    height: box.height + self.title_size + 40
-    title_size: 25
+    size_hint: 0.4, 1
+    height: box.height + self.title_size + dp(40)
+    title_size: dp(25)
     title: root.title_text
     BoxLayout:
         id: box
         size_hint_y: None
         height: self.minimum_height
         orientation: 'vertical'
-        padding: 10, 20, 10, 10
-        spacing: 10
+        padding: dp(10), dp(20), dp(10), dp(10)
+        spacing: dp(10)
         Sentence:
+            font_size: sp(25)
             text: root.message
         AnchorLayout:
             anchor_x: 'right'
@@ -149,10 +153,10 @@
                 on_release: root.dismiss()
 
 <DetectWidget>:
-    padding: 10
-    spacing: 20
+    padding: dp(10)
+    spacing: dp(20)
     InnerBox:  # Image frame
-        size_hint: 0.5, 1
+        size_hint: 0.6, 1
         orientation: 'vertical'
         Image:  # Input image
             id: input_img
@@ -167,17 +171,17 @@
             size_hint_y: 0.5
             source: root.src_dir + '/img/output.png'
     InnerBox:  # Method frame
-        padding: 10, 0, 10, 10
-        size_hint: 0.5, 1
+        padding: dp(10), dp(0), dp(10), dp(10)
+        size_hint: 0.4, 1
         orientation: 'vertical'
         canvas.after:
             Color:
                 rgba: 1,1,1,1
             Line:
-                rectangle: self.x-2, self.y-2, self.width+2, self.height+2
-                width: 2
+                rectangle: self.x-dp(2), self.y-dp(2), self.width+dp(2), self.height+dp(2)
+                width: dp(2)
         Word:  # Method title label
-            font_size: 25
+            font_size: sp(25)
             text: 'Method'
         ScrollView:  # Method area
             InnerBox:
@@ -185,7 +189,7 @@
                 Sentence:
                     text: 'Detects contours from an image.'
                 Image:
-                    height: 200
+                    height: dp(200)
                     size_hint_y: None
                     source: root.src_dir + '/img/icon.png'
                 Space:
@@ -236,51 +240,56 @@
                         on_release: app.root.switch_to(app.root.ids.fvfm)
 
 <FvFmWidget>:
-    padding: 10
-    spacing: 20
-    InnerBox:  # Image frame
-        size_hint: 0.5, 1
-        orientation: 'vertical'
-        Image:  # Input image
-            id: input_img
-            size_hint_y: 0.5
-        Word:
-            font_size: 20
-            text: 'v'
-        Image:  # Output image
-            texture: app.fvfm_texture
-            size_hint_y: 0.5
-    BoxLayout:  # Fv/Fm list frame
-        size_hint_x: 0.2
-        orientation: 'vertical'
-        Word:
-            font_size: 25
-            text: 'Fv/Fm value list'
-        RecycleView:
-            id: rv
-            viewclass: 'RVBox'
-            bar_width: dp(10)
-            scroll_type: ["bars", "content"]
-            scroll_wheel_distance: sp(50)
-            RecycleBoxLayout:
-                default_size: None, sp(50)
-                default_size_hint: 1, None
-                size_hint_y: None
-                height: self.minimum_height
-                orientation: 'vertical'
-                spacing: dp(8)
+    padding: dp(10)
+    spacing: dp(20)
+    InnerBox:
+        size_hint: 0.6, 1
+        InnerBox:  # Image frame
+            size_hint: 0.4, 1
+            orientation: 'vertical'
+            Image:  # Input image
+                id: input_img
+                size_hint_y: 0.5
+                source: root.src_dir + '/img/input.png'
+            Image:
+                size_hint: 1, None
+                width: 
+                source: root.src_dir + '/img/arrow.png'
+            Image:  # Output image
+                texture: app.fvfm_texture
+                size_hint_y: 0.5
+                source: root.src_dir + '/img/output.png'
+        InnerBox:  # Fv/Fm list frame
+            size_hint: 0.2, 1
+            orientation: 'vertical'
+            Word:
+                font_size: sp(25)
+                text: 'Fv/Fm value'
+            RecycleView:
+                id: rv
+                viewclass: 'RVBox'
+                bar_width: dp(10)
+                scroll_type: ["bars", "content"]
+                scroll_wheel_distance: sp(50)
+                RecycleBoxLayout:
+                    default_size: None, sp(50)
+                    default_size_hint: 1, None
+                    size_hint_y: None
+                    height: self.minimum_height
+                    orientation: 'vertical'
+                    spacing: dp(8)
     InnerBox:  # Method frame
-        padding: 10, 0, 10, 10
-        size_hint: 0.5, 1
+        padding: dp(10), dp(0), dp(10), dp(10)
+        size_hint: 0.4, 1
         orientation: 'vertical'
         canvas.after:
             Color:
                 rgba: 1,1,1,1
             Line:
-                rectangle: self.x-2, self.y-2, self.width+2, self.height+2
-                width: 2
+                rectangle: self.x-dp(2), self.y-dp(2), self.width+dp(2), self.height+dp(2)
+                width: dp(2)
         Word:  # Method title label
-            font_size: 25
+            font_size: sp(25)
             text: 'Method'
         ScrollView:  # Method area
             InnerBox:
@@ -288,24 +297,22 @@
                 Sentence:
                     text: 'Reads the Fv/Fm scale bar from an image and creates its value and color correspondence table. Also, extract only the leaf area from an image.'
                 Image:
-                    height: 200
+                    height: dp(200)
                     size_hint_y: None
                     source: root.src_dir + '/img/icon.png'
                 Space:
                 InnerBox:  # Step 1 Input
                     Sentence:
-                        text: 'Step 1. Select fvfm result image'
+                        text: 'Step 1. Select leaf image'
                     Button:
                         text: 'Select'
                         on_release: Factory.FileDialogPopup(select=root.input_img, cancel=root.cancel).open()
                 Space:
                 InnerBox:  # Step 2 Threshold
+                    id: inner
                     orientation: 'vertical'
                     Sentence:
                         text: 'Step 2. Set threshold for extract'
-                    Image:
-                        size_hint_y: None
-                        height: 50
                     InnerBox:
                         Button:
                             text: 'Reset'
@@ -316,8 +323,9 @@
                             height: std_height
                             range: 0, 255
                             step: 1
-                            value: default_thresh
+                            value: 0 if textin.text == '' else int(textin.text)
                         TextInput:
+                            id: textin
                             text: '{:.0f}'.format(thresh_slider.value)
                             input_filter: 'int'
                             on_text_validate: 
@@ -338,7 +346,7 @@
                     Button:
                         text: 'Next->'
                         on_release: app.root.switch_to(app.root.ids.arrange)
-        
+                            
 <ArrangeWidget>:
     InnerBox:
         size_hint: 0.35, 1
@@ -452,9 +460,6 @@
                     Image:
                         size_hint_y: std_height
                         texture: root.color1_texture
-                    RangeSlider:
-                        step: 1
-                        value: 0, 255
                     Button:
                         text: 'RUN'
                         on_press: root.run()
