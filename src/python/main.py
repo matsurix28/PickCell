@@ -50,6 +50,7 @@ class MyBoxLayout(BoxLayout):
         super(MyBoxLayout, self).__init__(**kwargs)
         self.src_dir = src_dir
         self.input_path = None
+        self.thread = None
 
     def input_img(self, file):
         if file != []:
@@ -70,6 +71,9 @@ class MyBoxLayout(BoxLayout):
     def show_error_popup(self, message, title='Error'):
         popup = ErrorPopup(message=message, title_text=title)
         popup.open()
+
+    def cancel_process(self):
+        self.thread.raise_exception()
     
 class PickcellApp(App):
     leaf_img = None
@@ -137,61 +141,68 @@ class DetectWidget(MyBoxLayout):
         self.src_dir = src_dir
         self.d = None
         self.input_path = None
-        Clock.schedule_once(self.set_default, 1.2)
+        Clock.schedule_once(self.set_default, 0)
         self.app = App.get_running_app()
 
     def run(self):
         if self.input_path is None:
             self.show_error_popup('Select leaf image.')
             return
-        self.popup = self.show_progress_popup(self.cancel_proc, 'Detect leaf', 'Running...')
+        self.popup = self.show_progress_popup(self.cancel_process, 'Detect leaf', 'Running...')
+        
+        self.thread = WorkingThread(target=self.run_process)
+        self.thread.start()
+
+    def run_process(self):
         if self.d is None:
             self.d = Detect()
         thr = self.ids.thresh_slider.value
         self.d.set_param(bin_thr=thr)
-        self.thread = WorkingThread(target=self.detect)
-        self.thread.start()
-
-    def detect(self):
         try:
             output_img, main_obj = self.d.extr_leaf(self.input_path)
-            self.leaf_img = output_img
+            self.output_img = output_img
             self.app.leaf_img = output_img
             self.app.leaf_obj = main_obj
             Clock.schedule_once(self.update_texture, 0)
         except (ValueError, TypeError) as e:
-            self.err = str(e)
-            Clock.schedule_once(self.thread_err, 0)
-            print(e)
+            self.err_msg = str(e)
+            Clock.schedule_once(self.thread_error, 0)
         self.popup.dismiss()
 
-    def thread_err(self, dt):
-        self.show_error_popup(self.err)
-        self.err = None
+    def thread_error(self, dt):
+        self.show_error_popup(self.err_msg)
+        self.err_msg = None
 
     def set_default(self, dt):
         self.ids.thresh_slider.value = default_threshold
-    
-    def cancel_proc(self):
-        self.thread.raise_exception()
 
     def update_texture(self, dt):
-        texture = self.cv2_to_texture(self.leaf_img)
+        texture = self.cv2_to_texture(self.output_img)
         self.app.leaf_texture = texture
         
-class FvFmWidget(BoxLayout):
+class FvFmWidget(MyBoxLayout):
     def __init__(self, **kwargs):
         super(FvFmWidget, self).__init__(**kwargs)
         self.src_dir = src_dir
         self.f = None
         self.d = None
         self.input_path = None
+        self.app = App.get_running_app()
+        Clock.schedule_once(self.set_default, 0)
 
     def run(self):
-        app = App.get_running_app()
         if self.input_path is None:
-            self.err_pop('Select Fv/Fm result image.')
+            self.show_error_popup('Select Fv/Fm result image.')
             return
+        self.popup = self.show_progress_popup(
+            self.cancel_process,
+            'Read Fv/Fm value',
+            'Running...'
+        )
+        self.thread = WorkingThread(target=self.run_process)
+        self.thread.start()
+
+    def run_process(self):
         if self.f is None:
             from fvfm import Fvfm
             self.f = Fvfm()
@@ -202,37 +213,30 @@ class FvFmWidget(BoxLayout):
         self.d.set_param(bin_thr=thr)
         try:
             output_img, main_obj = self.d.extr_leaf(self.input_path)
-            out_texture = self.cv2_to_texture(output_img)
-            #self.ids.output_img.texture = out_texture
+            self.output_img = output_img
+            self.app.fvfm_img = output_img
+            self.app.fvfm_obj = main_obj
             self.fvfm_list = self.f.get(self.input_path)
-            self.show_fvfm_list(self.fvfm_list)
-            app.fvfm_texture = out_texture
-            app.fvfm_img = output_img
-            app.fvfm_obj = main_obj
+            Clock.schedule_once(self.update_texture, 0)
         except Exception as e:
-            self.err_pop(e)
+            self.err_msg = str(e)
+            Clock.schedule_once(self.thread_error, 0)
+        self.popup.dismiss()
 
-    def input_img(self, file):
-        if file != []:
-            self.ids.input_img.source = file[0]
-            self.input_path = file[0]
+    def thread_error(self, dt):
+        self.show_error_popup(self.err_msg)
+        self.err_msg = None
 
-    def cv2_to_texture(self, cv2_img):
-        texture = Texture.create(size=(cv2_img.shape[1], cv2_img.shape[0]), colorfmt='bgr', bufferfmt='ubyte')
-        texture.blit_buffer(cv2_img.tostring(), colorfmt='bgr', bufferfmt='ubyte')
-        texture.flip_vertical()
-        return texture
+    def update_texture(self, dt):
+        texture = self.cv2_to_texture(self.output_img)
+        self.app.fvfm_texture = texture
+        self.show_fvfm_list()
 
-    def cancel(self):
-        pass
+    def set_default(self, dt):
+        self.ids.thresh_slider.value = default_threshold
 
-    def err_pop(self, msg):
-        popup = ErrorPopup()
-        popup.ids.err_msg.text = msg
-        popup.open()
-
-    def show_fvfm_list(self, fvfm_list=None):
-        for f in fvfm_list:
+    def show_fvfm_list(self):
+        for f in self.fvfm_list:
             color = f[0]
             img = np.full((36,36,3), color, np.uint8)
             texture = self.cv2_to_texture(img)
