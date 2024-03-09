@@ -35,6 +35,14 @@
     size_hint_y: None
     height: self.minimum_height
 
+<IntInput@TextInput>:
+    input_filter: 'int'
+    on_text_validate:
+        if self.text == '': self.text = '0'
+        elif int(self.text) > 255: self.text = '255'
+        elif int(self.text) < 0: self.text = '0'
+        print('henkou')
+
 <Word@Label>:
     size_hint_y: None
     height: self.texture_size[1] + dp(10)
@@ -82,14 +90,14 @@
 <Root>:
     do_default_tab: False
     tab_width: dp(120)
-    TabbedPanelItem:
-        text: 'Detect'
-        id: detect
-        DetectWidget:
 #    TabbedPanelItem:
-#        text: 'Fv/Fm'
-#        id: fvfm
-#        FvFmWidget:
+#        text: 'Detect'
+#        id: detect
+#        DetectWidget:
+    TabbedPanelItem:
+        text: 'Fv/Fm'
+        id: fvfm
+        FvFmWidget:
 #    TabbedPanelItem:
 #        text: 'Align'
 #        id: align
@@ -341,15 +349,15 @@
                             step: 1
                             value: 0 if textin.text == '' else int(textin.text)
                             value: root.default_thresh
-                        TextInput:
+                        IntInput:
                             id: textin
                             text: '{:.0f}'.format(thresh_slider.value)
                             input_filter: 'int'
-                            on_text_validate: 
-                                if self.text == '': self.text = '0'
-                                elif int(self.text) > 255: self.text = '255'
-                                elif int(self.text) < 0: self.text = '0'
-                                thresh_slider.value = int(self.text)
+                            on_text_validate: thresh_slider.value = int(self.text)
+                                #if self.text == '': self.text = '0'
+                                #elif int(self.text) > 255: self.text = '255'
+                                #elif int(self.text) < 0: self.text = '0'
+                                
                 Space:
                 InnerBox:  # Step 3 Run
                     Sentence:
