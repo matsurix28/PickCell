@@ -148,23 +148,7 @@ class DetectWidget(MyBoxLayout):
         print('owari')
 
     def set_default(self, dt):
-        print('set default')
-        self.ids.thresh_slider.bind(value=lambda slider, value: self.update_thresh_img(value))
         self.ids.thresh_slider.value = default_threshold
-        
-
-    def update_thresh_img(self, thresh):
-        print('update')
-        width = int(self.ids.thresh_img.size[0])
-        height = int(self.ids.thresh_img.size[1])
-        img = np.zeros((height, width, 1), np.uint8)
-        color_range = np.linspace(thresh, 255, width)
-        for i in range(width):
-            for j in range(height):
-                img[j,i,0] = color_range[i]
-        img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-        texture = self.cv2_to_texture(img)
-        self.ids.thresh_img.texture = texture
     
     def cancel(self):
         pass
