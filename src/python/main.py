@@ -82,6 +82,7 @@ class PickcellApp(App):
     fvfm_texture = ObjectProperty(None)
     leaf_obj = None
     fvfm_obj = None
+    fvfm_list = None
     res_leaf_img = None
     res_fvfm_img = None
     res_leaf_texture = ObjectProperty(None)
@@ -212,11 +213,8 @@ class FvFmWidget(MyBoxLayout):
         thr = self.ids.thresh_slider.value
         self.d.set_param(bin_thr=thr)
         try:
-            output_img, main_obj = self.d.extr_leaf(self.input_path)
-            self.output_img = output_img
-            self.app.fvfm_img = output_img
-            self.app.fvfm_obj = main_obj
-            self.fvfm_list = self.f.get(self.input_path)
+            self.app.fvfm_img, self.app.fvfm_obj = self.d.extr_leaf(self.input_path)
+            self.app.fvfm_list = self.f.get(self.input_path)
             Clock.schedule_once(self.update_texture, 0)
         except Exception as e:
             self.err_msg = str(e)
@@ -228,15 +226,14 @@ class FvFmWidget(MyBoxLayout):
         self.err_msg = None
 
     def update_texture(self, dt):
-        texture = self.cv2_to_texture(self.output_img)
-        self.app.fvfm_texture = texture
+        self.app.fvfm_texture = self.cv2_to_texture(self.app.fvfm_img)
         self.show_fvfm_list()
 
     def set_default(self, dt):
         self.ids.thresh_slider.value = default_threshold
 
     def show_fvfm_list(self):
-        for f in self.fvfm_list:
+        for f in self.app.fvfm_list:
             color = f[0]
             img = np.full((36,36,3), color, np.uint8)
             texture = self.cv2_to_texture(img)
@@ -259,8 +256,15 @@ class AlignWidget(MyBoxLayout):
         leaf_obj = self.app.leaf_obj
         fvfm_obj = self.app.fvfm_obj
         self.args = [leaf_img, fvfm_img, leaf_obj, fvfm_obj]
-        if None in self.args:
-            self.show_error_popup('Not enough input.')
+        if (leaf_img is None) or (leaf_obj is None):
+            if (fvfm_img is None) or (fvfm_obj is None):
+                self.show_error_popup('There is no input.\nPlease run "Detect" and "Fv/Fm" before align.')
+                return
+            else:
+                self.show_error_popup('There is no "Leaf".\nPlease run "Detect" before align.')
+                return
+        elif (fvfm_img is None) or (fvfm_obj is None):
+            self.show_error_popup('There is no "Fv/Fm".\nPlease run "Fv/Fm" before align.')
             return
         self.popup = self.show_progress_popup(self.cancel_process, 'Align two images', 'Running...')
         self.thread = WorkingThread(target=self.run_process)
@@ -269,7 +273,7 @@ class AlignWidget(MyBoxLayout):
     
     def run_process(self):
         if self.a is None:
-            from python.align import Align
+            from align import Align
             self.a = Align()
         try:
             self.app.res_leaf_img, self.app.res_fvfm_img, self.overlay_img = self.a.run(*self.args)
