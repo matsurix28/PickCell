@@ -146,6 +146,7 @@ class DetectWidget(MyBoxLayout):
     def __init__(self, **kwargs):
         super(DetectWidget, self).__init__(**kwargs)
         self.src_dir = src_dir
+        self.default_thresh = default_threshold
         self.d = None
         self.input_path = None
         self.app = App.get_running_app()
@@ -185,13 +186,13 @@ class FvFmWidget(MyBoxLayout):
     def __init__(self, **kwargs):
         super(FvFmWidget, self).__init__(**kwargs)
         self.src_dir = src_dir
+        self.default_thresh = default_threshold
         self.f = None
         self.d = None
         self.input_path = None
         self.app = App.get_running_app()
         self.setup_thread = threading.Thread(target=self.setup_analysis)
         self.setup_thread.start()
-        Clock.schedule_once(self.set_default, 0)
 
     def run(self):
         if self.input_path is None:
@@ -227,9 +228,6 @@ class FvFmWidget(MyBoxLayout):
     def update_texture(self, dt):
         self.app.fvfm_texture = self.cv2_to_texture(self.app.fvfm_img)
         self.show_fvfm_list()
-
-    def set_default(self, dt):
-        self.ids.thresh_slider.value = default_threshold
 
     def show_fvfm_list(self):
         for f in self.app.fvfm_list:

@@ -231,7 +231,7 @@
                             range: 0, 255
                             step: 1
                             value: 0 if textin.text == '' else int(textin.text)
-                            value: 30
+                            value: root.default_thresh
                         TextInput:
                             id: textin
                             text: '{:.0f}'.format(thresh_slider.value)
@@ -340,6 +340,7 @@
                             range: 0, 255
                             step: 1
                             value: 0 if textin.text == '' else int(textin.text)
+                            value: root.default_thresh
                         TextInput:
                             id: textin
                             text: '{:.0f}'.format(thresh_slider.value)
