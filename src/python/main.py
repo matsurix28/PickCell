@@ -42,6 +42,9 @@ class ErrorPopup(Popup):
 class ProgressPopup(Popup):
     title_text = StringProperty('')
     message = StringProperty('')
+    def __init__(self, cancel_func, **kwargs):
+        super(ProgressPopup, self).__init__(**kwargs)
+        self.cancel = cancel_func
 
 class MyBoxLayout(BoxLayout):
     def __init__(self, **kwargs):
@@ -60,9 +63,10 @@ class MyBoxLayout(BoxLayout):
         texture.flip_vertical()
         return texture
     
-    def show_progress_popup(self, title, message):
-        popup = ProgressPopup(title_text=title, message=message)
+    def show_progress_popup(self,cancel_func, title, message):
+        popup = ProgressPopup(cancel_func, title_text=title, message=message)
         popup.open()
+        return popup
 
     def show_error_popup(self, message, title='Error'):
         popup = ErrorPopup(message=message, title_text=title)
@@ -123,35 +127,33 @@ class DetectWidget(MyBoxLayout):
         if self.input_path is None:
             self.show_error_popup('Select leaf image.')
             return
-        
-        #if self.d is None:
-        #    self.d = Detect()
-        
-        
+        self.popup = self.show_progress_popup(self.cancel, 'Detect leaf', 'Running...')
+
+        if self.d is None:
+            self.d = Detect()
+
+        thr = self.ids.thresh_slider.value
+        self.d.set_param(bin_thr=thr)
+
         thread = threading.Thread(target=self.detect)
         thread.start()
 
     def detect(self):
-        print(self.input_path)
-        d = Detect()
-        thr = self.ids.thresh_slider.value
-        d.set_param(bin_thr=thr)
-        
         try:
-            output_img, main_obj = d.extr_leaf(self.input_path)
+            output_img, main_obj = self.d.extr_leaf(self.input_path)
             out_texture = self.cv2_to_texture(output_img)
             self.app.leaf_texture = out_texture
             self.app.leaf_img = output_img
             self.app.leaf_obj = main_obj
         except (ValueError, TypeError) as e:
             self.show_error_popup(str(e))
-        print('owari')
+        self.popup.dismiss()
 
     def set_default(self, dt):
         self.ids.thresh_slider.value = default_threshold
     
     def cancel(self):
-        pass
+        print('cancel')
 
 class FvFmWidget(BoxLayout):
     def __init__(self, **kwargs):
