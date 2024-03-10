@@ -53,6 +53,7 @@ class MyBoxLayout(BoxLayout):
         self.src_dir = src_dir
         self.input_path = None
         self.thread = None
+        Clock.schedule_once(self.set_default, 0)
 
     def input_img(self, file):
         if file != []:
@@ -88,6 +89,9 @@ class MyBoxLayout(BoxLayout):
             input.text = '255'
         if target is not None:
             target = int(input.text)
+
+    def set_default(self, dt):
+        pass
 
 class PickcellApp(App):
     leaf_img = None
@@ -179,9 +183,7 @@ class DetectWidget(MyBoxLayout):
         except (ValueError, TypeError) as e:
             self.err_msg = str(e)
             Clock.schedule_once(self.thread_error, 0)
-        self.popup.dismiss()
-
-    
+        self.popup.dismiss()    
 
     def set_default(self, dt):
         self.ids.thresh_slider.value = default_threshold
@@ -247,6 +249,9 @@ class FvFmWidget(MyBoxLayout):
                 'text': str(f[1])
             })
 
+    def set_default(self, dt):
+        self.ids.thresh_slider.value = default_threshold
+
 class AlignWidget(MyBoxLayout):
     res_leaf_texture = ObjectProperty(None)
     res_fvfm_texture = ObjectProperty(None)
@@ -294,7 +299,7 @@ class AlignWidget(MyBoxLayout):
         self.res_fvfm_texture = self.cv2_to_texture(self.app.res_fvfm_img)
         self.overlay_texture = self.cv2_to_texture(self.overlay_img)
 
-class SplitColorWidget(BoxLayout):
+class SplitColorWidget(MyBoxLayout):
     color1_texture = ObjectProperty(None)
     color2_texture = ObjectProperty(None)
     img_color1_texture = ObjectProperty(None)
@@ -306,6 +311,34 @@ class SplitColorWidget(BoxLayout):
     def analyze(self):
         pass
 
+    def set_default(self, dt):
+        self.ids.color1_slider.value1 = 30
+        self.ids.color1_slider.value2 = 60
+        self.ids.color2_slider.value1 = 60
+        self.ids.color2_slider.value2 = 90
+        self.ids.color1_slider.value.bind(
+            self.set_hue_texture(
+                self.ids.color1_slider,
+                self.color1_texture
+            )
+        )
+
+    def set_hue_texture(self, slider, img):
+        low = [slider.value1, 0, 0]
+        high = [slider.value2, 255, 255]
+        height = 40
+        width = 400
+        img = np.zeros((height, width, 3), np.uint8)
+        h = np.linspace(low[0], high[0], width)
+        s = np.linspace(low[1], high[1], height)
+        v = np.linspace(low[2], high[2], height)
+        for i in range(width):
+            for j in range(height):
+                img[j,i,0] = h[i]
+                img[j,i,1] = s[j]
+                img[j,i,2] = v[j]
+        texture = self.cv2_to_texture(img)
+        img = texture
 class Root(TabbedPanel):
     pass
 

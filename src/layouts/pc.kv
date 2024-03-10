@@ -89,10 +89,10 @@
 #        text: 'Detect'
 #        id: detect
 #        DetectWidget:
-    TabbedPanelItem:
-        text: 'Fv/Fm'
-        id: fvfm
-        FvFmWidget:
+#    TabbedPanelItem:
+#        text: 'Fv/Fm'
+#        id: fvfm
+#        FvFmWidget:
 #    TabbedPanelItem:
 #        text: 'Align'
 #        id: align
@@ -235,15 +235,10 @@
                             step: 1
                             value: 0 if textin.text == '' else int(textin.text)
                             value: root.default_thresh
-                        TextInput:
+                        IntInput:
                             id: textin
                             text: '{:.0f}'.format(thresh_slider.value)
-                            input_filter: 'int'
-                            on_text_validate: 
-                                if self.text == '': self.text = '0'
-                                elif int(self.text) > 255: self.text = '255'
-                                elif int(self.text) < 0: self.text = '0'
-                                thresh_slider.value = int(self.text)
+                            on_text_validate: root.int_input(self, thresh_slider.value)
                 Space:
                 InnerBox:  # Step 3 Run
                     Sentence:
@@ -343,12 +338,10 @@
                             range: 0, 255
                             step: 1
                             value: 0 if textin.text == '' else int(textin.text)
-                            #value: root.default_thresh
                         IntInput:
                             id: textin
                             text: '{:.0f}'.format(thresh_slider.value)
-                            on_text_validate: root.int_input(self, thresh_slider.value)
-                                
+                            on_text_validate: root.int_input(self, thresh_slider.value)             
                 Space:
                 InnerBox:  # Step 3 Run
                     Sentence:
@@ -495,40 +488,52 @@
                 InnerBox:  # Step 1 select range of color1
                     orientation: 'vertical'
                     Sentence:
-                        text: 'Step 1. Select color range 1.'
+                        text: 'Step 1. Select hue range 1.'
                     ImageArea:
+                        id: 
                         size_hint_y: None
                         height: std_height
-                        texture: root.color1_texture
                     InnerBox:  # Slider frame
                         size_hint: 1, None
                         height: std_height
-                        TextInput:
+                        IntInput:
                             id: color1_text1
                             text: '{:.0f}'.format(color1_slider.value1)
-                            input_filter: 'int'
-                            on_text_validate: 
-                                if self.text == '': self.text = '0'
-                                elif int(self.text) > 255: self.text = '255'
-                                elif int(self.text) < 0: self.text = '0'
-                                thresh_slider.value = int(self.text)
+                            on_text_validate: root.int_input(self, color1_slider.value1)
                         RangeSlider:
                             id: color1_slider
+                            range: 0, 180
                             value1: 0 if color1_text1.text == '' else int(color1_text1.text)
-                            value: 30, 60
+                            value2: 0 if color1_text2.text == '' else int(color1_text2.text)
+                        IntInput:
+                            id: color1_text2
+                            text: '{:.0f}'.format(color1_slider.value2)
+                            on_text_validate: root.int_input(self, color1_slider.value2)
                     Button:
                         text: 'RUN'
                         on_press: root.run()
                 InnerBox:  # Step 1 select range of color1
                     orientation: 'vertical'
                     Sentence:
-                        text: 'Step 2. Select color range 2.'
+                        text: 'Step 2. Select hue range 2.'
                     ImageArea:
                         size_hint_y: None
                         height: std_height
-                        texture: root.color1_texture
-                    RangeSlider:
-                        value: 60,90
+                        texture: root.color2_texture
+                    InnerBox:  # Color2 slider frame
+                        IntInput:
+                            id: color2_text1
+                            text: '{:.0f}'.format(color2_slider.value1)
+                            on_text_validate: root.int_input(self, color2_slider.value1)
+                        RangeSlider:
+                            id: color2_slider
+                            range: 0, 180
+                            value1: 0 if color2_text1.text == '' else int(color2_text1.text)
+                            value2: 0 if color2_text2.text == '' else int(color2_text2.text)
+                        IntInput:
+                            id: color2_text2
+                            text: '{:.0f}'.format(color2_slider.value2)
+                            on_text_validate: root.int_input(self, color2_slider.value2)
                     Button:
                         text: 'RUN'
                         on_press: root.run()
