@@ -12,7 +12,7 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics.texture import Texture
 from kivy.lang import Builder
-from kivy.properties import ObjectProperty, StringProperty
+from kivy.properties import NumericProperty, ObjectProperty, StringProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.uix.tabbedpanel import TabbedPanel
@@ -301,78 +301,97 @@ class AlignWidget(MyBoxLayout):
         self.overlay_texture = self.cv2_to_texture(self.overlay_img)
 
 class SplitColorWidget(MyBoxLayout):
-    color1_texture = ObjectProperty(None)
-    color2_texture = ObjectProperty(None)
-    img_color1_texture = ObjectProperty(None)
-    img_color2_texture = ObjectProperty(None)
+    extr1_texture = ObjectProperty(None)
+    extr2_texture = ObjectProperty(None)
+    range1_texture = ObjectProperty(None)
+    range2_texture = ObjectProperty(None)
+    
     def __init__(self, **kwargs):
         super(SplitColorWidget, self).__init__(**kwargs)
         self.src_dir = src_dir
-        Window.bind(on_resize=lambda window, size, size2: self.resize_img())
-        self.app = App.get_running_app()
+        Clock.schedule_once(self.bind_func, 0)
 
-    def analyze(self):
-        pass
+    def bind_func(self, dt):
+        self.ids.hue1_slider.bind(
+            value1=lambda slider, value: self.set_value1(value, 'h1l'),
+            value2=lambda slider, value: self.set_value1(value, 'h1h')
+        )
+        self.ids.s1_slider.bind(
+            value1=lambda slider, value: self.set_value1(value, 's1l'),
+            value2=lambda slider, value: self.set_value1(value, 's1h')
+        )
+        self.ids.v1_slider.bind(
+            value1=lambda slider, value: self.set_value1(value, 'v1l'),
+            value2=lambda slider, value: self.set_value1(value, 'v1h')
+        )
+
+    def test(self, value):
+        print(value)
+
+    def set_value1(self, value, val_type):
+        if val_type == 'h1l':
+            self.h1l = int(value)
+        elif val_type == 'h1h':
+            self.h1h = int(value)
+        elif val_type == 's1l':
+            self.s1l = int(value)
+        elif val_type == 's1h':
+            self.s1h = int(value)
+        elif val_type == 'v1l':
+            self.v1l = int(value)
+        elif val_type == 'v1h':
+            self.v1h = int(value)
+        self.update_texture(
+            self.h1l, self.h1h,
+            self.s1l, self.s1h,
+            self.v1l, self.v1h,
+            self.ids.range1_img
+        )
+        
+    def set_value2(self, value, val_type):
+        if val_type == 'h2l':
+            self.h2l = int(value)
+        elif val_type == 'h2h':
+            self.h2h = int(value)
+        elif val_type == 's2l':
+            self.s2l = int(value)
+        elif val_type == 's2h':
+            self.s2h = int(value)
+        elif val_type == 'v2l':
+            self.v2l = int(value)
+        elif val_type == 'vh':
+            self.v2h = int(value)
+        self.update_texture(
+            self.h2l, self.h2h,
+            self.s2l, self.s2h,
+            self.v2l, self.v2h,
+            self.ids.range1_img
+        )
+        
+    def update_texture(self, hl, hh, sl, sh, vl,vh, img):
+        print('update texture', hl, hh, sl, sh, vl,vh)
+        height = int(img.height)
+        width = int(img.width)
+        hue = np.linspace(hl, hh, width)
+        saturation = np.linspace(sl, sh, height)
+        value = np.linspace(vl, vh, height)
+        img_hsv = np.array([[h,s,v] for (s, v) in zip(saturation, value) for h in hue], np.uint8).reshape(height, width, 3)
+        img = cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR)
+        texture = self.cv2_to_texture(img)
+        self.range1_texture = texture
+
 
     def set_default(self, dt):
-        self.ids.color1_slider.bind(
-            #value=lambda slider, value: self.set_hue_texture(slider, self.ids.color1_img)
-            value=lambda slider, value: self.set_hue1(slider, value)
-        )
-        self.ids.color2_slider.bind(
-            #value=lambda slider, value: self.set_hue_texture(slider, self.ids.color2_img)
-            value=lambda slider, value: self.set_hue2(slider, value)
-        )
-        self.ids.color1_slider.value1 = 30
-        self.ids.color1_slider.value2 = 60
-        self.ids.color2_slider.value1 = 60
-        self.ids.color2_slider.value2 = 90
-        self.low1 = (30, 0, 0)
-        self.high1 = (60, 255, 255)
-        self.low2 = (60, 0, 0)
-        self.high2 = (90, 255, 255)
+        self.h1l = 30
+        self.h1h = 60
+        self.s1l = 0
+        self.s1h = 255
+        self.v1l = 0
+        self.v1h = 255
+        self.ids.hue1_slider.value = (self.h1l, self.h1h)
+        self.ids.s1_slider.value = (self.s1l, self.s1h)
+        self.ids.v1_slider.value = (self.v1l, self.v1h)
 
-    def set_hue_texture(self, slider, img_widget):
-        low = [slider.value1, 0, 0]
-        high = [slider.value2, 255, 255]
-        height = int(img_widget.height)
-        width = int(img_widget.width)
-        hue = np.linspace(low[0], high[0], width)
-        saturation = np.linspace(low[1], high[1], height)
-        value = np.linspace(low[2], high[2], height)
-        img = np.array([[h,s,v] for (s,v) in zip(saturation, value) for h in hue], np.uint8).reshape(height, width, 3)
-        img = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
-        texture = self.cv2_to_texture(img)
-        img_widget.texture = texture
-
-    def set_hue1(self, slider, value=None):
-        print('set hue', value)
-        if value is not None:
-            self.low1 = (value[0], 0, 0)
-            self.high1 = (value[1], 255, 255)
-        self.set_hue_texture(slider, self.ids.color1_img)
-
-    def set_hue2(self, slider, value=None):
-        if value is not None:
-            self.low2 = (value[0], 0, 0)
-            self.high2 = (value[1], 255, 255)
-        self.set_hue_texture(slider, self.ids.color2_img)
-
-    def resize_img(self):
-        Clock.schedule_once(lambda x: self.set_hue1(self.ids.color1_slider), 0)
-        Clock.schedule_once(lambda x: self.set_hue2(self.ids.color2_slider), 0)
-
-    def extr_color1(self):
-        img = cv2.imread('test_res.png')
-        hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        cv2.imwrite('test_hsv.png', hsv_img)
-        print(self.low1)
-        result_hsv = cv2.inRange(hsv_img, self.low1, self.high1)
-        cv2.imwrite('test_res_hsv.png', result_hsv)
-        result_img = cv2.bitwise_and(img, img, mask=result_hsv)
-        #result_img = cv2.cvtColor(result_hsv, cv2.COLOR_HSV2BGR)
-        cv2.imwrite('test_res2.png', result_img)
-        self.img_color1_texture = self.cv2_to_texture(result_img)
         
 class Root(TabbedPanel):
     pass
