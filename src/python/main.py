@@ -308,21 +308,28 @@ class SplitColorWidget(MyBoxLayout):
     def __init__(self, **kwargs):
         super(SplitColorWidget, self).__init__(**kwargs)
         self.src_dir = src_dir
+        Window.bind(on_resize=lambda window, size, size2: self.resize_img())
 
     def analyze(self):
         pass
 
     def set_default(self, dt):
         self.ids.color1_slider.bind(
-            value=lambda slider, value: self.set_hue_texture(slider, self.ids.color1_img)
+            #value=lambda slider, value: self.set_hue_texture(slider, self.ids.color1_img)
+            value=lambda slider, value: self.set_hue1(slider, value)
         )
         self.ids.color2_slider.bind(
-            value=lambda slider, value: self.set_hue_texture(slider, self.ids.color2_img)
+            #value=lambda slider, value: self.set_hue_texture(slider, self.ids.color2_img)
+            value=lambda slider, value: self.set_hue2(slider, value)
         )
         self.ids.color1_slider.value1 = 30
         self.ids.color1_slider.value2 = 60
         self.ids.color2_slider.value1 = 60
         self.ids.color2_slider.value2 = 90
+        self.low1 = 30
+        self.high1 = 60
+        self.low2 = 60
+        self.high2 = 90
 
     def set_hue_texture(self, slider, img_widget):
         low = [slider.value1, 0, 0]
@@ -336,6 +343,22 @@ class SplitColorWidget(MyBoxLayout):
         img = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
         texture = self.cv2_to_texture(img)
         img_widget.texture = texture
+
+    def set_hue1(self, slider, value=None):
+        if value is not None:
+            self.low1 = [value[0], 0, 0]
+            self.high1 = [value[1], 0, 0]
+        self.set_hue_texture(slider, self.ids.color1_img)
+
+    def set_hue2(self, slider, value=None):
+        if value is not None:
+            self.low2 = [value[0], 0, 0]
+            self.high2 = [value[1], 0, 0]
+        self.set_hue_texture(slider, self.ids.color2_img)
+
+    def resize_img(self):
+        Clock.schedule_once(lambda x: self.set_hue1(self.ids.color1_slider), 0)
+        Clock.schedule_once(lambda x: self.set_hue2(self.ids.color2_slider), 0)
         
 class Root(TabbedPanel):
     pass
