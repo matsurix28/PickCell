@@ -312,7 +312,7 @@ class SplitColorWidget(MyBoxLayout):
         Clock.schedule_once(self.bind_func, 0)
 
     def bind_func(self, dt):
-        self.ids.hue1_slider.bind(
+        self.ids.h1_slider.bind(
             value1=lambda slider, value: self.set_value1(value, 'h1l'),
             value2=lambda slider, value: self.set_value1(value, 'h1h')
         )
@@ -388,7 +388,7 @@ class SplitColorWidget(MyBoxLayout):
         self.s1h = 255
         self.v1l = 0
         self.v1h = 255
-        self.ids.hue1_slider.value = (self.h1l, self.h1h)
+        self.ids.h1_slider.value = (self.h1l, self.h1h)
         self.ids.s1_slider.value = (self.s1l, self.s1h)
         self.ids.v1_slider.value = (self.v1l, self.v1h)
 

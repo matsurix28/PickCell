@@ -497,20 +497,23 @@
                     InnerBox:  # Slider frame
                         size_hint: 1, None
                         height: std_height
+                        Word:
+                            text: 'H'
+                            size_hint_x: None
                         IntInput:
-                            id: hue1_text1
+                            id: h1_text1
                             width: self.minimum_height + dp(20)
-                            text: '{:.0f}'.format(hue1_slider.value1)
+                            text: '{:.0f}'.format(h1_slider.value1)
                             #on_text_validate: root.int_input(self, color1_slider.value1)
                         RangeSlider:
-                            id: hue1_slider
+                            id: h1_slider
                             range: 0, 180
-                            value1: 0 if hue1_text1.text == '' else hue1_text1.text
-                            value2: 0 if hue1_text2.text == '' else hue1_text2.text
+                            value1: 0 if h1_text1.text == '' else h1_text1.text
+                            value2: 0 if h1_text2.text == '' else h1_text2.text
                         IntInput:
-                            id: hue1_text2
+                            id: h1_text2
                             width: self.minimum_height + dp(20)
-                            text: '{:.0f}'.format(hue1_slider.value2)
+                            text: '{:.0f}'.format(h1_slider.value2)
                             #on_text_validate: root.int_input(self, color1_slider.value2)
                     RangeSlider:
                         id: s1_slider
