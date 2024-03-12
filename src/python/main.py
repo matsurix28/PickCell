@@ -3,6 +3,7 @@ import os
 import threading
 from os.path import expanduser
 
+import cv2
 import numpy as np
 from detect import Detect
 from kivy import platform
@@ -312,33 +313,38 @@ class SplitColorWidget(MyBoxLayout):
         pass
 
     def set_default(self, dt):
+        self.ids.color1_slider.bind(
+            value=lambda slider, value: self.set_hue_texture(slider, self.ids.color1_img)
+        )
+        self.ids.color2_slider.bind(
+            value=lambda slider, value: self.set_hue_texture(slider, self.ids.color2_img)
+        )
         self.ids.color1_slider.value1 = 30
         self.ids.color1_slider.value2 = 60
         self.ids.color2_slider.value1 = 60
         self.ids.color2_slider.value2 = 90
-        self.ids.color1_slider.value.bind(
-            self.set_hue_texture(
-                self.ids.color1_slider,
-                self.color1_texture
-            )
-        )
+        
 
-    def set_hue_texture(self, slider, img):
+    def set_hue_texture(self, slider, img_widget):
         low = [slider.value1, 0, 0]
         high = [slider.value2, 255, 255]
-        height = 40
-        width = 400
+        height = int(img_widget.height)
+        width = int(img_widget.width)
+        print('hue image size',height, width)
         img = np.zeros((height, width, 3), np.uint8)
         h = np.linspace(low[0], high[0], width)
         s = np.linspace(low[1], high[1], height)
         v = np.linspace(low[2], high[2], height)
+        
         for i in range(width):
             for j in range(height):
                 img[j,i,0] = h[i]
                 img[j,i,1] = s[j]
                 img[j,i,2] = v[j]
+        img = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
         texture = self.cv2_to_texture(img)
-        img = texture
+        img_widget.texture = texture
+        
 class Root(TabbedPanel):
     pass
 

@@ -490,9 +490,12 @@
                     Sentence:
                         text: 'Step 1. Select hue range 1.'
                     ImageArea:
-                        id: 
+                        id: color1_img
                         size_hint_y: None
-                        height: std_height
+                        width: dp(476)
+                        size_hint_x: 1
+                        height: std_height * 2
+                        
                     InnerBox:  # Slider frame
                         size_hint: 1, None
                         height: std_height
@@ -517,9 +520,9 @@
                     Sentence:
                         text: 'Step 2. Select hue range 2.'
                     ImageArea:
+                        id: color2_img
                         size_hint_y: None
-                        height: std_height
-                        texture: root.color2_texture
+                        height: std_height * 2
                     InnerBox:  # Color2 slider frame
                         IntInput:
                             id: color2_text1
