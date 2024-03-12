@@ -85,18 +85,18 @@
 <Root>:
     do_default_tab: False
     tab_width: dp(120)
-#    TabbedPanelItem:
-#        text: 'Detect'
-#        id: detect
-#        DetectWidget:
-#    TabbedPanelItem:
-#        text: 'Fv/Fm'
-#        id: fvfm
-#        FvFmWidget:
-#    TabbedPanelItem:
-#        text: 'Align'
-#        id: align
-#        AlignWidget:
+    TabbedPanelItem:
+        text: 'Detect'
+        id: detect
+        DetectWidget:
+    TabbedPanelItem:
+        text: 'Fv/Fm'
+        id: fvfm
+        FvFmWidget:
+    TabbedPanelItem:
+        text: 'Align'
+        id: align
+        AlignWidget:
     TabbedPanelItem:
         text: 'Split Color'
         id: split_color
@@ -385,7 +385,7 @@
         InnerBox:  # Aligned image frame
             size_hint: 1, 0.3
             ImageArea:  # Output leaf image
-                texture: root.res_leaf_texture
+                texture: app.res_leaf_texture
                 source: root.src_dir + '/img/output.png'
             ImageArea:  # Output fvfm image
                 texture: root.res_fvfm_texture
@@ -498,6 +498,7 @@
                         height: std_height
                         IntInput:
                             id: color1_text1
+                            width: self.minimum_height + dp(20)
                             text: '{:.0f}'.format(color1_slider.value1)
                             on_text_validate: root.int_input(self, color1_slider.value1)
                         RangeSlider:
@@ -507,12 +508,14 @@
                             value2: 0 if color1_text2.text == '' else int(color1_text2.text)
                         IntInput:
                             id: color1_text2
+                            width: self.minimum_height + dp(20)
                             text: '{:.0f}'.format(color1_slider.value2)
                             on_text_validate: root.int_input(self, color1_slider.value2)
-                    Button:
-                        text: 'RUN'
-                        on_press: root.run()
-                InnerBox:  # Step 1 select range of color1
+                        Button:
+                            text: 'Extract'
+                            on_press: root.extr_color1()
+                Space:
+                InnerBox:  # Step 2 select range of color2
                     orientation: 'vertical'
                     Sentence:
                         text: 'Step 2. Select hue range 2.'
@@ -523,6 +526,7 @@
                     InnerBox:  # Color2 slider frame
                         IntInput:
                             id: color2_text1
+                            width: self.minimum_height + dp(20)
                             text: '{:.0f}'.format(color2_slider.value1)
                             on_text_validate: root.int_input(self, color2_slider.value1)
                         RangeSlider:
@@ -532,11 +536,12 @@
                             value2: 0 if color2_text2.text == '' else int(color2_text2.text)
                         IntInput:
                             id: color2_text2
+                            width: self.minimum_height + dp(20)
                             text: '{:.0f}'.format(color2_slider.value2)
                             on_text_validate: root.int_input(self, color2_slider.value2)
-                    Button:
-                        text: 'RUN'
-                        on_press: root.run()
+                        Button:
+                            text: 'Extract'
+                            on_press: root.extr_color2()
                 Space:
                 AnchorLayout:  # Next button
                     anchor_x: 'right'

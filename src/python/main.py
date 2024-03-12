@@ -296,7 +296,7 @@ class AlignWidget(MyBoxLayout):
         self.popup.dismiss()
 
     def update_texture(self, dt):
-        self.res_leaf_texture = self.cv2_to_texture(self.app.res_leaf_img)
+        self.app.res_leaf_texture = self.cv2_to_texture(self.app.res_leaf_img)
         self.res_fvfm_texture = self.cv2_to_texture(self.app.res_fvfm_img)
         self.overlay_texture = self.cv2_to_texture(self.overlay_img)
 
@@ -309,6 +309,7 @@ class SplitColorWidget(MyBoxLayout):
         super(SplitColorWidget, self).__init__(**kwargs)
         self.src_dir = src_dir
         Window.bind(on_resize=lambda window, size, size2: self.resize_img())
+        self.app = App.get_running_app()
 
     def analyze(self):
         pass
@@ -326,10 +327,10 @@ class SplitColorWidget(MyBoxLayout):
         self.ids.color1_slider.value2 = 60
         self.ids.color2_slider.value1 = 60
         self.ids.color2_slider.value2 = 90
-        self.low1 = 30
-        self.high1 = 60
-        self.low2 = 60
-        self.high2 = 90
+        self.low1 = (30, 0, 0)
+        self.high1 = (60, 255, 255)
+        self.low2 = (60, 0, 0)
+        self.high2 = (90, 255, 255)
 
     def set_hue_texture(self, slider, img_widget):
         low = [slider.value1, 0, 0]
@@ -345,20 +346,33 @@ class SplitColorWidget(MyBoxLayout):
         img_widget.texture = texture
 
     def set_hue1(self, slider, value=None):
+        print('set hue', value)
         if value is not None:
-            self.low1 = [value[0], 0, 0]
-            self.high1 = [value[1], 0, 0]
+            self.low1 = (value[0], 0, 0)
+            self.high1 = (value[1], 255, 255)
         self.set_hue_texture(slider, self.ids.color1_img)
 
     def set_hue2(self, slider, value=None):
         if value is not None:
-            self.low2 = [value[0], 0, 0]
-            self.high2 = [value[1], 0, 0]
+            self.low2 = (value[0], 0, 0)
+            self.high2 = (value[1], 255, 255)
         self.set_hue_texture(slider, self.ids.color2_img)
 
     def resize_img(self):
         Clock.schedule_once(lambda x: self.set_hue1(self.ids.color1_slider), 0)
         Clock.schedule_once(lambda x: self.set_hue2(self.ids.color2_slider), 0)
+
+    def extr_color1(self):
+        img = cv2.imread('test_res.png')
+        hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        cv2.imwrite('test_hsv.png', hsv_img)
+        print(self.low1)
+        result_hsv = cv2.inRange(hsv_img, self.low1, self.high1)
+        cv2.imwrite('test_res_hsv.png', result_hsv)
+        result_img = cv2.bitwise_and(img, img, mask=result_hsv)
+        #result_img = cv2.cvtColor(result_hsv, cv2.COLOR_HSV2BGR)
+        cv2.imwrite('test_res2.png', result_img)
+        self.img_color1_texture = self.cv2_to_texture(result_img)
         
 class Root(TabbedPanel):
     pass
