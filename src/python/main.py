@@ -5,6 +5,9 @@ from os.path import expanduser
 
 import cv2
 import numpy as np
+from custom_widgets.myboxlayout import MyBoxLayout
+from custom_widgets.popup import ErrorPopup, FileDialogPopup, ProgressPopup
+from custom_widgets.range_slider import RangeSlider
 from detect import Detect
 from kivy import platform
 from kivy.app import App
@@ -17,12 +20,6 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.uix.tabbedpanel import TabbedPanel
 
-from range_slider import RangeSlider
-
-src_dir = os.path.normpath(
-    os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        '../'))
 currentActivity = None
 CLS_Activity = None
 CLS_Intent = None
@@ -33,66 +30,10 @@ MediaStore_Images_Media_DATA = '_data'
 
 default_threshold = 60
 
-class FileDialogPopup(Popup):
-    select = ObjectProperty(None)
-    cancel = ObjectProperty(None)
-
-class ErrorPopup(Popup):
-    title_text = StringProperty('Error')
-    message = StringProperty('')
-
-class ProgressPopup(Popup):
-    title_text = StringProperty('')
-    message = StringProperty('')
-    def __init__(self, cancel_func, **kwargs):
-        super(ProgressPopup, self).__init__(**kwargs)
-        self.cancel = cancel_func
-
-class MyBoxLayout(BoxLayout):
-    def __init__(self, **kwargs):
-        super(MyBoxLayout, self).__init__(**kwargs)
-        self.src_dir = src_dir
-        self.input_path = None
-        self.thread = None
-        Clock.schedule_once(self.set_default, 0)
-
-    def input_img(self, file):
-        if file != []:
-            self.ids.input_img.source = file[0]
-            self.input_path = file[0]
-
-    def cv2_to_texture(self, cv2_img):
-        texture = Texture.create(size=(cv2_img.shape[1], cv2_img.shape[0]), colorfmt='bgr', bufferfmt='ubyte')
-        texture.blit_buffer(cv2_img.tobytes(), colorfmt='bgr', bufferfmt='ubyte')
-        texture.flip_vertical()
-        return texture
-    
-    def show_progress_popup(self,cancel_func, title, message):
-        popup = ProgressPopup(cancel_func, title_text=title, message=message)
-        popup.open()
-        return popup
-
-    def show_error_popup(self, message, title='Error'):
-        popup = ErrorPopup(message=message, title_text=title)
-        popup.open()
-
-    def cancel_process(self):
-        self.thread.raise_exception()
-
-    def thread_error(self, dt):
-        self.show_error_popup(self.err_msg)
-        self.err_msg = None
-    
-    def int_input(self, input, target=None):
-        if (input.text == '') or (int(input.text) < 0):
-            input.text = '0'
-        elif int(input.text) > 255:
-            input.text = '255'
-        if target is not None:
-            target = int(input.text)
-
-    def set_default(self, dt):
-        pass
+src_dir = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        '../'))
 
 class PickcellApp(App):
     leaf_img = None
@@ -449,6 +390,7 @@ class SplitColorWidget(MyBoxLayout):
         self.app.res_leaf2_img = cv2.bitwise_and(img, img, mask=mask)
         texture = self.cv2_to_texture(self.app.res_leaf2_img)
         self.extr2_texture = texture
+
 class Root(TabbedPanel):
     pass
 
