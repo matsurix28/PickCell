@@ -309,6 +309,7 @@ class SplitColorWidget(MyBoxLayout):
     def __init__(self, **kwargs):
         super(SplitColorWidget, self).__init__(**kwargs)
         self.src_dir = src_dir
+        self.app = App.get_running_app()
         Clock.schedule_once(self.bind_func, 0)
 
     def bind_func(self, dt):
@@ -323,6 +324,21 @@ class SplitColorWidget(MyBoxLayout):
         self.ids.v1_slider.bind(
             value1=lambda slider, value: self.set_value1(value, 'v1l'),
             value2=lambda slider, value: self.set_value1(value, 'v1h')
+        )
+        self.ids.h2_slider.bind(
+            value1=lambda slider, value: self.set_value2(value, 'h2l'),
+            value2=lambda slider, value: self.set_value2(value, 'h2h')
+        )
+        self.ids.s2_slider.bind(
+            value1=lambda slider, value: self.set_value2(value, 's2l'),
+            value2=lambda slider, value: self.set_value2(value, 's2h')
+        )
+        self.ids.v2_slider.bind(
+            value1=lambda slider, value: self.set_value2(value, 'v2l'),
+            value2=lambda slider, value: self.set_value2(value, 'v2h')
+        )
+        Window.bind(
+            on_resize=lambda window, size, size2: Clock.schedule_once(self.resize_widgets, 0)
         )
 
     def test(self, value):
@@ -365,21 +381,20 @@ class SplitColorWidget(MyBoxLayout):
             self.h2l, self.h2h,
             self.s2l, self.s2h,
             self.v2l, self.v2h,
-            self.ids.range1_img
+            self.ids.range2_img
         )
         
-    def update_texture(self, hl, hh, sl, sh, vl,vh, img):
-        print('update texture', hl, hh, sl, sh, vl,vh)
-        height = int(img.height)
-        width = int(img.width)
+    def update_texture(self, hl, hh, sl, sh, vl,vh, range_img):
+        height = int(range_img.height)
+        width = int(range_img.width)
+        
         hue = np.linspace(hl, hh, width)
         saturation = np.linspace(sl, sh, height)
         value = np.linspace(vl, vh, height)
         img_hsv = np.array([[h,s,v] for (s, v) in zip(saturation, value) for h in hue], np.uint8).reshape(height, width, 3)
         img = cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR)
         texture = self.cv2_to_texture(img)
-        self.range1_texture = texture
-
+        range_img.texture = texture
 
     def set_default(self, dt):
         self.h1l = 30
@@ -391,8 +406,49 @@ class SplitColorWidget(MyBoxLayout):
         self.ids.h1_slider.value = (self.h1l, self.h1h)
         self.ids.s1_slider.value = (self.s1l, self.s1h)
         self.ids.v1_slider.value = (self.v1l, self.v1h)
+        self.h2l = 30
+        self.h2h = 60
+        self.s2l = 0
+        self.s2h = 255
+        self.v2l = 0
+        self.v2h = 255
+        self.ids.h2_slider.value = (self.h2l, self.h2h)
+        self.ids.s2_slider.value = (self.s2l, self.s2h)
+        self.ids.v2_slider.value = (self.v2l, self.v2h)
 
+    def resize_widgets(self, dt):
+        self.update_texture(
+            self.h1l, self.h1h,
+            self.s1l, self.s1h,
+            self.v1l, self.v1h,
+            self.ids.range1_img
+        )
+        self.update_texture(
+            self.h2l, self.h2h,
+            self.s2l, self.s2h,
+            self.v2l, self.v2h,
+            self.ids.range2_img
+        )
         
+    def extr_color1(self):
+        img = self.app.res_leaf_img
+        img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        low = (self.h1l, self.s1l, self.v1l)
+        high = (self.h1h, self.s1h, self.v1h)
+        mask = cv2.inRange(img_hsv, low, high)
+        self.app.res_leaf1_img = cv2.bitwise_and(img, img, mask=mask)
+        texture = self.cv2_to_texture(self.app.res_leaf1_img)
+        self.extr1_texture = texture
+
+    def extr_color2(self):
+        img = self.app.res_leaf_img
+        img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        low = (self.h2l, self.s2l, self.v2l)
+        high = (self.h2h, self.s2h, self.v2h)
+        mask = cv2.inRange(img_hsv, low, high)
+        self.app.res_leaf2_img = cv2.bitwise_and(img, img, mask=mask)
+        texture = self.cv2_to_texture(self.app.res_leaf2_img)
+        self.extr2_texture = texture
 class Root(TabbedPanel):
     pass
 

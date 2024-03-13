@@ -37,6 +37,7 @@
 
 <IntInput@TextInput>:
     input_filter: 'int'
+    multiline: False
 
 <Word@Label>:
     size_hint_y: None
@@ -46,7 +47,6 @@
 <TextInput>:
     font_size: sp(20)
     multiline: False
-    line_height: 1
     size_hint: None, None
     height: std_height
     valign: 'center'
@@ -85,18 +85,18 @@
 <Root>:
     do_default_tab: False
     tab_width: dp(120)
-#    TabbedPanelItem:
-#        text: 'Detect'
-#        id: detect
-#        DetectWidget:
-#    TabbedPanelItem:
-#        text: 'Fv/Fm'
-#        id: fvfm
-#        FvFmWidget:
-#    TabbedPanelItem:
-#        text: 'Align'
-#        id: align
-#        AlignWidget:
+    TabbedPanelItem:
+        text: 'Detect'
+        id: detect
+        DetectWidget:
+    TabbedPanelItem:
+        text: 'Fv/Fm'
+        id: fvfm
+        FvFmWidget:
+    TabbedPanelItem:
+        text: 'Align'
+        id: align
+        AlignWidget:
     TabbedPanelItem:
         text: 'Split Color'
         id: split_color
@@ -494,17 +494,18 @@
                         texture: root.range1_texture
                         size_hint_y: None
                         height: std_height * 2
-                    InnerBox:  # Slider frame
+                        width: dp(476)
+                    InnerBox:  # Hue slider frame
                         size_hint: 1, None
                         height: std_height
                         Word:
                             text: 'H'
-                            size_hint_x: None
+                            size_hint: None, None
+                            size: std_height, std_height
                         IntInput:
                             id: h1_text1
                             width: self.minimum_height + dp(20)
                             text: '{:.0f}'.format(h1_slider.value1)
-                            #on_text_validate: root.int_input(self, color1_slider.value1)
                         RangeSlider:
                             id: h1_slider
                             range: 0, 180
@@ -514,18 +515,126 @@
                             id: h1_text2
                             width: self.minimum_height + dp(20)
                             text: '{:.0f}'.format(h1_slider.value2)
-                            #on_text_validate: root.int_input(self, color1_slider.value2)
-                    RangeSlider:
-                        id: s1_slider
-                        range: 0, 255
-                    RangeSlider:
-                        id: v1_slider
-                        range: 0, 255
-                    Button:
-                        text: 'Extract'
-                        #on_press: root.extr_color1()
+                    InnerBox:  # Saturation slider frame
+                        size_hint: 1, None
+                        height: std_height
+                        Word:
+                            text: 'S'
+                            size_hint: None, None
+                            size: std_height, std_height
+                        IntInput:
+                            id: s1_text1
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(s1_slider.value1)
+                        RangeSlider:
+                            id: s1_slider
+                            range: 0, 255
+                            value1: 0 if s1_text1.text == '' else s1_text1.text
+                            value2: 0 if s1_text2.text == '' else s1_text2.text
+                        IntInput:
+                            id: s1_text2
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(s1_slider.value2)
+                    InnerBox:  # Value slider frame
+                        size_hint: 1, None
+                        height: std_height
+                        Word:
+                            text: 'V'
+                            size_hint: None, None
+                            size: std_height, std_height
+                        IntInput:
+                            id: v1_text1
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(v1_slider.value1)
+                        RangeSlider:
+                            id: v1_slider
+                            range: 0, 255
+                            value1: 0 if v1_text1.text == '' else v1_text1.text
+                            value2: 0 if v1_text2.text == '' else v1_text2.text
+                        IntInput:
+                            id: v1_text2
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(v1_slider.value2)
+                    AnchorLayout:
+                        anchor_x: 'center'
+                        Button:
+                            text: 'Extract'
+                            on_press: root.extr_color1()
                 Space:
-                
+                InnerBox:  # Step 2 select range of color1
+                    orientation: 'vertical'
+                    Sentence:
+                        text: 'Step 2. Extract color range 2.'
+                    Image:
+                        id: range2_img
+                        texture: root.range2_texture
+                        size_hint_y: None
+                        height: std_height * 2
+                    InnerBox:  # Hue slider frame
+                        size_hint: 1, None
+                        height: std_height
+                        Word:
+                            text: 'H'
+                            size_hint: None, None
+                            size: std_height, std_height
+                        IntInput:
+                            id: h2_text1
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(h2_slider.value1)
+                        RangeSlider:
+                            id: h2_slider
+                            range: 0, 180
+                            value1: 0 if h2_text1.text == '' else h2_text1.text
+                            value2: 0 if h2_text2.text == '' else h2_text2.text
+                        IntInput:
+                            id: h2_text2
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(h2_slider.value2)
+                    InnerBox:  # Saturation slider frame
+                        size_hint: 1, None
+                        height: std_height
+                        Word:
+                            text: 'S'
+                            size_hint: None, None
+                            size: std_height, std_height
+                        IntInput:
+                            id: s2_text1
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(s2_slider.value1)
+                        RangeSlider:
+                            id: s2_slider
+                            range: 0, 255
+                            value1: 0 if s2_text1.text == '' else s2_text1.text
+                            value2: 0 if s2_text2.text == '' else s2_text2.text
+                        IntInput:
+                            id: s2_text2
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(s2_slider.value2)
+                    InnerBox:  # Value slider frame
+                        size_hint: 1, None
+                        height: std_height
+                        Word:
+                            text: 'V'
+                            size_hint: None, None
+                            size: std_height, std_height
+                        IntInput:
+                            id: v2_text1
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(v2_slider.value1)
+                        RangeSlider:
+                            id: v2_slider
+                            range: 0, 255
+                            value1: 0 if v2_text1.text == '' else v2_text1.text
+                            value2: 0 if v2_text2.text == '' else v2_text2.text
+                        IntInput:
+                            id: v2_text2
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(v2_slider.value2)
+                    AnchorLayout:
+                        anchor_x: 'center'
+                        Button:
+                            text: 'Extract'
+                            on_press: root.extr_color2()
                 Space:
                 AnchorLayout:  # Next button
                     anchor_x: 'right'
