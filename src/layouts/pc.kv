@@ -435,6 +435,9 @@
                             text: 'Next->'
                             on_release: app.root.switch_to(app.root.ids.split_color)
 
+#:import CloseAccordion custom_widgets.close_accordion.CloseAccordion
+#:import CloseAccordionItem custom_widgets.close_accordion.CloseAccordionItem
+
 <SplitColorWidget>:
     padding: dp(10)
     spacing: dp(20)
@@ -488,11 +491,11 @@
                 Sentence:
                     text: 'Split color to compare.'
                 InnerBox:
-                    Accordion:
-                        size_hint: None, None
-                        size: 500, 500
+                    CloseAccordion:
+                        size_hint: 1, None
+                        height: 500
                         orientation: 'vertical'
-                        AccordionItem:
+                        CloseAccordionItem:
                             title: 'Extract Color 1'
                             InnerBox:  # Step 1 select range of color1
                                 orientation: 'vertical'
@@ -569,7 +572,7 @@
                                     Button:
                                         text: 'Extract'
                                         on_press: root.extr_color1()
-                        AccordionItem:
+                        CloseAccordionItem:
                             title: 'Extract Color 2'
                             InnerBox:  # Step 2 select range of color1
                                 orientation: 'vertical'
