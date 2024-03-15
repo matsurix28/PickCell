@@ -328,7 +328,7 @@ class SplitColorWidget(MyBoxLayout):
     def update_texture(self, hl, hh, sl, sh, vl,vh, range_img):
         height = int(range_img.height)
         width = int(range_img.width)
-        
+        print(height, width)
         hue = np.linspace(hl, hh, width)
         saturation = np.linspace(sl, sh, height)
         value = np.linspace(vl, vh, height)
@@ -347,8 +347,8 @@ class SplitColorWidget(MyBoxLayout):
         self.ids.h1_slider.value = (self.h1l, self.h1h)
         self.ids.s1_slider.value = (self.s1l, self.s1h)
         self.ids.v1_slider.value = (self.v1l, self.v1h)
-        self.h2l = 30
-        self.h2h = 60
+        self.h2l = 60
+        self.h2h = 90
         self.s2l = 0
         self.s2h = 255
         self.v2l = 0
@@ -358,6 +358,7 @@ class SplitColorWidget(MyBoxLayout):
         self.ids.v2_slider.value = (self.v2l, self.v2h)
 
     def resize_widgets(self, dt):
+        print('resize')
         self.update_texture(
             self.h1l, self.h1h,
             self.s1l, self.s1h,
@@ -392,8 +393,16 @@ class SplitColorWidget(MyBoxLayout):
         self.extr2_texture = texture
 
 class Root(TabbedPanel):
-    pass
+    def __init__(self, **kwargs):
+        super(Root, self).__init__(**kwargs)
 
+    def switch_to(self, header, do_scroll=False):
+        print('switch')
+        width = Window.width
+        height = Window.height
+        Window.size = (width + 1, height + 1)
+        Window.size = (width, height)
+        return super().switch_to(header, do_scroll)
 
 if __name__ == '__main__':
     PickcellApp().run()
