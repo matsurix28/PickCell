@@ -5,10 +5,10 @@ from os.path import expanduser
 
 import cv2
 import numpy as np
+from analyze.detect import Detect
 from custom_widgets.myboxlayout import MyBoxLayout
 from custom_widgets.popup import ErrorPopup, FileDialogPopup, ProgressPopup
 from custom_widgets.range_slider import RangeSlider
-from detect import Detect
 from kivy import platform
 from kivy.app import App
 from kivy.clock import Clock
@@ -47,6 +47,8 @@ class PickcellApp(App):
     res_fvfm_img = None
     res_leaf_texture = ObjectProperty(None)
     res_fvfm_texture = ObjectProperty(None)
+    res_leaf1_img = None
+    res_leaf2_img = None
     def build(self):
         if platform == 'android':
             Window.fullscreen = 'auto'
@@ -67,7 +69,7 @@ class PickcellApp(App):
             from android.permissions import Permission, request_permissions
             request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.MANAGE_DOCUMENTS])
         else:
-            Window.size = (1280, 800)
+            Window.size = (1280, 850)
             Builder.load_file(src_dir + '/layouts/pc.kv')
             self.home_dir = expanduser('~')
         return Root()
@@ -95,7 +97,6 @@ class WorkingThread(threading.Thread):
         if resu > 1:
             ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread_id), 0)
             
-
 class DetectWidget(MyBoxLayout):
     def __init__(self, **kwargs):
         super(DetectWidget, self).__init__(**kwargs)
@@ -159,8 +160,8 @@ class FvFmWidget(MyBoxLayout):
         self.thread.start()
 
     def setup_analysis(self):
-        from detect import Detect
-        from fvfm import Fvfm
+        from analyze.detect import Detect
+        from analyze.fvfm import Fvfm
         self.d = Detect()
         self.f = Fvfm()
 
@@ -226,7 +227,7 @@ class AlignWidget(MyBoxLayout):
         
     def run_process(self):
         if self.a is None:
-            from align import Align
+            from analyze.align import Align
             self.a = Align()
         try:
             self.app.res_leaf_img, self.app.res_fvfm_img, self.overlay_img = self.a.run(*self.args)
@@ -281,9 +282,6 @@ class SplitColorWidget(MyBoxLayout):
         Window.bind(
             on_resize=lambda window, size, size2: Clock.schedule_once(self.resize_widgets, 0)
         )
-
-    def test(self, value):
-        print(value)
 
     def set_value1(self, value, val_type):
         if val_type == 'h1l':
@@ -374,6 +372,9 @@ class SplitColorWidget(MyBoxLayout):
         
     def extr_color1(self):
         img = self.app.res_leaf_img
+        if img is None:
+            self.show_error_popup('Run previous steps before color extraction.')
+            return
         img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         low = (self.h1l, self.s1l, self.v1l)
         high = (self.h1h, self.s1h, self.v1h)
@@ -384,6 +385,9 @@ class SplitColorWidget(MyBoxLayout):
 
     def extr_color2(self):
         img = self.app.res_leaf_img
+        if img is None:
+            self.show_error_popup('Run previous steps before color extraction.')
+            return
         img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         low = (self.h2l, self.s2l, self.v2l)
         high = (self.h2h, self.s2h, self.v2h)
@@ -392,12 +396,54 @@ class SplitColorWidget(MyBoxLayout):
         texture = self.cv2_to_texture(self.app.res_leaf2_img)
         self.extr2_texture = texture
 
+class AnalyzeWidget(MyBoxLayout):
+    def __init__(self, **kwargs):
+        super(AnalyzeWidget, self).__init__(**kwargs)
+        self.p = None
+        self.g = None
+        self.app = App.get_running_app()
+
+    def run(self):
+        if (self.app.res_leaf_img is None) or (self.app.res_fvfm_img is None):
+            self.show_error_popup('There is no input. Do previous steps.')
+            return
+        self.popup = self.show_progress_popup(self.cancel_process, 'Running', 'Pick up leaf color and its Fv/Fm value.')
+        self.thread = WorkingThread(target=self.run_process)
+        self.thread.start()
+        
+    def run_process(self):
+        if self.p is None:
+            from analyze.pickcell import Pickcell
+            self.p = Pickcell()
+        if self.g is None:
+            from analyze.graph import Graph
+            self.g = Graph()
+        leaf_img = self.app.res_leaf_img
+        fvfm_img = self.app.res_fvfm_img
+        fvfm_list = self.app.fvfm_list
+        leaf1_img = self.app.res_leaf1_img
+        leaf2_img = self.app.res_leaf2_img
+        try:
+            self.res_px, self.res_fvfm = self.p.run(leaf_img, fvfm_img, fvfm_list)
+            self.fig_color3d, self.fig_fvfm3d, self.fig_scat2d = self.g.draw(self.res_px, self.res_fvfm)
+            self.ids.show_res_btn.disabled = False
+            if leaf1_img is not None:
+                self.res_leaf1_px, self.res_leaf1_fvfm = self.p.run(leaf1_img, fvfm_img, fvfm_list)
+                self.fig_color3d_leaf1, self.fig_fvfm3d_leaf1, self.fig_scat2d_leaf1 = self.g.draw(self.res_leaf1_px, self.res_leaf1_fvfm)
+                self.ids.show_res1_btn.disabled = False
+            if leaf2_img is not None:
+                self.res_leaf2_px, self.res_leaf2_fvfm = self.p.run(leaf2_img, fvfm_img, fvfm_list)
+                self.fig_color3d_leaf2, self.fig_fvfm3d_leaf2, self.fig_scat2d_leaf2 = self.g.draw(self.res_leaf2_px, self.res_leaf2_fvfm)
+                self.ids.show_res2_btn.disabled = False
+        except:
+            pass
+
+                
 class Root(TabbedPanel):
     def __init__(self, **kwargs):
         super(Root, self).__init__(**kwargs)
 
     def switch_to(self, header, do_scroll=False):
-        print('switch')
         width = Window.width
         height = Window.height
         Window.size = (width + 1, height + 1)

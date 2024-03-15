@@ -7,8 +7,9 @@ import os
 import sys
 
 import cv2
-import detect
 import numpy as np
+
+import python.analyze.detect as detect
 
 
 def main():

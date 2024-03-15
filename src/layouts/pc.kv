@@ -101,6 +101,10 @@
         text: 'Split Color'
         id: split_color
         SplitColorWidget:
+    TabbedPanelItem:
+        text: 'Analyze'
+        id: analyze
+        AnalyzeWidget:
 
 <FileDialogPopup>:
     size_hint: 0.8, 0.8
@@ -435,8 +439,6 @@
                             text: 'Next->'
                             on_release: app.root.switch_to(app.root.ids.split_color)
 
-#:import CloseAccordion custom_widgets.close_accordion.CloseAccordion
-#:import CloseAccordionItem custom_widgets.close_accordion.CloseAccordionItem
 
 <SplitColorWidget>:
     padding: dp(10)
@@ -487,7 +489,8 @@
             InnerBox:
                 orientation: 'vertical'
                 Sentence:
-                    text: 'Split color to compare.'
+                    text: 'Split color to compare. This operation is optional.'
+                Space:
                 InnerBox:  # Step 1 select range of color1
                     orientation: 'vertical'
                     Sentence:
@@ -638,11 +641,41 @@
                         Button:
                             text: 'Extract'
                             on_press: root.extr_color2()
-                AnchorLayout:  # Next button
-                    anchor_x: 'right'
+                InnerBox:
                     Button:
-                        text: 'Analyze'
-                        on_release: root.test()
+                        text: '<-Back'
+                        on_press: app.root.switch_to(app.root.ids.align)
+                    AnchorLayout:  # Next button
+                        anchor_x: 'right'
+                        Button:
+                            text: 'Next->'
+                            on_release: app.root.switch_to(app.root.ids.analyze)
+
+<AnalyzeWidget>:
+    padding: dp(50)
+    spacing: dp(20)
+    orientation: 'vertical'
+    AnchorLayout:
+        size_hint: 1, 1
+        anchor: 'center', 'center'
+        Button:
+            height: self.texture_size[1]
+            font_size: sp(200)
+            text: 'RUN'
+            on_release: root.run()
+    InnerBox:
+        Button:
+            id: show_res_btn
+            text: 'Show fig'
+            disabled: True
+        Button:
+            id: show_res1_btn
+            text: 'Show fig1'
+            disabled: True
+        Button:
+            id: show_res2_btn
+            text: 'Show fig2'
+            disabled: True
 
 
 #<Widget>:
