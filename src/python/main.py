@@ -401,6 +401,7 @@ class AnalyzeWidget(MyBoxLayout):
         super(AnalyzeWidget, self).__init__(**kwargs)
         self.p = None
         self.g = None
+        self.s = None
         self.app = App.get_running_app()
 
     def run(self):
@@ -437,6 +438,10 @@ class AnalyzeWidget(MyBoxLayout):
                 self.ids.show_res2_btn.disabled = False
         except:
             pass
+
+    def show_fig(self):
+        if self.s is None:
+            from analyze.show
 
                 
 class Root(TabbedPanel):
