@@ -444,16 +444,22 @@ class AnalyzeWidget(MyBoxLayout):
 class Root(TabbedPanel):
     def __init__(self, **kwargs):
         super(Root, self).__init__(**kwargs)
+        self.density = Window._density
 
     def switch_to(self, header, do_scroll=False):
+        print(Window._density)
         width = Window.width
         height = Window.height
+        Window.size = ((width+1)/self.density, height/self.density)
+        Window.size = (width/self.density, height/self.density)
+        '''
         if platform == 'macosx':
             Window.size = ((width+2)/2, height/2)
             Window.size = (width/2, height/2)
         else:
             Window.size = (width + 1, height + 1)
             Window.size = (width, height)
+        '''
         return super().switch_to(header, do_scroll)
 
 if __name__ == '__main__':
