@@ -322,7 +322,8 @@ class SplitColorWidget(MyBoxLayout):
     def update_texture(self, hl, hh, sl, sh, vl,vh, range_img):
         height = int(range_img.height)
         width = int(range_img.width)
-        print(height, width)
+        if width == 0:
+            width = 1
         hue = np.linspace(hl, hh, width)
         saturation = np.linspace(sl, sh, height)
         value = np.linspace(vl, vh, height)
@@ -447,8 +448,12 @@ class Root(TabbedPanel):
     def switch_to(self, header, do_scroll=False):
         width = Window.width
         height = Window.height
-        Window.size = (width + 1, height + 1)
-        Window.size = (width, height)
+        if platform == 'macosx':
+            Window.size = ((width+2)/2, height/2)
+            Window.size = (width/2, height/2)
+        else:
+            Window.size = (width + 1, height + 1)
+            Window.size = (width, height)
         return super().switch_to(header, do_scroll)
 
 if __name__ == '__main__':
