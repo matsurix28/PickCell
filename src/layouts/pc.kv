@@ -86,22 +86,22 @@
 <Root>:
     do_default_tab: False
     tab_width: dp(120)
-    TabbedPanelItem:
-        text: 'Detect'
-        id: detect
-        DetectWidget:
-    TabbedPanelItem:
-        text: 'Fv/Fm'
-        id: fvfm
-        FvFmWidget:
-    TabbedPanelItem:
-        text: 'Align'
-        id: align
-        AlignWidget:
-    TabbedPanelItem:
-        text: 'Split Color'
-        id: split_color
-        SplitColorWidget:
+#    TabbedPanelItem:
+#        text: 'Detect'
+#        id: detect
+#        DetectWidget:
+#    TabbedPanelItem:
+#        text: 'Fv/Fm'
+#        id: fvfm
+#        FvFmWidget:
+#    TabbedPanelItem:
+#        text: 'Align'
+#        id: align
+#        AlignWidget:
+#    TabbedPanelItem:
+#        text: 'Split Color'
+#        id: split_color
+#        SplitColorWidget:
     TabbedPanelItem:
         text: 'Analyze'
         id: analyze
@@ -657,26 +657,42 @@
     spacing: dp(20)
     orientation: 'vertical'
     AnchorLayout:
-        size_hint: 1, 1
+        size_hint: 1, 0.6
         anchor: 'center', 'center'
         Button:
-            height: self.texture_size[1]
+            height: self.texture_size[1] + dp(20)
             font_size: sp(200)
             text: 'RUN'
             on_release: root.run()
+    AnchorLayout:
+        size_hint: 1, 0.3
+        anchor_x: 'center'
+        InnerBox:
+            size_hint_x: None
+            width: self.minimum_width
+            spacing: dp(50)
+            Button:
+                font_size: sp(50)
+                height: self.texture_size[1] + dp(20)
+                id: show_res_btn
+                text: 'Show fig'
+                disabled: True
+            Button:
+                font_size: sp(50)
+                height: self.texture_size[1] + dp(20)
+                id: show_res1_btn
+                text: 'Show fig1'
+                disabled: True
+            Button:
+                font_size: sp(50)
+                height: self.texture_size[1] + dp(20)
+                id: show_res2_btn
+                text: 'Show fig2'
+                disabled: True
     InnerBox:
         Button:
-            id: show_res_btn
-            text: 'Show fig'
-            disabled: True
-        Button:
-            id: show_res1_btn
-            text: 'Show fig1'
-            disabled: True
-        Button:
-            id: show_res2_btn
-            text: 'Show fig2'
-            disabled: True
+            text: '<-Back'
+            on_release: app.root.switch_to(app.root.ids.split_color)
 
 
 #<Widget>:

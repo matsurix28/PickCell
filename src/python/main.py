@@ -29,7 +29,6 @@ src_dir = os.path.normpath(
     os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
         '../'))
-print(src_dir)
 
 class PickcellApp(App):
     leaf_img = None
@@ -353,7 +352,6 @@ class SplitColorWidget(MyBoxLayout):
         self.ids.v2_slider.value = (self.v2l, self.v2h)
 
     def resize_widgets(self, dt):
-        print('resize')
         self.update_texture(
             self.h1l, self.h1h,
             self.s1l, self.s1h,
@@ -447,19 +445,10 @@ class Root(TabbedPanel):
         self.density = Window._density
 
     def switch_to(self, header, do_scroll=False):
-        print(Window._density)
         width = Window.width
         height = Window.height
         Window.size = ((width+1)/self.density, height/self.density)
         Window.size = (width/self.density, height/self.density)
-        '''
-        if platform == 'macosx':
-            Window.size = ((width+2)/2, height/2)
-            Window.size = (width/2, height/2)
-        else:
-            Window.size = (width + 1, height + 1)
-            Window.size = (width, height)
-        '''
         return super().switch_to(header, do_scroll)
 
 if __name__ == '__main__':
