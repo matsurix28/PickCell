@@ -29,6 +29,7 @@ src_dir = os.path.normpath(
     os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
         '../'))
+print(src_dir)
 
 class PickcellApp(App):
     leaf_img = None
