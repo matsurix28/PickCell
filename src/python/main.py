@@ -437,10 +437,14 @@ class AnalyzeWidget(MyBoxLayout):
         self.popup.dismiss()
 
     def show_fig(self):
-        show_fig(self.fig_color3d, self.fig_fvfm3d, self.fig_scat2d)
-        print(type(self.fig_color3d))
-        print(self.fig_color3d)
+        self.popup = self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
+        self.thread = WorkingThread(target=self.show_fig_process)
+        self.thread.start()
 
+    def show_fig_process(self):
+        show_fig(self.fig_color3d, self.fig_fvfm3d, self.fig_scat2d)
+        self.popup.dismiss()
+        Window.minimize()
                 
 class Root(TabbedPanel):
     def __init__(self, **kwargs):
