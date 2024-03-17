@@ -7,17 +7,12 @@ import cv2
 import numpy as np
 from analyze.detect import Detect
 from custom_widgets.myboxlayout import MyBoxLayout
-from custom_widgets.popup import ErrorPopup, FileDialogPopup, ProgressPopup
-from custom_widgets.range_slider import RangeSlider
 from kivy import platform
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.graphics.texture import Texture
 from kivy.lang import Builder
-from kivy.properties import NumericProperty, ObjectProperty, StringProperty
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.popup import Popup
+from kivy.properties import ObjectProperty
 from kivy.uix.tabbedpanel import TabbedPanel
 
 currentActivity = None
@@ -417,7 +412,7 @@ class AnalyzeWidget(MyBoxLayout):
             from analyze.pickcell import Pickcell
             self.p = Pickcell()
         if self.g is None:
-            from analyze.graph import Graph
+            from python.analyze.create_graph import Graph
             self.g = Graph()
         leaf_img = self.app.res_leaf_img
         fvfm_img = self.app.res_fvfm_img
@@ -441,7 +436,7 @@ class AnalyzeWidget(MyBoxLayout):
 
     def show_fig(self):
         if self.s is None:
-            from analyze.show
+            from analyze.show_fig import show_fig
 
                 
 class Root(TabbedPanel):
