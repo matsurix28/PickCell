@@ -6,10 +6,9 @@ import argparse
 import os
 import sys
 
+import analyze.detect as detect
 import cv2
 import numpy as np
-
-import python.analyze.detect as detect
 
 
 def main():

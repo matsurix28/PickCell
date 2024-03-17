@@ -86,22 +86,22 @@
 <Root>:
     do_default_tab: False
     tab_width: dp(120)
-#    TabbedPanelItem:
-#        text: 'Detect'
-#        id: detect
-#        DetectWidget:
-#    TabbedPanelItem:
-#        text: 'Fv/Fm'
-#        id: fvfm
-#        FvFmWidget:
-#    TabbedPanelItem:
-#        text: 'Align'
-#        id: align
-#        AlignWidget:
-#    TabbedPanelItem:
-#        text: 'Split Color'
-#        id: split_color
-#        SplitColorWidget:
+    TabbedPanelItem:
+        text: 'Detect'
+        id: detect
+        DetectWidget:
+    TabbedPanelItem:
+        text: 'Fv/Fm'
+        id: fvfm
+        FvFmWidget:
+    TabbedPanelItem:
+        text: 'Align'
+        id: align
+        AlignWidget:
+    TabbedPanelItem:
+        text: 'Split Color'
+        id: split_color
+        SplitColorWidget:
     TabbedPanelItem:
         text: 'Analyze'
         id: analyze
@@ -677,6 +677,7 @@
                 id: show_res_btn
                 text: 'Show fig'
                 disabled: True
+                on_press: root.show_fig()
             Button:
                 font_size: sp(50)
                 height: self.texture_size[1] + dp(20)

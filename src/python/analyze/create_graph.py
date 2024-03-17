@@ -42,11 +42,15 @@ class Graph():
     def _than_min_area(self, df: pd.DataFrame):
         min_px = 10
         count_df = df[['blue', 'green', 'red']].value_counts()
+        print('countdf')
         than = count_df[count_df > min_px].reset_index()
+        print('than tahn')
         b = than['blue'].tolist()
         g = than['green'].tolist()
         r = than['red'].tolist()
+        print('bgr')
         color = [[i,j,k] for (i,j,k) in zip(b,g,r)]
+        print('color')
         result = df[df['px'].isin(color)]
         return result
     
@@ -78,6 +82,7 @@ class Graph():
             marker.update(color=value)
             if bar_title is not None:
                 marker['colorbar'] = {'title': bar_title}
+        '''
         fig = go.Figure(
             data=[go.Scatter3d(
                 x=x, y=y, z=z,
@@ -85,13 +90,20 @@ class Graph():
                 marker=marker
             )]
         )
-        return fig
+        '''
+        data=go.Scatter3d(
+            x=x, y=y, z=z,
+            mode='markers',
+            marker=marker
+            )
+        return data
     
     def draw_2dscatter(self, x, y, marker_color):
         marker = {
             'size': 5,
             'color': marker_color,
         }
+        '''
         fig = go.Figure(
             data=[go.Scatter(
                 x=x,
@@ -100,7 +112,14 @@ class Graph():
                 marker=marker
             )]
         )
-        return fig
+        '''
+        data=[go.Scatter(
+            x=x,
+            y=y,
+            mode='markers',
+            marker=marker
+            )]
+        return data
     
     def input(self, px, fvfm):
         df = pd.DataFrame(px,
@@ -113,9 +132,9 @@ class Graph():
     def draw(self, px, fvfm):
         df = self.input(px, fvfm)
         print('than')
-        than_df = self._than_min_area(df)
+        #than_df = self._than_min_area(df)
         print('uniq')
-        uniq_df = self._unique_px(than_df)
+        uniq_df = self._unique_px(df)
         print('add hue')
         hue_df = self.add_hue(uniq_df)
         #print(uniq)
@@ -137,6 +156,7 @@ class Graph():
         print('drw 2d')
         c = self.rgb2color(color)
         fig_2d = self.draw_2dscatter(h, fvfm, marker_color=c)
+        print('finish')
         return fig_l, fig_h, fig_2d
         '''
         red = [i[2] for i in px]

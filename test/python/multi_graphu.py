@@ -1,9 +1,9 @@
 from plotly import graph_objects as go
 from plotly.subplots import make_subplots
 
-fig = make_subplots(rows=2, cols=2,
+fig = make_subplots(rows=1, cols=3,
                     specs=[
-                        [{"type": "scene"}, {"type": "scene"}],[{'type': 'xy'}, {'type': 'xy'}]
+                        [{"type": "scene"}, {"type": "scene"},{'type': 'xy'}]
                     ])
 
 px1 = [[255,20,20], [230,10,10], [200, 50,50]]
@@ -36,6 +36,6 @@ fig.add_trace(go.Scatter3d(
 fig.add_trace(go.Scatter(
     x=r1, y=g1,
     mode='markers'
-), row=2, col=1)
+), row=1, col=3)
 
 fig.show()

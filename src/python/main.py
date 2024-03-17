@@ -6,6 +6,7 @@ from os.path import expanduser
 import cv2
 import numpy as np
 from analyze.detect import Detect
+from analyze.show_fig import show_fig
 from custom_widgets.myboxlayout import MyBoxLayout
 from kivy import platform
 from kivy.app import App
@@ -396,7 +397,6 @@ class AnalyzeWidget(MyBoxLayout):
         super(AnalyzeWidget, self).__init__(**kwargs)
         self.p = None
         self.g = None
-        self.s = None
         self.app = App.get_running_app()
 
     def run(self):
@@ -412,7 +412,7 @@ class AnalyzeWidget(MyBoxLayout):
             from analyze.pickcell import Pickcell
             self.p = Pickcell()
         if self.g is None:
-            from python.analyze.create_graph import Graph
+            from analyze.create_graph import Graph
             self.g = Graph()
         leaf_img = self.app.res_leaf_img
         fvfm_img = self.app.res_fvfm_img
@@ -431,12 +431,15 @@ class AnalyzeWidget(MyBoxLayout):
                 self.res_leaf2_px, self.res_leaf2_fvfm = self.p.run(leaf2_img, fvfm_img, fvfm_list)
                 self.fig_color3d_leaf2, self.fig_fvfm3d_leaf2, self.fig_scat2d_leaf2 = self.g.draw(self.res_leaf2_px, self.res_leaf2_fvfm)
                 self.ids.show_res2_btn.disabled = False
-        except:
-            pass
+        except (ValueError, TypeError) as e:
+            self.err_msg = str(e)
+            Clock.schedule_once(self.thread_error, 0)
+        self.popup.dismiss()
 
     def show_fig(self):
-        if self.s is None:
-            from analyze.show_fig import show_fig
+        show_fig(self.fig_color3d, self.fig_fvfm3d, self.fig_scat2d)
+        print(type(self.fig_color3d))
+        print(self.fig_color3d)
 
                 
 class Root(TabbedPanel):
