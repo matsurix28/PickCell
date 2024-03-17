@@ -23,11 +23,21 @@ marker1.update(color=px1)
 marker2 = {'size': 1}
 marker2.update(color=px2)
 
+f1 = go.Figure(
+    data=[go.Scatter3d(
+        x=r1,y=g1,z=b1,mode='markers'
+    )]
+)
+
+print(f1)
+fig.add_trace(f1['data'][0], row=1, col=1)
+
+'''
 fig.add_trace(go.Scatter3d(
     x=r1, y=g1, z=b1,mode='markers',
     marker=marker1,
 ), row=1, col=1)
-
+'''
 fig.add_trace(go.Scatter3d(
     x=r2, y=g2, z=b2,mode='markers',
     marker=marker2

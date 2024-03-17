@@ -82,7 +82,6 @@ class Graph():
             marker.update(color=value)
             if bar_title is not None:
                 marker['colorbar'] = {'title': bar_title}
-        '''
         fig = go.Figure(
             data=[go.Scatter3d(
                 x=x, y=y, z=z,
@@ -90,20 +89,13 @@ class Graph():
                 marker=marker
             )]
         )
-        '''
-        data=go.Scatter3d(
-            x=x, y=y, z=z,
-            mode='markers',
-            marker=marker
-            )
-        return data
+        return fig
     
     def draw_2dscatter(self, x, y, marker_color):
         marker = {
             'size': 5,
             'color': marker_color,
         }
-        '''
         fig = go.Figure(
             data=[go.Scatter(
                 x=x,
@@ -112,14 +104,7 @@ class Graph():
                 marker=marker
             )]
         )
-        '''
-        data=[go.Scatter(
-            x=x,
-            y=y,
-            mode='markers',
-            marker=marker
-            )]
-        return data
+        return fig
     
     def input(self, px, fvfm):
         df = pd.DataFrame(px,
