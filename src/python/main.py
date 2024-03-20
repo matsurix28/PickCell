@@ -473,6 +473,8 @@ class AnalyzeWidget(MyBoxLayout):
 
     def save(self):
         self.popup = self.show_progress_popup(self.cancel_process, 'Save results', 'Running...')
+        self.thread = WorkingThread(target=self.save_process)
+        self.thread.start()
 
     def save_process(self):
         name = self.app.file_name
