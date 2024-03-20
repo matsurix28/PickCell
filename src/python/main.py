@@ -439,6 +439,8 @@ class AnalyzeWidget(MyBoxLayout):
         except (ValueError, TypeError) as e:
             self.err_msg = str(e)
             Clock.schedule_once(self.thread_error, 0)
+        else:
+            self.ids.save_btn.disabled = False
         self.popup.dismiss()
 
     def show_fig(self):
