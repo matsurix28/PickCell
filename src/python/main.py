@@ -513,7 +513,7 @@ class AnalyzeWidget(MyBoxLayout):
             self.fig_color3d_leaf2.write_html(os.path.join(res_dir, 'color2_color3d.html'))
             self.fig_fvfm3d_leaf2.write_html(os.path.join(res_dir, 'color2_fvfm3d.html'))
             self.fig_scat2d_leaf2.write_html(os.path.join(res_dir, 'color2_scatter2dd.html'))
-            self.fig_color2.write_html(name + '_color2_all.html')
+            self.fig_color2.write_html(os.path.join(res_dir, 'color2_all.html')
         self.popup.dismiss()
                 
 class Root(TabbedPanel):
