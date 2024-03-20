@@ -684,12 +684,14 @@
                 id: show_res1_btn
                 text: 'Show fig1'
                 disabled: True
+                on_press: root.show_fig_color1()
             Button:
                 font_size: sp(50)
                 height: self.texture_size[1] + dp(20)
                 id: show_res2_btn
                 text: 'Show fig2'
                 disabled: True
+                on_press: root.show_fig_color2()
     InnerBox:
         Button:
             text: '<-Back'
