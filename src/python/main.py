@@ -480,42 +480,43 @@ class AnalyzeWidget(MyBoxLayout):
         name = self.app.file_name
         res_root_dir = name + '_PickCells'
         os.makedirs(res_dir, exist_ok=True)
-        def make_res_dir(dir_name):
-            if os.path.exists(dir_name):
-                i = 1
-                while True:
-                    new_name = '{}_{}'.format(dir_name, i)
-                    if os.path.exists(new_name):
-                        i += 1
-                    else:
-                        os.makedirs(new_name)
-                        return new_name
-            else:
-                os.makedirs(dir_name)
-                return dir_name
+        
         if (self.fig_color3d is not None) and (self.fig_fvfm3d is not None) and (self.fig_scat2d is not None):
             dir_name = os.path.join(res_root_dir, 'All')
-            res_dir = make_res_dir(dir_name)
+            res_dir = self.make_res_dir(dir_name)
             self.fig_color3d.write_html(os.path.join(res_dir, 'color3d.html'))
             self.fig_fvfm3d.write_html(os.path.join(res_dir, 'fvfm3d.html'))
             self.fig_scat2d.write_html(os.path.join(res_dir, 'scatter2d.html'))
             self.fig_all.write_html(os.path.join(res_dir, 'all.html'))
         if (self.fig_color3d_leaf1 is not None) and (self.fig_fvfm3d_leaf1 is not None) and (self.fig_scat2d_leaf1 is not None):
             dir_name = os.path.join(res_root_dir, 'Color1')
-            res_dir = make_res_dir(dir_name)
+            res_dir = self.make_res_dir(dir_name)
             self.fig_color3d_leaf1.write_html(os.path.join(res_dir, 'color1_color3d.html'))
             self.fig_fvfm3d_leaf1.write_html(os.path.join(res_dir, 'color1_fvfm3d.html'))
             self.fig_scat2d_leaf1.write_html(os.path.join(res_dir, 'color1_scatter2d.html'))
             self.fig_color1.write_html(os.path.join(res_dir, 'color1_all.html'))
         if (self.fig_color3d_leaf2 is not None) and (self.fig_fvfm3d_leaf2 is not None) and (self.fig_scat2d_leaf2 is not None):
             dir_name = os.path.join(res_root_dir, 'Color2')
-            res_dir = make_res_dir(dir_name)
+            res_dir = self.make_res_dir(dir_name)
             self.fig_color3d_leaf2.write_html(os.path.join(res_dir, 'color2_color3d.html'))
             self.fig_fvfm3d_leaf2.write_html(os.path.join(res_dir, 'color2_fvfm3d.html'))
             self.fig_scat2d_leaf2.write_html(os.path.join(res_dir, 'color2_scatter2dd.html'))
             self.fig_color2.write_html(name + '_color2_all.html')
         self.popup.dismiss()
                 
+    def make_res_dir(dir_name):
+        if os.path.exists(dir_name):
+            i = 1
+            while True:
+                new_name = '{}_{}'.format(dir_name, i)
+                if os.path.exists(new_name):
+                    i += 1
+                else:
+                    os.makedirs(new_name)
+                    return new_name
+        else:
+            os.makedirs(dir_name)
+            return dir_name
 class Root(TabbedPanel):
     def __init__(self, **kwargs):
         super(Root, self).__init__(**kwargs)
