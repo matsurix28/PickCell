@@ -32,6 +32,7 @@ src_dir = os.path.normpath(
         '../'))
 
 class PickcellApp(App):
+    file_name = None
     leaf_img = None
     fvfm_img = None
     leaf_texture = ObjectProperty(None)
@@ -106,6 +107,7 @@ class DetectWidget(MyBoxLayout):
         if self.input_path is None:
             self.show_error_popup('Select leaf image.')
             return
+        self.app.file_name = os.path.splitext(self.input_path)[0]
         self.popup = self.show_progress_popup(self.cancel_process, 'Detect leaf', 'Running...')
         
         self.thread = WorkingThread(target=self.run_process)
@@ -438,22 +440,49 @@ class AnalyzeWidget(MyBoxLayout):
 
     def show_fig(self):
         self.popup = self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
-        self.thread = WorkingThread(target=self.show_fig_process, args=(self.fig_color3d, self.fig_fvfm3d, self.fig_scat2d,))
+        self.thread = WorkingThread(target=self.show_fig_process, args=('all',))
         self.thread.start()
 
     def show_fig_color1(self):
         self.popup = self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
-        self.thread = WorkingThread(target=self.show_fig_process, args=(self.fig_color3d_leaf1, self.fig_fvfm3d_leaf1, self.fig_scat2d_leaf1,))
+        self.thread = WorkingThread(target=self.show_fig_process, args=('color1',))
         self.thread.start()
 
     def show_fig_color2(self):
         self.popup = self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
-        self.thread = WorkingThread(target=self.show_fig_process, args=(self.fig_color3d_leaf2, self.fig_fvfm3d_leaf2, self.fig_scat2d_leaf2,))
+        self.thread = WorkingThread(target=self.show_fig_process, args=('color2',))
         self.thread.start()
 
-    def show_fig_process(self, fig_color3d, fig_fvfm3d, fig_scatter2d):
-        show_fig(fig_color3d, fig_fvfm3d, fig_scatter2d)
+    def show_fig_process(self, group):
+        if group == 'all':
+            self.fig_all = show_fig(self.fig_color3d, self.fig_fvfm3d, self.fig_scat2d)
+        elif group == 'color1':
+            self.fig_color1 = show_fig(self.fig_color3d_leaf1, self.fig_fvfm3d_leaf1, self.fig_scat2d_leaf1)
+        elif group == 'color2':
+            self.fig_color2 = show_fig(self.fig_color3d_leaf2, self.fig_fvfm3d_leaf2, self.fig_scat2d_leaf2)
         self.popup.dismiss()
+
+    def test(self, id):
+        print(type(id))
+        print(id.id)
+
+    def save(self):
+        name = self.app.file_name
+        if (self.fig_color3d is not None) and (self.fig_fvfm3d is not None) and (self.fig_scat2d is not None):
+            self.fig_color3d.write_html(name + '_color3d.html')
+            self.fig_fvfm3d.write_html(name + '_fvfm3d.html')
+            self.fig_scat2d.write_html(name + '_scatter2d.html')
+            self.fig_all.write_html(name + '_all.html')
+        if (self.fig_color3d_leaf1 is not None) and (self.fig_fvfm3d_leaf1 is not None) and (self.fig_scat2d_leaf1 is not None):
+            self.fig_color3d.write_html(name + '_color1_color3d.html')
+            self.fig_fvfm3d.write_html(name + '_color1_fvfm3d.html')
+            self.fig_scat2d.write_html(name + '_color1_scatter2d.html')
+            self.fig_color1.write_html(name + '_color1_all.html')
+        if (self.fig_color3d_leaf2 is not None) and (self.fig_fvfm3d_leaf2 is not None) and (self.fig_scat2d_leaf2 is not None):
+            self.fig_color3d.write_html(name + '_color2_color3d.html')
+            self.fig_fvfm3d.write_html(name + '_color2_fvfm3d.html')
+            self.fig_scat2d.write_html(name + '_color2_scatter2dd.html')
+            self.fig_color2.write_html(name + '_color2_all.html')
                 
 class Root(TabbedPanel):
     def __init__(self, **kwargs):

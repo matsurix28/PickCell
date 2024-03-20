@@ -11,3 +11,4 @@ def show_fig(color3d, fvfm3d, scatter2d):
     fig.add_trace(fvfm3d['data'][0], row=1, col=2)
     fig.add_trace(scatter2d['data'][0], row=1, col=3)
     fig.show()
+    return fig

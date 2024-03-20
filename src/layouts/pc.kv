@@ -692,6 +692,15 @@
                 text: 'Show fig2'
                 disabled: True
                 on_press: root.show_fig_color2()
+    AnchorLayout:
+        anchor_x: 'center'
+        Button:
+            font_size: sp(50)
+            height: self.texture_size[1] + dp(20)
+            id: save_btn
+            text: 'Save'
+            #disabled: True
+            on_press: root.save()
     InnerBox:
         Button:
             text: '<-Back'
