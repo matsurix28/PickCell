@@ -443,17 +443,16 @@ class AnalyzeWidget(MyBoxLayout):
 
     def show_fig_color1(self):
         self.popup = self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
-        self.thread = WorkingThread(target=lambda x: self.show_fig_process(self.fig_color3d_leaf1, self.fig_fvfm3d_leaf1, self.fig_scat2d_leaf1))
+        self.thread = WorkingThread(target=self.show_fig_process, args=(self.fig_color3d_leaf1, self.fig_fvfm3d_leaf1, self.fig_scat2d_leaf1,))
+        self.thread.start()
+
+    def show_fig_color2(self):
+        self.popup = self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
+        self.thread = WorkingThread(target=self.show_fig_process, args=(self.fig_color3d_leaf2, self.fig_fvfm3d_leaf2, self.fig_scat2d_leaf2,))
         self.thread.start()
 
     def show_fig_process(self, fig_color3d, fig_fvfm3d, fig_scatter2d):
         show_fig(fig_color3d, fig_fvfm3d, fig_scatter2d)
-        self.popup.dismiss()
-
-    
-
-    def show_fig_color2(self):
-        show_fig(self.fig_color3d_leaf2, self.fig_fvfm3d_leaf2, self.fig_scat2d_leaf2)
         self.popup.dismiss()
                 
 class Root(TabbedPanel):
