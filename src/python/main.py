@@ -6,7 +6,7 @@ from os.path import expanduser
 import cv2
 import numpy as np
 from analyze.detect import Detect
-from analyze.show_fig import show_fig
+from analyze.multi_graph import multi_graph
 from custom_widgets.myboxlayout import MyBoxLayout
 from kivy import platform
 from kivy.app import App
@@ -424,14 +424,17 @@ class AnalyzeWidget(MyBoxLayout):
         try:
             self.res_px, self.res_fvfm = self.p.run(leaf_img, fvfm_img, fvfm_list)
             self.fig_color3d, self.fig_fvfm3d, self.fig_scat2d = self.g.draw(self.res_px, self.res_fvfm)
+            self.fig_all = multi_graph(self.fig_color3d, self.fig_fvfm3d, self.fig_scat2d)
             self.ids.show_res_btn.disabled = False
             if leaf1_img is not None:
                 self.res_leaf1_px, self.res_leaf1_fvfm = self.p.run(leaf1_img, fvfm_img, fvfm_list)
                 self.fig_color3d_leaf1, self.fig_fvfm3d_leaf1, self.fig_scat2d_leaf1 = self.g.draw(self.res_leaf1_px, self.res_leaf1_fvfm)
+                self.fig_color1 = multi_graph(self.fig_color3d_leaf1, self.fig_fvfm3d_leaf1, self.fig_scat2d_leaf1)
                 self.ids.show_res1_btn.disabled = False
             if leaf2_img is not None:
                 self.res_leaf2_px, self.res_leaf2_fvfm = self.p.run(leaf2_img, fvfm_img, fvfm_list)
                 self.fig_color3d_leaf2, self.fig_fvfm3d_leaf2, self.fig_scat2d_leaf2 = self.g.draw(self.res_leaf2_px, self.res_leaf2_fvfm)
+                self.fig_color2 = multi_graph(self.fig_color3d_leaf2, self.fig_fvfm3d_leaf2, self.fig_scat2d_leaf2)
                 self.ids.show_res2_btn.disabled = False
         except (ValueError, TypeError) as e:
             self.err_msg = str(e)
@@ -455,11 +458,11 @@ class AnalyzeWidget(MyBoxLayout):
 
     def show_fig_process(self, group):
         if group == 'all':
-            self.fig_all = show_fig(self.fig_color3d, self.fig_fvfm3d, self.fig_scat2d)
+            self.fig_all.show()
         elif group == 'color1':
-            self.fig_color1 = show_fig(self.fig_color3d_leaf1, self.fig_fvfm3d_leaf1, self.fig_scat2d_leaf1)
+            self.fig_color1.show()
         elif group == 'color2':
-            self.fig_color2 = show_fig(self.fig_color3d_leaf2, self.fig_fvfm3d_leaf2, self.fig_scat2d_leaf2)
+            self.fig_color2.show()
         self.popup.dismiss()
 
     def test(self, id):

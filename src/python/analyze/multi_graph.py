@@ -2,7 +2,7 @@ from plotly import graph_objects as go
 from plotly.subplots import make_subplots
 
 
-def show_fig(color3d, fvfm3d, scatter2d):
+def multi_graph(color3d, fvfm3d, scatter2d):
     fig = make_subplots(rows=1, cols=3,
                         specs=[
                             [{"type": "scatter3d"}, {"type": "scatter3d"},{'type': 'xy'}]
