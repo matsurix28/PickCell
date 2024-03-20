@@ -444,7 +444,14 @@ class AnalyzeWidget(MyBoxLayout):
     def show_fig_process(self):
         show_fig(self.fig_color3d, self.fig_fvfm3d, self.fig_scat2d)
         self.popup.dismiss()
-        Window.minimize()
+
+    def show_fig_color1(self):
+        show_fig(self.fig_color3d_leaf1, self.fig_fvfm3d_leaf1, self.fig_scat2d_leaf1)
+        self.popup.dismiss()
+
+    def show_fig_color2(self):
+        show_fig(self.fig_color3d_leaf2, self.fig_fvfm3d_leaf2, self.fig_scat2d_leaf2)
+        self.popup.dismiss()
                 
 class Root(TabbedPanel):
     def __init__(self, **kwargs):
