@@ -25,20 +25,29 @@ class MyBoxLayout(BoxLayout):
         return texture
     
     def show_progress_popup(self,cancel_func, title, message):
-        popup = ProgressPopup(cancel_func, title_text=title, message=message)
-        popup.open()
-        return popup
+        self.popup = ProgressPopup(cancel_func, title_text=title, message=message)
+        self.popup.open()
+        #return self.popup
 
     def show_error_popup(self, message, title='Error'):
         popup = ErrorPopup(message=message, title_text=title)
         popup.open()
 
     def cancel_process(self):
-        self.thread.raise_exception()
+        try:
+            self.thread.raise_exception()
+        except Exception as e:
+            print('erorr dayooooo')
+            print(self.popup)
+            self.popup.dismiss()
+            self.show_error_popup(str(e))
 
     def thread_error(self, dt):
         self.show_error_popup(self.err_msg)
         self.err_msg = None
+
+    def close_popup(self):
+        self.popup.dismiss()
     
     def int_input(self, input, target=None):
         if (input.text == '') or (int(input.text) < 0):

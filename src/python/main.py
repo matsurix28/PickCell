@@ -108,7 +108,8 @@ class DetectWidget(MyBoxLayout):
             self.show_error_popup('Select leaf image.')
             return
         self.app.file_name = os.path.splitext(self.input_path)[0]
-        self.popup = self.show_progress_popup(self.cancel_process, 'Detect leaf', 'Running...')
+        #self.popup = self.show_progress_popup(self.cancel_process, 'Detect leaf', 'Running...')
+        self.show_progress_popup(self.cancel_process, 'Detect leaf', 'Running...')
         
         self.thread = WorkingThread(target=self.run_process)
         self.thread.start()
@@ -149,7 +150,8 @@ class FvFmWidget(MyBoxLayout):
         if self.input_path is None:
             self.show_error_popup('Select Fv/Fm result image.')
             return
-        self.popup = self.show_progress_popup(
+        #self.popup = self.show_progress_popup(
+        self.show_progress_popup(
             self.cancel_process,
             'Read Fv/Fm value',
             'Running...'
@@ -219,7 +221,8 @@ class AlignWidget(MyBoxLayout):
         elif (fvfm_img is None) or (fvfm_obj is None):
             self.show_error_popup('There is no "Fv/Fm".\nPlease run "Fv/Fm" before align.')
             return
-        self.popup = self.show_progress_popup(self.cancel_process, 'Align two images', 'Running...')
+        #self.popup = self.show_progress_popup(self.cancel_process, 'Align two images', 'Running...')
+        self.show_progress_popup(self.cancel_process, 'Align two images', 'Running...')
         self.thread = WorkingThread(target=self.run_process)
         self.thread.start()
         
@@ -399,13 +402,26 @@ class AnalyzeWidget(MyBoxLayout):
         super(AnalyzeWidget, self).__init__(**kwargs)
         self.p = None
         self.g = None
+        self.fig_color3d = None
+        self.fig_fvfm3d = None
+        self.fig_scat2d = None
+        self.fig_all = None
+        self.fig_color3d_leaf1 = None
+        self.fig_fvfm3d_leaf1 = None
+        self.fig_scat2d_leaf1 = None
+        self.fig_color1 = None
+        self.fig_color3d_leaf2 = None
+        self.fig_fvfm3d_leaf2 = None
+        self.fig_scat2d_leaf2 = None
+        self.fig_color2 = None
         self.app = App.get_running_app()
 
     def run(self):
         if (self.app.res_leaf_img is None) or (self.app.res_fvfm_img is None):
             self.show_error_popup('There is no input. Do previous steps.')
             return
-        self.popup = self.show_progress_popup(self.cancel_process, 'Running', 'Pick up leaf color and its Fv/Fm value.')
+        #self.popup = self.show_progress_popup(self.cancel_process, 'Running', 'Pick up leaf color and its Fv/Fm value.')
+        self.show_progress_popup(self.cancel_process, 'Running', 'Pick up leaf color and its Fv/Fm value.')
         self.thread = WorkingThread(target=self.run_process)
         self.thread.start()
         
@@ -444,17 +460,20 @@ class AnalyzeWidget(MyBoxLayout):
         self.popup.dismiss()
 
     def show_fig(self):
-        self.popup = self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
+        #self.popup = self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
+        self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
         self.thread = WorkingThread(target=self.show_fig_process, args=('all',))
         self.thread.start()
 
     def show_fig_color1(self):
-        self.popup = self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
+        #self.popup = self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
+        self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
         self.thread = WorkingThread(target=self.show_fig_process, args=('color1',))
         self.thread.start()
 
     def show_fig_color2(self):
-        self.popup = self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
+        #self.popup = self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
+        self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
         self.thread = WorkingThread(target=self.show_fig_process, args=('color2',))
         self.thread.start()
 
@@ -472,7 +491,8 @@ class AnalyzeWidget(MyBoxLayout):
         print(id.id)
 
     def save(self):
-        self.popup = self.show_progress_popup(self.cancel_process, 'Save results', 'Running...')
+        #self.popup = self.show_progress_popup(self.cancel_process, 'Save results', 'Running...')
+        self.show_progress_popup(self.cancel_process, 'Save results', 'Running...')
         self.thread = WorkingThread(target=self.save_process)
         self.thread.start()
 
@@ -513,8 +533,9 @@ class AnalyzeWidget(MyBoxLayout):
             self.fig_color3d_leaf2.write_html(os.path.join(res_dir, 'color2_color3d.html'))
             self.fig_fvfm3d_leaf2.write_html(os.path.join(res_dir, 'color2_fvfm3d.html'))
             self.fig_scat2d_leaf2.write_html(os.path.join(res_dir, 'color2_scatter2dd.html'))
-            self.fig_color2.write_html(os.path.join(res_dir, 'color2_all.html')
+            self.fig_color2.write_html(os.path.join(res_dir, 'color2_all.html'))
         self.popup.dismiss()
+        Clock.schedule_once(lambda x: self.show_error_popup('Finished.', 'Save'))
                 
 class Root(TabbedPanel):
     def __init__(self, **kwargs):
