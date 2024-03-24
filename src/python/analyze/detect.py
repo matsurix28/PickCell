@@ -241,7 +241,6 @@ class Detect:
         else:
             raise ValueError('No object was detected.')
         res_img = img.copy()
-        print(len(main_obj))
         cv2.drawContours(res_img, [main_obj], -1, (0,0,255), 3)
         self.__save(res_img, 'green-cnts', outdir=output_path)
         img = self.__extr(img, main_obj)
@@ -320,10 +319,7 @@ class Detect:
         mask_area = np.sum(mask) / 255 /3
         green_area = np.sum(green) / 255
         green_ratio = green_area / mask_area
-        print('gren area: ',green_area)
-        print('mask area: ', mask_area)
         a = h* w
-        print('total area: ', a)
         return green_ratio
 
     def __best_hsv(self, img: np.ndarray) -> list:

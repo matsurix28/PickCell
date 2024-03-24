@@ -143,7 +143,6 @@ class Fvfm:
             fvfm = std_fvfm[1] + i
             pos = int(std_fvfm[0] - (i * scale))
             value = img[pos, center]
-            print(value)
             fvfm_list.append([value.tolist(), fvfm])
         for i in range(1, lower_num + 1):
             fvfm = std_fvfm[1] - i

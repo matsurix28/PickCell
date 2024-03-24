@@ -18,7 +18,6 @@ def main():
         p.run(img1, img2, fvfm)
     except (ValueError, TypeError) as e:
         print(e)
-    #print(type(res))
 
 def args():
     parser = argparse.ArgumentParser()
