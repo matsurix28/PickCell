@@ -13,47 +13,6 @@ class Graph():
         uniq = df[['blue', 'green', 'red', 'fvfm']].drop_duplicates()
         return uniq
     
-    '''
-    def _unique_px(self, px, value):
-        val_list = [[i,0,0] for i in value]
-        gti_list = np.stack([px, val_list], 1)
-        uniq_list = np.unique(gti_list, axis=0)
-        return uniq_list
-    '''
-        
-    '''
-    def _than_min_area(self, px_list, value_list):
-        px = []
-        value = []
-        min_count = len(px_list) / 1000
-        print('min count', min_count)
-        print('px1', px_list[0])
-        print('count', px_list.count(px_list[0]))
-        c = 0
-        for p, v in zip(px_list, value_list):
-            print(c)
-            if int(px_list.count(p)) > min_count:
-                px.append(p)
-                value.append(v)
-            c += 1
-        return px, value
-    '''
-
-    def _than_min_area(self, df: pd.DataFrame):
-        min_px = 10
-        count_df = df[['blue', 'green', 'red']].value_counts()
-        print('countdf')
-        than = count_df[count_df > min_px].reset_index()
-        print('than tahn')
-        b = than['blue'].tolist()
-        g = than['green'].tolist()
-        r = than['red'].tolist()
-        print('bgr')
-        color = [[i,j,k] for (i,j,k) in zip(b,g,r)]
-        print('color')
-        result = df[df['px'].isin(color)]
-        return result
-    
     def get_3dscatter_value(self, uniq_list):
         #px, value = self._than_min_area(px_list, value_list)
         #uniq_px_list = self._unique_px(px, value)
