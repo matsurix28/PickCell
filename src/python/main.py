@@ -4,6 +4,7 @@ import threading
 from os.path import expanduser
 
 import cv2
+import japanize_kivy
 import numpy as np
 from analyze.detect import Detect
 from analyze.multi_graph import multi_graph
@@ -25,6 +26,8 @@ REQUEST_GALLERY = 1
 MediaStore_Images_Media_DATA = '_data'
 
 default_threshold = 60
+default_size2d = 5
+default_size3d = 1
 
 src_dir = os.path.normpath(
     os.path.join(
@@ -416,6 +419,11 @@ class AnalyzeWidget(MyBoxLayout):
         self.fig_color2 = None
         self.app = App.get_running_app()
 
+    def set_default(self, dt):
+        self.ids.size_2d.value = default_size2d
+        self.ids.size_3d.value = default_size3d
+        return super().set_default(dt)
+
     def run(self):
         if (self.app.res_leaf_img is None) or (self.app.res_fvfm_img is None):
             self.show_error_popup('There is no input. Do previous steps.')
@@ -489,6 +497,9 @@ class AnalyzeWidget(MyBoxLayout):
     def test(self, id):
         print(type(id))
         print(id.id)
+
+    def set_size(self):
+        pass
 
     def save(self):
         #self.popup = self.show_progress_popup(self.cancel_process, 'Save results', 'Running...')

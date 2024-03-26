@@ -4,16 +4,21 @@ import numpy as np
 import pandas as pd
 from plotly import graph_objects as go
 
+
 def test():
     g = Graph()
     px = [[200,34,45], [45,56,67], [100,120,150]]
     fvfm = [0.6, 0.7, 0.8]
     fig1, fig2, fig3 = g.draw(px, fvfm)
+    g.update_size()
     fig3.show()
 
 class Graph():
     def __init__(self):
         self.set_val()
+        self.fig_color3d = None
+        self.fig_fvfm3d = None
+        self.fig_2d = None
 
     def _unique_px(self, df: pd.DataFrame):
         uniq = df[['blue', 'green', 'red', 'fvfm']].drop_duplicates()
@@ -98,6 +103,18 @@ class Graph():
         self.size_2d = size_2d
         self.size_3d = size_3d
     
+    def update_size(self):
+        if self.fig_color3d is not None:
+            print('change color 3d')
+            self.fig_color3d['data'][0]['marker']['size'] = self.size_3d
+        if self.fig_fvfm3d is not None:
+            print('change fvfm 3d')
+            self.fig_fvfm3d['data'][0]['marker']['size'] = self.size_3d
+        if self.fig_2d is not None:
+            print('change 2d')
+            print(self.size_2d)
+            self.fig_2d['data'][0]['marker']['size'] = self.size_2d
+
     def input(self, px, fvfm):
         df = pd.DataFrame(px,
                           columns=['blue', 'green', 'red'])
@@ -115,11 +132,11 @@ class Graph():
         h = hue_df['hue']
         fvfm = hue_df['fvfm']
         color = hue_df[['red', 'green', 'blue']].to_numpy().tolist()
-        fig_l = self.draw_3dscatter(b,g,r, value=color, fig_title='Color Scatter')
-        fig_h = self.draw_3dscatter(b,g,r, value=fvfm, bar_title='Fv/Fm', fig_title='Fv/Fm Scatter')
+        self.fig_color3d = self.draw_3dscatter(b,g,r, value=color, fig_title='Color Scatter')
+        self.fig_fvfm3d = self.draw_3dscatter(b,g,r, value=fvfm, bar_title='Fv/Fm', fig_title='Fv/Fm Scatter')
         c = self.rgb2color(color)
-        fig_2d = self.draw_2dscatter(h, fvfm, marker_color=c, fig_title='Hue and Fv/Fm')
-        return fig_l, fig_h, fig_2d
+        self.fig_2d = self.draw_2dscatter(h, fvfm, marker_color=c, fig_title='Hue and Fv/Fm')
+        return self.fig_color3d, self.fig_fvfm3d, self.fig_2d
 
     def _hue2rgb(self, hue):
         rgb = tuple(np.array(colorsys.hsv_to_rgb(hue/255, 1, 1)) * 255)

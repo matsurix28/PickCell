@@ -1,0 +1,52 @@
+#:set std_height dp(40)
+
+<IntInput@TextInput>:
+    input_filter: 'int'
+    multiline: False
+
+<SpinBox@BoxLayout>:
+    value: 0 if input.text == '' else int(input.text)
+    low: 0
+    high: 100
+    box_width: std_height * 2
+    IntInput:
+        size_hint: None, None
+        height: std_height
+        width: root.box_width - std_height / 2
+        id: input
+        text: '{:.0f}'.format(root.value)
+    BoxLayout:
+        orientation: 'vertical'
+        Button:
+            size_hint: None, None
+            width: std_height /2
+            height: std_height / 2
+            font_size: sp(10)
+            text: '^'
+            on_press: if root.value < root.high: root.value += 1
+        Button:
+            size_hint: None, None
+            width: std_height / 2
+            height: std_height / 2
+            font_size: sp(10)
+            text: 'v'
+            on_press: if root.value > root.low: root.value -= 1
+
+<Root>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: '2D plot size'
+        SpinBox:
+        SpinBox:
+
+
+
+<Widget>:
+    canvas.after:
+        Color:
+            rgba: 1,0,1,1
+        Line:
+            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+            dash_offset: 5
+            dash_length: 3

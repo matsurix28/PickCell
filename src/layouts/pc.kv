@@ -57,6 +57,38 @@
     bar_width: dp(10)
     scroll_type: ['bars']
 
+<SpinBox@BoxLayout>:
+    size_hint: None, None
+    width: self.minimum_width
+    height: self.minimum_height
+    value: 0 if input.text == '' else int(input.text)
+    low: 0
+    high: 100
+    box_width: std_height * 2
+    IntInput:
+        size_hint: None, None
+        height: std_height
+        width: root.box_width - std_height / 2
+        id: input
+        text: '{:.0f}'.format(root.value)
+    BoxLayout:
+        orientation: 'vertical'
+        Button:
+            size_hint: None, None
+            width: std_height /2
+            height: std_height / 2
+            font_size: sp(10)
+            text: '∧'
+            on_press: if root.value < root.high: root.value += 1
+        Button:
+            size_hint: None, None
+            width: std_height / 2
+            height: std_height / 2
+            font_size: sp(10)
+            text: '∨'
+            on_press: if root.value > root.low: root.value -= 1
+
+
 <RVBox@BoxLayout>:
     text: ''
     texture: None
@@ -86,22 +118,22 @@
 <Root>:
     do_default_tab: False
     tab_width: dp(120)
-    TabbedPanelItem:
-        text: 'Detect'
-        id: detect
-        DetectWidget:
-    TabbedPanelItem:
-        text: 'Fv/Fm'
-        id: fvfm
-        FvFmWidget:
-    TabbedPanelItem:
-        text: 'Align'
-        id: align
-        AlignWidget:
-    TabbedPanelItem:
-        text: 'Split Color'
-        id: split_color
-        SplitColorWidget:
+#    TabbedPanelItem:
+#        text: 'Detect'
+#        id: detect
+#        DetectWidget:
+#    TabbedPanelItem:
+#        text: 'Fv/Fm'
+#        id: fvfm
+#        FvFmWidget:
+#    TabbedPanelItem:
+#        text: 'Align'
+#        id: align
+#        AlignWidget:
+#    TabbedPanelItem:
+#        text: 'Split Color'
+#        id: split_color
+#        SplitColorWidget:
     TabbedPanelItem:
         text: 'Analyze'
         id: analyze
@@ -239,7 +271,6 @@
                             range: 0, 255
                             step: 1
                             value: 0 if textin.text == '' else int(textin.text)
-                            value: root.default_thresh
                         IntInput:
                             id: textin
                             text: '{:.0f}'.format(thresh_slider.value)
@@ -272,7 +303,7 @@
                 source: root.src_dir + '/img/input.png'
             Image:
                 size_hint: 1, None
-                width: 
+                width: 1
                 source: root.src_dir + '/img/arrow.png'
             ImageArea:  # Output image
                 texture: app.fvfm_texture
@@ -656,43 +687,80 @@
     padding: dp(50)
     spacing: dp(20)
     orientation: 'vertical'
-    AnchorLayout:
-        size_hint: 1, 0.6
-        anchor: 'center', 'center'
+    Word:
+        font_size: sp(50)
+        text: 'Calculate the Fv/Fm value for each pixel'
+    AnchorLayout:  # Run button
+        size_hint: 1, 0.1
+        anchor_x: 'center'
         Button:
             height: self.texture_size[1] + dp(20)
-            font_size: sp(200)
+            font_size: sp(50)
             text: 'RUN'
             on_release: root.run()
-    AnchorLayout:
+    Space:
+    AnchorLayout:  # Show button
         size_hint: 1, 0.3
         anchor_x: 'center'
         InnerBox:
             size_hint_x: None
             width: self.minimum_width
-            spacing: dp(50)
-            Button:
+            orientation: 'vertical'
+            Word:
                 font_size: sp(50)
-                height: self.texture_size[1] + dp(20)
-                id: show_res_btn
-                text: 'Show fig'
-                disabled: True
-                on_press: root.show_fig()
-            Button:
-                font_size: sp(50)
-                height: self.texture_size[1] + dp(20)
-                id: show_res1_btn
-                text: 'Show fig1'
-                disabled: True
-                on_press: root.show_fig_color1()
-            Button:
-                font_size: sp(50)
-                height: self.texture_size[1] + dp(20)
-                id: show_res2_btn
-                text: 'Show fig2'
-                disabled: True
-                on_press: root.show_fig_color2()
-    AnchorLayout:
+                text: 'Show figure'
+            InnerBox:
+                InnerBox:  # 2D plot size
+                    orientation: 'vertical'
+                    Word:
+                        font_size: sp(30)
+                        text: '2D plot size'
+                    AnchorLayout:
+                        size_hint_y: None
+                        height: std_height
+                        anchor_x: 'center'
+                        SpinBox:
+                            id: size_2d
+                InnerBox:  # 3D plot size
+                    orientation: 'vertical'
+                    Word:
+                        font_size: sp(30)
+                        text: '3D plot size'
+                    AnchorLayout:
+                        size_hint_y: None
+                        height: std_height
+                        anchor_x: 'center'
+                        SpinBox:
+                            id: size_3d
+            InnerBox:
+                size_hint_x: None
+                width: self.minimum_width
+                spacing: dp(50)
+                Button:
+                    font_size: sp(50)
+                    height: self.texture_size[1] + dp(20)
+                    id: show_res_btn
+                    text: 'All Color'
+                    disabled: True
+                    on_press: root.show_fig()
+                Button:
+                    font_size: sp(50)
+                    height: self.texture_size[1] + dp(20)
+                    id: show_res1_btn
+                    text: 'Color 1'
+                    disabled: True
+                    on_press: root.show_fig_color1()
+                Button:
+                    font_size: sp(50)
+                    height: self.texture_size[1] + dp(20)
+                    id: show_res2_btn
+                    text: 'Color 2'
+                    disabled: True
+                    on_press: root.show_fig_color2()
+    Space:
+    AnchorLayout:  # Save button
+        size_hint: 1, None
+        height: save_btn.height
         anchor_x: 'center'
         Button:
             font_size: sp(50)
@@ -705,7 +773,6 @@
         Button:
             text: '<-Back'
             on_release: app.root.switch_to(app.root.ids.split_color)
-
 
 #<Widget>:
 #    canvas.after:

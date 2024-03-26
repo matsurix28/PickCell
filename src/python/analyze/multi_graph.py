@@ -1,6 +1,7 @@
 from plotly import graph_objects as go
 from plotly.subplots import make_subplots
 
+
 def test():
     from create_graph import Graph
     g = Graph()
