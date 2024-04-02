@@ -710,6 +710,7 @@
                 font_size: sp(50)
                 text: 'Show figure'
             InnerBox:
+                padding: dp(10)
                 InnerBox:  # 2D plot size
                     orientation: 'vertical'
                     Word:
@@ -774,11 +775,11 @@
             text: '<-Back'
             on_release: app.root.switch_to(app.root.ids.split_color)
 
-#<Widget>:
-#    canvas.after:
-#        Color:
-#            rgba: 1,0,1,1
-#        Line:
-#            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
-#            dash_offset: 5
-#            dash_length: 3
+<Widget>:
+    canvas.after:
+        Color:
+            rgba: 1,0,1,1
+        Line:
+            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+            dash_offset: 5
+            dash_length: 3

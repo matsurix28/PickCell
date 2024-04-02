@@ -468,7 +468,7 @@ class AnalyzeWidget(MyBoxLayout):
         self.popup.dismiss()
 
     def show_fig(self):
-        #self.popup = self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
+        
         self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
         self.thread = WorkingThread(target=self.show_fig_process, args=('all',))
         self.thread.start()
