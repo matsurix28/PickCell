@@ -37,7 +37,6 @@ def multi_graph(color3d, fvfm3d, scatter2d):
     fig['layout']['scene2']['xaxis']['range'] = [0, 255]
     fig['layout']['scene2']['yaxis']['range'] = [0, 255]
     fig['layout']['scene2']['zaxis']['range'] = [0, 255]
-    print(fig)
     return fig
 
 if __name__ == '__main__':

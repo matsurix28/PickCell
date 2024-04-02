@@ -27,5 +27,6 @@ RUN apt-get update && apt-get upgrade -y \
     plotly \
     easyocr \
     kivy \
+    japanize-kivy \
     pandas \
     && echo 'export PATH=$PATH:~/.local/bin/' >> ~/.bashrc

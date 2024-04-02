@@ -494,10 +494,6 @@ class AnalyzeWidget(MyBoxLayout):
             self.fig_color2.show()
         self.popup.dismiss()
 
-    def test(self, id):
-        print(type(id))
-        print(id.id)
-
     def set_size(self):
         pass
 
