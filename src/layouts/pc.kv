@@ -92,7 +92,7 @@
 <RVBox@BoxLayout>:
     text: ''
     texture: None
-    ImageArea:
+    Image:
         id: img
         texture: root.texture
     Word:
@@ -216,7 +216,7 @@
         ImageArea:  # Input image
             id: input_img
             size_hint_y: 0.5
-            source: root.src_dir + '/img/input.png'
+            source: root.src_dir + '/img/leaf_input.png'
         Image:
             size_hint: 1, None
             width: 
@@ -224,7 +224,7 @@
         ImageArea:  # Output image
             texture: app.leaf_texture
             size_hint_y: 0.5
-            source: root.src_dir + '/img/output.png'
+            source: root.src_dir + '/img/leaf_output.png'
     InnerBox:  # Method frame
         padding: dp(10), dp(0), dp(10), dp(10)
         size_hint: 0.4, 1
@@ -242,7 +242,7 @@
             InnerBox:
                 orientation: 'vertical'
                 Sentence:
-                    text: 'Detects contours from an image.'
+                    text: 'Detect leaf outlines from an image. And remove background.'
                 Image:
                     height: dp(200)
                     size_hint_y: None
@@ -300,7 +300,7 @@
             ImageArea:  # Input image
                 id: input_img
                 size_hint_y: 0.5
-                source: root.src_dir + '/img/input.png'
+                source: root.src_dir + '/img/fvfm_input.png'
             Image:
                 size_hint: 1, None
                 width: 1
@@ -308,7 +308,7 @@
             ImageArea:  # Output image
                 texture: app.fvfm_texture
                 size_hint_y: 0.5
-                source: root.src_dir + '/img/output.png'
+                source: root.src_dir + '/img/fvfm_output.png'
         InnerBox:  # Fv/Fm list frame
             size_hint: 0.2, 1
             orientation: 'vertical'
@@ -414,23 +414,23 @@
             size_hint: 1, 0.3
             ImageArea:  # Input leaf image
                 texture: app.leaf_texture
-                source: root.src_dir + '/img/input.png'
+                source: root.src_dir + '/img/leaf_input.png'
             ImageArea:  # Input fvfm image
                 texture: app.fvfm_texture
-                source: root.src_dir + '/img/input.png'
+                source: root.src_dir + '/img/fvfm_input.png'
         InnerBox:  # Aligned image frame
             size_hint: 1, 0.3
             ImageArea:  # Output leaf image
                 texture: app.res_leaf_texture
-                source: root.src_dir + '/img/output.png'
+                source: root.src_dir + '/img/leaf_output.png'
             ImageArea:  # Output fvfm image
                 texture: root.res_fvfm_texture
-                source: root.src_dir + '/img/output.png'
+                source: root.src_dir + '/img/fvfm_output.png'
         InnerBox:  # Overlay image frame
             size_hint: 1, 0.3
             ImageArea:
                 texture: root.overlay_texture
-                source: root.src_dir + '/img/output.png'
+                source: root.src_dir + '/img/overlay.png'
     InnerBox:  # Method frame
         padding: dp(10), dp(0), dp(10), dp(10)
         size_hint: 0.4, 1
@@ -448,7 +448,7 @@
             InnerBox:
                 orientation: 'vertical'
                 Sentence:
-                    text: 'Reads the Fv/Fm scale bar from an image and creates its value and color correspondence table. Also, extract only the leaf area from an image.'
+                    text: 'Adjust the size and tilt so that the two images overlap exactly.'
                 Image:
                     height: dp(250)
                     size_hint_y: None
@@ -485,25 +485,41 @@
                 text: 'Original image'
             ImageArea:
                 texture: app.res_leaf_texture
-                source: root.src_dir + '/img/input.png'
+                source: root.src_dir + '/img/leaf_input.png'
         InnerBox:  #Split color images frame
             size_hint_y: 0.5
             InnerBox:  # Color 1
                 size_hint: 0.5, 1
                 orientation: 'vertical'
+                AnchorLayout:
+                    size_hint_y: None
+                    height: std_height
+                    anchor_x: 'center'
+                    Image:
+                        size_hint: None, None
+                        source: root.src_dir + '/img/arrow.png'
+                        size: std_height, std_height
                 Word:
                     text: 'Color 1'
                 ImageArea:
                     texture: root.extr1_texture
-                    source: root.src_dir + '/img/output.png'
+                    source: root.src_dir + '/img/color1.png'
             InnerBox:  # Color 2
                 size_hint: 0.5, 1
                 orientation: 'vertical'
+                AnchorLayout:
+                    size_hint_y: None
+                    height: std_height
+                    anchor_x: 'center'
+                    Image:
+                        size_hint: None, None
+                        source: root.src_dir + '/img/arrow.png'
+                        size: std_height, std_height
                 Word:
                     text: 'Color 2'
                 ImageArea:
                     texture: root.extr2_texture
-                    source: root.src_dir + '/img/output.png'
+                    source: root.src_dir + '/img/color2.png'
     InnerBox:  # Method frame
         padding: dp(10), dp(0), dp(10), dp(10)
         size_hint: 0.4, 1
@@ -521,7 +537,7 @@
             InnerBox:
                 orientation: 'vertical'
                 Sentence:
-                    text: 'Split color to compare. This operation is optional.'
+                    text: 'Extract the color you want to compare. This operation is optional.'
                 Space:
                 InnerBox:  # Step 1 select range of color1
                     orientation: 'vertical'
@@ -775,11 +791,11 @@
             text: '<-Back'
             on_release: app.root.switch_to(app.root.ids.split_color)
 
-<Widget>:
-    canvas.after:
-        Color:
-            rgba: 1,0,1,1
-        Line:
-            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
-            dash_offset: 5
-            dash_length: 3
+#<Widget>:
+#    canvas.after:
+#        Color:
+#            rgba: 1,0,1,1
+#        Line:
+#            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+#            dash_offset: 5
+#            dash_length: 3
