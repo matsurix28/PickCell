@@ -1,0 +1,13 @@
+services:
+  gui:
+    build: .
+    volumes:
+      - ./:/workspace
+      - /tmp/.X11-unix/X0:/tmp/.X11-unix/X0
+    environment:
+      - DISPLAY=$DISPLAY
+      - PULSE_SERVER=$PULSE_SERVER
+      - WAYLAND_DISPLAY=$WAYLAND_DISPLAY
+      - XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR
+    tty: true
+    stdin_open: true

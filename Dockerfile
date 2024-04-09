@@ -30,3 +30,5 @@ RUN apt-get update && apt-get upgrade -y \
     japanize-kivy \
     pandas \
     && echo 'export PATH=$PATH:~/.local/bin/' >> ~/.bashrc
+
+CMD bash
