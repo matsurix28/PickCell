@@ -1,7 +1,8 @@
 #:import Factory kivy.factory.Factory
 #:import RangeSlider custom_widgets.range_slider.RangeSlider
 
-#:set std_height dp(40)
+#:set std_height dp(30)
+#:set std_font_size sp(16)
 #:set default_thresh 60
 #:set ext ['jpg', 'jpeg', 'png', 'tiff', 'bmp']
 #:set ext sum([['*.' + i.lower(), '*.' + i.upper()] for i in ext], [])
@@ -12,9 +13,9 @@
     height: std_height
 
 <Button>:
-    font_size: sp(20)
+    font_size: std_font_size
     size_hint: None, None
-    width: self.texture_size[0] + dp(20)
+    width: self.texture_size[0] + dp(15)
     height: std_height
 
 <RangeSlider>:
@@ -42,11 +43,11 @@
 
 <Word@Label>:
     size_hint_y: None
-    height: self.texture_size[1] + dp(10)
-    font_size: sp(20)
+    height: self.texture_size[1] + dp(5)
+    font_size: sp(18)
 
 <TextInput>:
-    font_size: sp(20)
+    font_size: std_font_size
     multiline: False
     size_hint: None, None
     height: std_height
@@ -101,7 +102,7 @@
         text: root.text
 
 <Sentence@Label>:
-    font_size: sp(22)
+    font_size: std_font_size
     text_size: self.width, None
     size_hint_y: None
     height: self.texture_size[1] + dp(10)
@@ -236,7 +237,7 @@
                 rectangle: self.x-dp(2), self.y-dp(2), self.width+dp(2), self.height+dp(2)
                 width: dp(2)
         Word:  # Method title label
-            font_size: sp(25)
+            font_size: sp(20)
             text: 'Method'
         ScrollView:  # Method area
             InnerBox:
@@ -313,7 +314,7 @@
             size_hint: 0.2, 1
             orientation: 'vertical'
             Word:
-                font_size: sp(25)
+                font_size: sp(20)
                 text: 'Fv/Fm value'
             RecycleView:
                 id: rv
@@ -339,7 +340,7 @@
                 rectangle: self.x-dp(2), self.y-dp(2), self.width+dp(2), self.height+dp(2)
                 width: dp(2)
         Word:  # Method title label
-            font_size: sp(25)
+            font_size: sp(20)
             text: 'Method'
         ScrollView:  # Method area
             InnerBox:
@@ -442,7 +443,7 @@
                 rectangle: self.x-dp(2), self.y-dp(2), self.width+dp(2), self.height+dp(2)
                 width: dp(2)
         Word:  # Method title label
-            font_size: sp(25)
+            font_size: sp(20)
             text: 'Method'
         ScrollView:  # Method area
             InnerBox:
@@ -531,7 +532,7 @@
                 rectangle: self.x-dp(2), self.y-dp(2), self.width+dp(2), self.height+dp(2)
                 width: dp(2)
         Word:  # Method title label
-            font_size: sp(25)
+            font_size: sp(20)
             text: 'Method'
         ScrollView:  # Method area
             InnerBox:
@@ -699,19 +700,21 @@
                             text: 'Next->'
                             on_release: app.root.switch_to(app.root.ids.analyze)
 
+#:set ana_font sp(35)
+#:set ana_btn sp(30)
 <AnalyzeWidget>:
-    padding: dp(50)
-    spacing: dp(20)
+    padding: dp(20)
+    spacing: dp(10)
     orientation: 'vertical'
     Word:
-        font_size: sp(50)
+        font_size: ana_font
         text: 'Calculate the Fv/Fm value for each pixel'
     AnchorLayout:  # Run button
         size_hint: 1, 0.1
         anchor_x: 'center'
         Button:
             height: self.texture_size[1] + dp(20)
-            font_size: sp(50)
+            font_size: ana_btn
             text: 'RUN'
             on_release: root.run()
     Space:
@@ -723,14 +726,14 @@
             width: self.minimum_width
             orientation: 'vertical'
             Word:
-                font_size: sp(50)
+                font_size: ana_font
                 text: 'Show figure'
             InnerBox:
                 padding: dp(10)
                 InnerBox:  # 2D plot size
                     orientation: 'vertical'
                     Word:
-                        font_size: sp(30)
+                        font_size: ana_font
                         text: '2D plot size'
                     AnchorLayout:
                         size_hint_y: None
@@ -741,7 +744,7 @@
                 InnerBox:  # 3D plot size
                     orientation: 'vertical'
                     Word:
-                        font_size: sp(30)
+                        font_size: ana_font
                         text: '3D plot size'
                     AnchorLayout:
                         size_hint_y: None
@@ -754,21 +757,21 @@
                 width: self.minimum_width
                 spacing: dp(50)
                 Button:
-                    font_size: sp(50)
+                    font_size: ana_btn
                     height: self.texture_size[1] + dp(20)
                     id: show_res_btn
                     text: 'All Color'
                     disabled: True
                     on_press: root.show_fig()
                 Button:
-                    font_size: sp(50)
+                    font_size: ana_btn
                     height: self.texture_size[1] + dp(20)
                     id: show_res1_btn
                     text: 'Color 1'
                     disabled: True
                     on_press: root.show_fig_color1()
                 Button:
-                    font_size: sp(50)
+                    font_size: ana_btn
                     height: self.texture_size[1] + dp(20)
                     id: show_res2_btn
                     text: 'Color 2'
@@ -780,7 +783,7 @@
         height: save_btn.height
         anchor_x: 'center'
         Button:
-            font_size: sp(50)
+            font_size: ana_btn
             height: self.texture_size[1] + dp(20)
             id: save_btn
             text: 'Save'
