@@ -1,5 +1,8 @@
+import collections
 import ctypes
+import glob
 import os
+import re
 import threading
 from os.path import expanduser
 
@@ -546,7 +549,63 @@ class AnalyzeWidget(MyBoxLayout):
             self.fig_color2.write_html(os.path.join(res_dir, 'color2_all.html'))
         self.popup.dismiss()
         Clock.schedule_once(lambda x: self.show_error_popup('Finished.', 'Save'))
+
+class AutoWidget(MyBoxLayout):
+    def __init__(self, **kwargs):
+        super(AutoWidget, self).__init__(**kwargs)
+        self.input_path = None
+        self.output_path = '.'
+        exts = ['jpg', 'jpeg', 'png', 'tiff', 'bmp']
+        self.exts = sum([[ext.lower(), ext.upper()] for ext in exts], [])
+
+    def click(self):
+        print(self.input_path)
+
+    def create_img_list(self):
+        print(self.input_path)
+        if self.input_path is None:
+            raise ValueError('There is no input. Please select directory.')
+        else:
+            files = []
+            for ext in self.exts:
+                files += glob.glob(self.input_path + '/*.' + ext)
+            print('files: ', files)
+            img_names = [re.sub('-(L|F)$', '', os.path.splitext(os.path.basename(f))[0]) for f in files]
+            img_name_list = [k for k, v in collections.Counter(img_names).items() if v > 1]
+            print('img name list', img_name_list)
+            self.img_list = []
+            for name in img_name_list:
+                l = glob.glob(self.input_path + '/' + name + '-L.*')
+                print(l)
+                f = glob.glob(self.input_path + '/' + name + '-F.*')
+                print(f)
+                if (len(l) == 0) or (len(f) == 0):
+                    break
+                if len(l) > 1:
+                    l = self.biggest_img(l)
+                if len(f) > 1:
+                    f = self.biggest_img(f)
+                self.img_list.append([name, l[0], f[0]])
+            if len(self.img_list) == 0:
+                #raise ValueError('There is no pair images.')
+                print('no pair')
+            print(self.img_list)
+            return
+            
                 
+
+
+    def biggest_img(self, img_list):
+        max_size = 0
+        biggest = None
+        for image in img_list:
+            img = cv2.imread(image)
+            size = img.size
+            if size > max_size:
+                max_size = size
+                biggest = image
+        return [biggest]
+
 class Root(TabbedPanel):
     def __init__(self, **kwargs):
         super(Root, self).__init__(**kwargs)

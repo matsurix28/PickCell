@@ -19,6 +19,10 @@ class MyBoxLayout(BoxLayout):
             self.ids.input_img.source = file[0]
             self.input_path = file[0]
 
+    def input_dir(self, file):
+        if file != []:
+            self.input_path = file[0]
+
     def cv2_to_texture(self, cv2_img):
         texture = Texture.create(size=(cv2_img.shape[1], cv2_img.shape[0]), colorfmt='bgr', bufferfmt='ubyte')
         texture.blit_buffer(cv2_img.tobytes(), colorfmt='bgr', bufferfmt='ubyte')

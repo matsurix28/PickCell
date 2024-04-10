@@ -1,3 +1,5 @@
+import os
+
 from kivy.properties import ObjectProperty, StringProperty
 from kivy.uix.popup import Popup
 
@@ -5,6 +7,13 @@ from kivy.uix.popup import Popup
 class FileDialogPopup(Popup):
     select = ObjectProperty(None)
     cancel = ObjectProperty(None)
+
+class FolderDialogPopup(Popup):
+    select = ObjectProperty(None)
+    cancel = ObjectProperty(None)
+    
+    def is_dir(self, dirname, filename):
+        return os.path.isdir(os.path.join(dirname, filename))
 
 class ErrorPopup(Popup):
     title_text = StringProperty('Error')

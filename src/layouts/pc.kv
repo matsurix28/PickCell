@@ -119,26 +119,30 @@
 <Root>:
     do_default_tab: False
     tab_width: dp(120)
+#   TabbedPanelItem:
+#        text: 'Detect'
+#        id: detect
+#        DetectWidget:
+#    TabbedPanelItem:
+#        text: 'Fv/Fm'
+#        id: fvfm
+#        FvFmWidget:
+#    TabbedPanelItem:
+#        text: 'Align'
+#        id: align
+#        AlignWidget:
+#    TabbedPanelItem:
+#        text: 'Split Color'
+#        id: split_color
+#        SplitColorWidget:
+#    TabbedPanelItem:
+#        text: 'Analyze'
+#        id: analyze
+#        AnalyzeWidget:
     TabbedPanelItem:
-        text: 'Detect'
-        id: detect
-        DetectWidget:
-    TabbedPanelItem:
-        text: 'Fv/Fm'
-        id: fvfm
-        FvFmWidget:
-    TabbedPanelItem:
-        text: 'Align'
-        id: align
-        AlignWidget:
-    TabbedPanelItem:
-        text: 'Split Color'
-        id: split_color
-        SplitColorWidget:
-    TabbedPanelItem:
-        text: 'Analyze'
-        id: analyze
-        AnalyzeWidget:
+        text: 'Auto'
+        id: auto
+        AutoWidget:
 
 <FileDialogPopup>:
     size_hint: 0.8, 0.8
@@ -161,6 +165,31 @@
                     text: 'OK'
                     on_release:
                         root.select(filechooser.selection)
+                        root.dismiss()
+
+<FolderDialogPopup>:
+    size_hint: 0.8, 0.8
+    FileChooserListView:
+        id: folderchooser
+        path: app.home_dir
+        #filters: [root.is_dir]
+        filters: ['']
+        dirselect: True
+        on_submit:
+            root.select(self.selection)
+            root.dismiss()
+        AnchorLayout:
+            anchor_x: 'right'
+            InnerBox:
+                size_hint_x: None
+                width: self.minimum_width
+                Button:
+                    text: 'Cancel'
+                    on_release: root.dismiss()
+                Button:
+                    text: 'OK'
+                    on_release:
+                        root.select(folderchooser.selection)
                         root.dismiss()
 
 <ProgressPopup>:
@@ -790,15 +819,46 @@
             disabled: True
             on_press: root.save()
     InnerBox:
-        Button:
-            text: '<-Back'
-            on_release: app.root.switch_to(app.root.ids.split_color)
+        AnchorLayout:
+            size_hint_x: 0.5
+            anchor_x: 'left'
+            Button:
+                text: '<-Back'
+                on_release: app.root.switch_to(app.root.ids.split_color)
+        AnchorLayout:
+            size_hint_x: 0.5
+            anchor_x: 'right'
+            Button:
+                text: 'Auto->'
+                on_release: app.root.switch_to(app.root.ids.auto)
 
-#<Widget>:
-#    canvas.after:
-#        Color:
-#            rgba: 1,0,1,1
-#        Line:
-#            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
-#            dash_offset: 5
-#            dash_length: 3
+
+<AutoWidget>:
+    orientation: 'vertical'
+    InnerBox:  # Select folder
+        orientation: 'vertical'
+        size_hint: 1,1
+        Word:
+            text: 'Select leaf images.'
+        Button:
+            size_hint: 1, 0.5
+            text: 'Select'
+            on_press: Factory.FolderDialogPopup(select=root.input_dir).open()
+        Button:
+            size_hint: 1, 0.5
+            text: 'buttttt'
+            on_press: root.create_img_list()
+    #InnerBox:  # Leaf
+    #InnerBox:  # Fv/Fm
+    #InnerBox:  # Split color
+    #InnerBox:  # Output
+    #InnerBox:  # Run
+
+<Widget>:
+    canvas.after:
+        Color:
+            rgba: 1,0,1,1
+        Line:
+            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+            dash_offset: 5
+            dash_length: 3
