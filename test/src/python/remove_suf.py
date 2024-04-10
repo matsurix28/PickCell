@@ -1,4 +1,5 @@
 import collections
+import csv
 import glob
 import os
 import re
@@ -31,7 +32,7 @@ for ext in exts:
 #ff = [os.path.splitext(f)[0].rstrip('-L' '-F') for f in files]
 
 
-ff = [re.sub('-(L|F)$', '', os.path.splitext(f)[0]) for f in files]
+ff = [re.sub('-(L|F)$', '', os.path.splitext(os.path.basename(f))[0]) for f in files]
 a = [k for k, v in collections.Counter(ff).items() if v > 1]
 
 img_list = []
@@ -54,3 +55,11 @@ for name in a:
     img_list.append([name, l[0], f[0]])
 
 print(img_list)
+
+
+outdir = './test_out.csv'
+with open(outdir, 'w', newline='') as f:
+    writer = csv.writer(f)
+    header = ['Image name', 'Leaf image', 'FvFm image']
+    writer.writerow(header)
+    writer.writerows(img_list)

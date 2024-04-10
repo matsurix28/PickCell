@@ -1,4 +1,5 @@
 import collections
+import csv
 import ctypes
 import glob
 import os
@@ -555,11 +556,9 @@ class AutoWidget(MyBoxLayout):
         super(AutoWidget, self).__init__(**kwargs)
         self.input_path = None
         self.output_path = '.'
+        self.img_list = None
         exts = ['jpg', 'jpeg', 'png', 'tiff', 'bmp']
         self.exts = sum([[ext.lower(), ext.upper()] for ext in exts], [])
-
-    def click(self):
-        print(self.input_path)
 
     def create_img_list(self):
         print(self.input_path)
@@ -587,13 +586,14 @@ class AutoWidget(MyBoxLayout):
                     f = self.biggest_img(f)
                 self.img_list.append([name, l[0], f[0]])
             if len(self.img_list) == 0:
-                #raise ValueError('There is no pair images.')
-                print('no pair')
-            print(self.img_list)
+                raise ValueError('There is no pair images.')
+            output = self.output_path + '/images_list.csv'
+            header = ['Image title', 'Leaf image file', 'FvFm image file']
+            with open(output, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(header)
+                writer.writerows(self.img_list)
             return
-            
-                
-
 
     def biggest_img(self, img_list):
         max_size = 0
