@@ -6,9 +6,6 @@ from os.path import expanduser
 import cv2
 import japanize_kivy
 import numpy as np
-from analyze.detect import Detect
-from analyze.multi_graph import multi_graph
-from custom_widgets.myboxlayout import MyBoxLayout
 from kivy import platform
 from kivy.app import App
 from kivy.clock import Clock
@@ -16,6 +13,10 @@ from kivy.core.window import Window
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty
 from kivy.uix.tabbedpanel import TabbedPanel
+
+from src.python.analyze.detect import Detect
+from src.python.analyze.multi_graph import multi_graph
+from src.python.custom_widgets.myboxlayout import MyBoxLayout
 
 currentActivity = None
 CLS_Activity = None
@@ -32,7 +33,9 @@ default_size3d = 1
 src_dir = os.path.normpath(
     os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
-        '../'))
+        'src'
+    )
+)
 
 class PickcellApp(App):
     file_name = None

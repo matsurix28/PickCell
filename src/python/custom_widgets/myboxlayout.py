@@ -1,9 +1,10 @@
 import os
 
-from custom_widgets.popup import ErrorPopup, ProgressPopup
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.uix.boxlayout import BoxLayout
+
+from .popup import ErrorPopup, ProgressPopup
 
 
 class MyBoxLayout(BoxLayout):
