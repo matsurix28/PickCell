@@ -56,6 +56,23 @@ class PickcellApp(App):
     res_fvfm_texture = ObjectProperty(None)
     res_leaf1_img = None
     res_leaf2_img = None
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.leaf_detect = None
+        self.fvfm_detect = None
+        self.fvfm = None
+        self.align = None
+        self.pickcell = None
+        self.graph = None
+
+    def setup_analysis(self):
+        from src.python.analyze.align import Align
+        from src.python.analyze.create_graph import Graph
+        from src.python.analyze.detect import Detect
+        from src.python.analyze.fvfm import Fvfm
+        from src.python.analyze.pickcell import Pickcell
+
     def build(self):
         if platform == 'android':
             Window.fullscreen = 'auto'
@@ -109,9 +126,9 @@ class DetectWidget(MyBoxLayout):
         super(DetectWidget, self).__init__(**kwargs)
         self.src_dir = src_dir
         self.default_thresh = default_threshold
-        self.d = None
         self.input_path = None
         self.app = App.get_running_app()
+        self.d = self.app
 
     def run(self):
         if self.input_path is None:
