@@ -66,6 +66,10 @@ class PickcellApp(App):
         self.align = None
         self.pickcell = None
         self.graph = None
+        self.low1 = None
+        self.high1 = None
+        self.low2 = None
+        self.high2 = None
         self.setup_fvfm_thread = threading.Thread(target=self.setup_fvfm)
         self.setup_fvfm_thread.start()
 
@@ -100,6 +104,22 @@ class PickcellApp(App):
             self.align = Align()
         self.res_leaf_img, self.res_fvfm_img, self.overlay_img = self.align.run(*args)
         
+    def extr_color(self, low, high):
+        img = self.res_leaf_img
+        img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        mask = cv2.inRange(img_hsv, low, high)
+        extr_img = cv2.bitwise_and(img, img, mask=mask)
+        return extr_img
+    
+    def run_extr_color1(self, low, high):
+        self.low1 = low
+        self.high1 = high
+        self.res_leaf1_img = self.extr_color(low, high)
+
+    def run_extr_color2(self, low, high):
+        self.low2 = low
+        self.high2 = high
+        self.res_leaf2_img = self.extr_color(low, high)
 
     def setup_pickcell(self):
         from src.python.analyze.create_graph import Graph
@@ -409,28 +429,22 @@ class SplitColorWidget(MyBoxLayout):
         )
         
     def extr_color1(self):
-        img = self.app.res_leaf_img
-        if img is None:
+        if self.app.res_leaf_img is None:
             self.show_error_popup('Run previous steps before color extraction.')
             return
-        img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         low = (self.h1l, self.s1l, self.v1l)
         high = (self.h1h, self.s1h, self.v1h)
-        mask = cv2.inRange(img_hsv, low, high)
-        self.app.res_leaf1_img = cv2.bitwise_and(img, img, mask=mask)
+        self.app.run_extr_color1(low, high)
         texture = self.cv2_to_texture(self.app.res_leaf1_img)
         self.extr1_texture = texture
 
     def extr_color2(self):
-        img = self.app.res_leaf_img
-        if img is None:
+        if self.app.res_leaf_img is None:
             self.show_error_popup('Run previous steps before color extraction.')
             return
-        img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         low = (self.h2l, self.s2l, self.v2l)
         high = (self.h2h, self.s2h, self.v2h)
-        mask = cv2.inRange(img_hsv, low, high)
-        self.app.res_leaf2_img = cv2.bitwise_and(img, img, mask=mask)
+        self.app.run_extr_color2(low, high)
         texture = self.cv2_to_texture(self.app.res_leaf2_img)
         self.extr2_texture = texture
 
