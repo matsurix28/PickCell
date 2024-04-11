@@ -16,7 +16,7 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics.texture import Texture
 from kivy.lang import Builder
-from kivy.properties import ObjectProperty
+from kivy.properties import ObjectProperty, StringProperty
 from kivy.uix.tabbedpanel import TabbedPanel
 
 from src.python.analyze.multi_graph import multi_graph
@@ -41,25 +41,33 @@ src_dir = os.path.normpath(
     )
 )
 
+home_dir = os.path.expanduser('~')
+
 class PickcellApp(App):
-    file_name = None
-    leaf_img = None
-    fvfm_img = None
     leaf_texture = ObjectProperty(None)
     fvfm_texture = ObjectProperty(None)
-    leaf_obj = None
-    fvfm_obj = None
-    fvfm_list = None
-    res_leaf_img = None
-    res_fvfm_img = None
-    overlay_img = None
     res_leaf_texture = ObjectProperty(None)
     res_fvfm_texture = ObjectProperty(None)
-    res_leaf1_img = None
-    res_leaf2_img = None
+    file_name = ''
+    outdir = StringProperty(home_dir + '/' + file_name)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.set_var()
+        self.setup_fvfm_thread = threading.Thread(target=self.setup_fvfm)
+        self.setup_fvfm_thread.start()
+
+    def set_var(self):
+        self.leaf_img = None
+        self.fvfm_img = None
+        self.leaf_obj = None
+        self.fvfm_obj = None
+        self.fvfm_list = None
+        self.res_leaf_img = None
+        self.res_fvfm_img = None
+        self.overlay_img = None
+        self.res_leaf1_img = None
+        self.res_leaf2_img = None
         self.leaf_detect = None
         self.fvfm_detect = None
         self.fvfm = None
@@ -70,8 +78,6 @@ class PickcellApp(App):
         self.high1 = None
         self.low2 = None
         self.high2 = None
-        self.setup_fvfm_thread = threading.Thread(target=self.setup_fvfm)
-        self.setup_fvfm_thread.start()
 
     def setup_fvfm(self):
         from src.python.analyze.fvfm import Fvfm
@@ -121,9 +127,51 @@ class PickcellApp(App):
         self.high2 = high
         self.res_leaf2_img = self.extr_color(low, high)
 
-    def setup_pickcell(self):
-        from src.python.analyze.create_graph import Graph
-        from src.python.analyze.pickcell import Pickcell
+    def run_split_color(self):
+        if (self.low1 is not None) and (self.high1 is not None):
+            self.res_leaf1_img = self.extr_color(self.low1, self.high1)
+        if (self.low2 is not None) and (self.high2 is not None):
+            self.res_leaf2_img = self.extr_color(self.low2, self.high2)
+
+    def clear(self):
+        self.file_name = None
+        self.leaf_img = None
+        self.fvfm_img = None
+        self.leaf_obj = None
+        self.fvfm_obj = None
+        self.fvfm_list = None
+        self.res_leaf_img = None
+        self.res_fvfm_img = None
+        self.overlay_img = None
+        self.res_leaf1_img = None
+        self.res_leaf2_img = None
+
+    def run_pickcell(self, leaf_img, fvfm_img, fvfm_list):
+        if self.pickcell is None:
+            from src.python.analyze.pickcell import Pickcell
+            self.pickcell = Pickcell()
+        if self.graph is None:
+            from src.python.analyze.create_graph import Graph
+            self.graph = Graph()
+        res_px, res_fvfm = self.pickcell.run(leaf_img, fvfm_img, fvfm_list)
+        fig_color3d, fig_fvfm3d, fig_scat2d = self.graph.draw(res_px, res_fvfm)
+        fig_all = multi_graph(fig_color3d, fig_fvfm3d, fig_scat2d)
+        return fig_color3d, fig_fvfm3d, fig_scat2d, fig_all
+
+    def update_marker_size(self, figures, size_2d, size_3d):
+        figures[0]['data'][0]['marker']['size'] = size_3d
+        figures[1]['data'][0]['marker']['size'] = size_3d
+        figures[2]['data'][0]['marker']['size'] = size_2d
+        figures[3]['data'][0]['marker']['size'] = size_2d
+        figures[3]['data'][1]['marker']['size'] = size_3d
+        figures[3]['data'][2]['marker']['size'] = size_3d
+        return figures
+
+    def set_marker_size(self, size_2d, size_3d):
+        if self.graph is None:
+            from src.python.analyze.create_graph import Graph
+            self.graph = Graph()
+        self.graph.set_val(size_2d=size_2d, size_3d=size_3d)
 
     def build(self):
         if platform == 'android':
@@ -291,6 +339,7 @@ class AlignWidget(MyBoxLayout):
             self.app.run_align(self.args)
             Clock.schedule_once(self.update_texture, 0)
         except Exception as e:
+            self.popup.dismiss()
             self.err_msg = str(e)
             Clock.schedule_once(self.thread_error, 0)
         self.popup.dismiss()
@@ -453,100 +502,88 @@ class AnalyzeWidget(MyBoxLayout):
         super(AnalyzeWidget, self).__init__(**kwargs)
         self.p = None
         self.g = None
-        self.fig_color3d = None
-        self.fig_fvfm3d = None
-        self.fig_scat2d = None
+        self.fig_c3d = None
+        self.fig_f3d = None
+        self.fig_2d = None
         self.fig_all = None
-        self.fig_color3d_leaf1 = None
-        self.fig_fvfm3d_leaf1 = None
-        self.fig_scat2d_leaf1 = None
-        self.fig_color1 = None
-        self.fig_color3d_leaf2 = None
-        self.fig_fvfm3d_leaf2 = None
-        self.fig_scat2d_leaf2 = None
-        self.fig_color2 = None
+        self.fig_c3d_1 = None
+        self.fig_f3d_1 = None
+        self.fig_2d_1 = None
+        self.fig_all_1 = None
+        self.fig_c3d_2 = None
+        self.fig_f3d_2 = None
+        self.fig_2d_2 = None
+        self.fig_all_2 = None
+        self.size_2d = default_size2d
+        self.size_3d = default_size3d
         self.app = App.get_running_app()
+        Clock.schedule_once(self.bind_func, 0)
 
     def set_default(self, dt):
         self.ids.size_2d.value = default_size2d
         self.ids.size_3d.value = default_size3d
         return super().set_default(dt)
 
+    def bind_func(self, dt):
+        self.ids.size_2d.bind(value=self.set_size)
+        self.ids.size_3d.bind(value=self.set_size)
+        self.ids.outdir_label.text = self.app.outdir
+
+    def set_size(self, *args):
+        self.size_2d = self.ids.size_2d.value
+        self.size_3d = self.ids.size_3d.value
+        self.app.set_marker_size(self.size_2d, self.size_3d)
+
     def run(self):
         if (self.app.res_leaf_img is None) or (self.app.res_fvfm_img is None):
             self.show_error_popup('There is no input. Do previous steps.')
             return
-        #self.popup = self.show_progress_popup(self.cancel_process, 'Running', 'Pick up leaf color and its Fv/Fm value.')
         self.show_progress_popup(self.cancel_process, 'Running', 'Pick up leaf color and its Fv/Fm value.')
         self.thread = WorkingThread(target=self.run_process)
         self.thread.start()
         
     def run_process(self):
-        if self.p is None:
-            from analyze.pickcell import Pickcell
-            self.p = Pickcell()
-        if self.g is None:
-            from analyze.create_graph import Graph
-            self.g = Graph()
         leaf_img = self.app.res_leaf_img
         fvfm_img = self.app.res_fvfm_img
         fvfm_list = self.app.fvfm_list
         leaf1_img = self.app.res_leaf1_img
         leaf2_img = self.app.res_leaf2_img
         try:
-            self.res_px, self.res_fvfm = self.p.run(leaf_img, fvfm_img, fvfm_list)
-            self.fig_color3d, self.fig_fvfm3d, self.fig_scat2d = self.g.draw(self.res_px, self.res_fvfm)
-            self.fig_all = multi_graph(self.fig_color3d, self.fig_fvfm3d, self.fig_scat2d)
+            self.fig = self.app.run_pickcell(leaf_img, fvfm_img, fvfm_list)
             self.ids.show_res_btn.disabled = False
             if leaf1_img is not None:
-                self.res_leaf1_px, self.res_leaf1_fvfm = self.p.run(leaf1_img, fvfm_img, fvfm_list)
-                self.fig_color3d_leaf1, self.fig_fvfm3d_leaf1, self.fig_scat2d_leaf1 = self.g.draw(self.res_leaf1_px, self.res_leaf1_fvfm)
-                self.fig_color1 = multi_graph(self.fig_color3d_leaf1, self.fig_fvfm3d_leaf1, self.fig_scat2d_leaf1)
+                self.fig1 = self.app.run_pickcell(leaf1_img, fvfm_img, fvfm_list)
                 self.ids.show_res1_btn.disabled = False
             if leaf2_img is not None:
-                self.res_leaf2_px, self.res_leaf2_fvfm = self.p.run(leaf2_img, fvfm_img, fvfm_list)
-                self.fig_color3d_leaf2, self.fig_fvfm3d_leaf2, self.fig_scat2d_leaf2 = self.g.draw(self.res_leaf2_px, self.res_leaf2_fvfm)
-                self.fig_color2 = multi_graph(self.fig_color3d_leaf2, self.fig_fvfm3d_leaf2, self.fig_scat2d_leaf2)
+                self.fig2 = self.app.run_pickcell(leaf2_img, fvfm_img, fvfm_list)
                 self.ids.show_res2_btn.disabled = False
-        except (ValueError, TypeError) as e:
+        except Exception as e:
+            self.popup.dismiss()
             self.err_msg = str(e)
             Clock.schedule_once(self.thread_error, 0)
         else:
             self.ids.save_btn.disabled = False
         self.popup.dismiss()
 
-    def show_fig(self):
-        
+    def show_figure(self, fig_type):
         self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
-        self.thread = WorkingThread(target=self.show_fig_process, args=('all',))
-        self.thread.start()
-
-    def show_fig_color1(self):
-        #self.popup = self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
-        self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
-        self.thread = WorkingThread(target=self.show_fig_process, args=('color1',))
-        self.thread.start()
-
-    def show_fig_color2(self):
-        #self.popup = self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
-        self.show_progress_popup(self.cancel_process, 'Show Figure', 'Drawing...')
-        self.thread = WorkingThread(target=self.show_fig_process, args=('color2',))
+        self.thread = WorkingThread(target=self.show_fig_process, args=(fig_type,))
         self.thread.start()
 
     def show_fig_process(self, group):
         if group == 'all':
-            self.fig_all.show()
+            self.fig = self.app.update_marker_size(self.fig, self.size_2d, self.size_3d)
+            self.fig[3].show()
+            print(self.fig[3])
         elif group == 'color1':
-            self.fig_color1.show()
+            self.fig1 = self.app.update_marker_size(self.fig1, self.size_2d, self.size_3d)
+            self.fig1[3].show()
         elif group == 'color2':
-            self.fig_color2.show()
+            self.fig2 = self.app.update_marker_size(self.fig2, self.size_2d, self.size_3d)
+            self.fig2[3].show()
         self.popup.dismiss()
 
-    def set_size(self):
-        pass
-
     def save(self):
-        #self.popup = self.show_progress_popup(self.cancel_process, 'Save results', 'Running...')
         self.show_progress_popup(self.cancel_process, 'Save results', 'Running...')
         self.thread = WorkingThread(target=self.save_process)
         self.thread.start()
@@ -568,27 +605,27 @@ class AnalyzeWidget(MyBoxLayout):
             else:
                 os.makedirs(dir_name)
                 return dir_name
-        if (self.fig_color3d is not None) and (self.fig_fvfm3d is not None) and (self.fig_scat2d is not None):
+        if (self.fig_c3d is not None) and (self.fig_f3d is not None) and (self.fig_2d is not None):
             dir_name = os.path.join(res_root_dir, 'All')
             res_dir = make_res_dir(dir_name)
-            self.fig_color3d.write_html(os.path.join(res_dir, 'color3d.html'))
-            self.fig_fvfm3d.write_html(os.path.join(res_dir, 'fvfm3d.html'))
-            self.fig_scat2d.write_html(os.path.join(res_dir, 'scatter2d.html'))
+            self.fig_c3d.write_html(os.path.join(res_dir, 'color3d.html'))
+            self.fig_f3d.write_html(os.path.join(res_dir, 'fvfm3d.html'))
+            self.fig_2d.write_html(os.path.join(res_dir, 'scatter2d.html'))
             self.fig_all.write_html(os.path.join(res_dir, 'all.html'))
-        if (self.fig_color3d_leaf1 is not None) and (self.fig_fvfm3d_leaf1 is not None) and (self.fig_scat2d_leaf1 is not None):
+        if (self.fig_c3d_1 is not None) and (self.fig_f3d_1 is not None) and (self.fig_2d_1 is not None):
             dir_name = os.path.join(res_root_dir, 'Color1')
             res_dir = make_res_dir(dir_name)
-            self.fig_color3d_leaf1.write_html(os.path.join(res_dir, 'color1_color3d.html'))
-            self.fig_fvfm3d_leaf1.write_html(os.path.join(res_dir, 'color1_fvfm3d.html'))
-            self.fig_scat2d_leaf1.write_html(os.path.join(res_dir, 'color1_scatter2d.html'))
-            self.fig_color1.write_html(os.path.join(res_dir, 'color1_all.html'))
-        if (self.fig_color3d_leaf2 is not None) and (self.fig_fvfm3d_leaf2 is not None) and (self.fig_scat2d_leaf2 is not None):
+            self.fig_c3d_1.write_html(os.path.join(res_dir, 'color1_color3d.html'))
+            self.fig_f3d_1.write_html(os.path.join(res_dir, 'color1_fvfm3d.html'))
+            self.fig_2d_1.write_html(os.path.join(res_dir, 'color1_scatter2d.html'))
+            self.fig_all_1.write_html(os.path.join(res_dir, 'color1_all.html'))
+        if (self.fig_c3d_2 is not None) and (self.fig_f3d_2 is not None) and (self.fig_2d_2 is not None):
             dir_name = os.path.join(res_root_dir, 'Color2')
             res_dir = make_res_dir(dir_name)
-            self.fig_color3d_leaf2.write_html(os.path.join(res_dir, 'color2_color3d.html'))
-            self.fig_fvfm3d_leaf2.write_html(os.path.join(res_dir, 'color2_fvfm3d.html'))
-            self.fig_scat2d_leaf2.write_html(os.path.join(res_dir, 'color2_scatter2dd.html'))
-            self.fig_color2.write_html(os.path.join(res_dir, 'color2_all.html'))
+            self.fig_c3d_2.write_html(os.path.join(res_dir, 'color2_color3d.html'))
+            self.fig_f3d_2.write_html(os.path.join(res_dir, 'color2_fvfm3d.html'))
+            self.fig_2d_2.write_html(os.path.join(res_dir, 'color2_scatter2dd.html'))
+            self.fig_all_2.write_html(os.path.join(res_dir, 'color2_all.html'))
         self.popup.dismiss()
         Clock.schedule_once(lambda x: self.show_error_popup('Finished.', 'Save'))
 

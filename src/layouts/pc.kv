@@ -135,10 +135,10 @@
         text: 'Split Color'
         id: split_color
         SplitColorWidget:
-#    TabbedPanelItem:
-#        text: 'Analyze'
-#        id: analyze
-#        AnalyzeWidget:
+    TabbedPanelItem:
+        text: 'Analyze'
+        id: analyze
+        AnalyzeWidget:
     TabbedPanelItem:
         text: 'Auto'
         id: auto
@@ -167,18 +167,13 @@
                         root.select(filechooser.selection)
                         root.dismiss()
 
-<FolderDialogPopup>:
+<FolderOrFilesDialogPopup>:
     size_hint: 0.8, 0.8
     FileChooserIconView:
         id: folderchooser
         path: app.home_dir
-        #filters: [root.is_dir]
-        #filters: ['']
         filters: ext
         dirselect: True
-        #on_submit:
-        #    root.select(self.selection)
-        #    root.dismiss()
         multiselect: True
         AnchorLayout:
             anchor_x: 'right'
@@ -193,6 +188,33 @@
                     on_release:
                         root.select(folderchooser.selection)
                         root.dismiss()
+
+<OutdirDialogPopup>:
+    size_hint: 0.8, 0.8
+    FileChooserIconView:
+        id: folderchooser
+        path: app.home_dir
+        filters: ['']
+        dirselect: True
+        AnchorLayout:
+            anchor_x: 'left'
+            Button:
+                text: 'New folder'
+                
+        AnchorLayout:
+            anchor_x: 'right'
+            InnerBox:
+                size_hint_x: None
+                width: self.minimum_width
+                Button:
+                    text: 'Cancel'
+                    on_release: root.dismiss()
+                Button:
+                    text: 'OK'
+                    on_release:
+                        root.select(folderchooser.selection)
+                        root.dismiss()
+
 
 <ProgressPopup>:
     auto_dismiss: False
@@ -793,33 +815,48 @@
                     id: show_res_btn
                     text: 'All Color'
                     disabled: True
-                    on_press: root.show_fig()
+                    on_press: root.show_figure('all')
                 Button:
                     font_size: ana_btn
                     height: self.texture_size[1] + dp(20)
                     id: show_res1_btn
                     text: 'Color 1'
                     disabled: True
-                    on_press: root.show_fig_color1()
+                    on_press: root.show_figure('color1')
                 Button:
                     font_size: ana_btn
                     height: self.texture_size[1] + dp(20)
                     id: show_res2_btn
                     text: 'Color 2'
                     disabled: True
-                    on_press: root.show_fig_color2()
+                    on_press: root.show_figure('color2')
     Space:
     AnchorLayout:  # Save button
         size_hint: 1, None
         height: save_btn.height
         anchor_x: 'center'
-        Button:
-            font_size: ana_btn
-            height: self.texture_size[1] + dp(20)
-            id: save_btn
-            text: 'Save'
-            disabled: True
-            on_press: root.save()
+        InnerBox:
+            height: self.minimum_height
+            Word:
+                font_size: ana_btn
+                size_hint_x: None
+                width: self.texture_size[0] + dp(20)
+                text: 'Directory:'
+            Word:
+                font_size: ana_btn
+                id: outdir_label
+            Button:
+                font_size: ana_btn
+                height: self.texture_size[1] + dp(20)
+                text: '∨'
+                on_release: Factory.FolderOrFilesDialogPopup(select=app.outdir).open
+            Button:
+                font_size: ana_btn
+                height: self.texture_size[1] + dp(20)
+                id: save_btn
+                text: 'Save'
+                disabled: True
+                on_press: root.save()
     InnerBox:
         AnchorLayout:
             size_hint_x: 0.5
