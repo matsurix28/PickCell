@@ -14,6 +14,7 @@ from kivy import platform
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
+from kivy.graphics.texture import Texture
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty
 from kivy.uix.tabbedpanel import TabbedPanel
@@ -65,12 +66,27 @@ class PickcellApp(App):
         self.align = None
         self.pickcell = None
         self.graph = None
+        self.setup_fvfm = threading.Thread(target=self.setup_fvfm)
 
-    def setup_analysis(self):
-        from src.python.analyze.align import Align
-        from src.python.analyze.create_graph import Graph
-        from src.python.analyze.detect import Detect
+    def detect(self, path, thr=None):
+        if self.leaf_detect is None:
+            from src.python.analyze.detect import Detect
+            self.leaf_detect = Detect()
+        if thr is not None:
+            self.leaf_detect.set_param(bin_thr=thr)
+        try:
+            self.leaf_img, self.leaf_obj = self.leaf_detect.extr_leaf(path)
+        except (ValueError, TypeError) as e:
+            raise e
+
+    def setup_fvfm(self):
         from src.python.analyze.fvfm import Fvfm
+
+    def setup_align(self):
+        from src.python.analyze.align import Align
+
+    def setup_pickcell(self):
+        from src.python.analyze.create_graph import Graph
         from src.python.analyze.pickcell import Pickcell
 
     def build(self):
@@ -135,27 +151,19 @@ class DetectWidget(MyBoxLayout):
             self.show_error_popup('Select leaf image.')
             return
         self.app.file_name = os.path.splitext(self.input_path)[0]
-        #self.popup = self.show_progress_popup(self.cancel_process, 'Detect leaf', 'Running...')
         self.show_progress_popup(self.cancel_process, 'Detect leaf', 'Running...')
-        
         self.thread = WorkingThread(target=self.run_process)
         self.thread.start()
 
     def run_process(self):
-        if self.d is None:
-            self.d = Detect()
         thr = self.ids.thresh_slider.value
-        self.d.set_param(bin_thr=thr)
         try:
-            self.app.leaf_img, self.app.leaf_obj = self.d.extr_leaf(self.input_path)
+            self.app.detect(self.input_path, thr=thr)
             Clock.schedule_once(self.update_texture, 0)
         except (ValueError, TypeError) as e:
             self.err_msg = str(e)
             Clock.schedule_once(self.thread_error, 0)
         self.popup.dismiss()    
-
-    def set_default(self, dt):
-        self.ids.thresh_slider.value = default_threshold
 
     def update_texture(self, dt):
         texture = self.cv2_to_texture(self.app.leaf_img)
@@ -576,6 +584,16 @@ class AutoWidget(MyBoxLayout):
         self.img_list = None
         exts = ['jpg', 'jpeg', 'png', 'tiff', 'bmp']
         self.exts = sum([[ext.lower(), ext.upper()] for ext in exts], [])
+
+    def input_dir_files(self, path):
+        print('input path: ', path)
+        super().input_dir_files(path)
+
+    def click(self):
+        try:
+            self.create_img_list()
+        except ValueError as e:
+            self.show_error_popup(str(e))
 
     def create_img_list(self):
         print(self.input_path)

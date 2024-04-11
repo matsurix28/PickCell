@@ -19,9 +19,15 @@ class MyBoxLayout(BoxLayout):
             self.ids.input_img.source = file[0]
             self.input_path = file[0]
 
-    def input_dir(self, file):
-        if file != []:
-            self.input_path = file[0]
+    def input_dir_files(self, file):
+        if len(file) == 1:
+            if os.path.isdir(file[0]):
+                self.input_path = file
+            elif os.path.isfile(file[0]):
+                self.show_error_popup('Please select directory or multiple files.')
+        elif len(file) > 1:
+            self.input_path = file
+                
 
     def cv2_to_texture(self, cv2_img):
         texture = Texture.create(size=(cv2_img.shape[1], cv2_img.shape[0]), colorfmt='bgr', bufferfmt='ubyte')
@@ -32,7 +38,6 @@ class MyBoxLayout(BoxLayout):
     def show_progress_popup(self,cancel_func, title, message):
         self.popup = ProgressPopup(cancel_func, title_text=title, message=message)
         self.popup.open()
-        #return self.popup
 
     def show_error_popup(self, message, title='Error'):
         popup = ErrorPopup(message=message, title_text=title)

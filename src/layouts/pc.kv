@@ -119,10 +119,10 @@
 <Root>:
     do_default_tab: False
     tab_width: dp(120)
-#   TabbedPanelItem:
-#        text: 'Detect'
-#        id: detect
-#        DetectWidget:
+    TabbedPanelItem:
+        text: 'Detect'
+        id: detect
+        DetectWidget:
 #    TabbedPanelItem:
 #        text: 'Fv/Fm'
 #        id: fvfm
@@ -169,15 +169,17 @@
 
 <FolderDialogPopup>:
     size_hint: 0.8, 0.8
-    FileChooserListView:
+    FileChooserIconView:
         id: folderchooser
         path: app.home_dir
         #filters: [root.is_dir]
-        filters: ['']
+        #filters: ['']
+        filters: ext
         dirselect: True
-        on_submit:
-            root.select(self.selection)
-            root.dismiss()
+        #on_submit:
+        #    root.select(self.selection)
+        #    root.dismiss()
+        multiselect: True
         AnchorLayout:
             anchor_x: 'right'
             InnerBox:
@@ -843,11 +845,11 @@
         Button:
             size_hint: 1, 0.5
             text: 'Select'
-            on_press: Factory.FolderDialogPopup(select=root.input_dir).open()
+            on_press: Factory.FolderDialogPopup(select=root.input_dir_files).open()
         Button:
             size_hint: 1, 0.5
             text: 'buttttt'
-            on_press: root.create_img_list()
+            on_press: root.click()
     #InnerBox:  # Leaf
     #InnerBox:  # Fv/Fm
     #InnerBox:  # Split color
