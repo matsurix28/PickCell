@@ -66,21 +66,33 @@ class PickcellApp(App):
         self.align = None
         self.pickcell = None
         self.graph = None
-        self.setup_fvfm = threading.Thread(target=self.setup_fvfm)
+        self.setup_fvfm_thread = threading.Thread(target=self.setup_fvfm)
+        self.setup_fvfm_thread.start()
 
-    def detect(self, path, thr=None):
+    def setup_fvfm(self):
+        from src.python.analyze.fvfm import Fvfm
+        self.fvfm = Fvfm()
+
+    def run_detect(self, path, thr=None):
         if self.leaf_detect is None:
             from src.python.analyze.detect import Detect
             self.leaf_detect = Detect()
         if thr is not None:
             self.leaf_detect.set_param(bin_thr=thr)
-        try:
-            self.leaf_img, self.leaf_obj = self.leaf_detect.extr_leaf(path)
-        except (ValueError, TypeError) as e:
-            raise e
+        self.leaf_img, self.leaf_obj = self.leaf_detect.extr_leaf(path)
 
-    def setup_fvfm(self):
-        from src.python.analyze.fvfm import Fvfm
+    def run_fvfm(self, path, thr=None):
+        if self.fvfm_detect is None:
+            from src.python.analyze.detect import Detect
+            self.fvfm_detect = Detect()
+        if thr is not None:
+            self.fvfm_detect.set_param(bin_thr=thr)
+        self.fvfm_img, self.fvfm_obj = self.fvfm_detect.extr_leaf(path)
+        self.setup_fvfm_thread.join()
+        self.fvfm_list = self.fvfm.get(path)
+
+
+        
 
     def setup_align(self):
         from src.python.analyze.align import Align
@@ -158,7 +170,7 @@ class DetectWidget(MyBoxLayout):
     def run_process(self):
         thr = self.ids.thresh_slider.value
         try:
-            self.app.detect(self.input_path, thr=thr)
+            self.app.run_detect(self.input_path, thr=thr)
             Clock.schedule_once(self.update_texture, 0)
         except (ValueError, TypeError) as e:
             self.err_msg = str(e)
@@ -178,14 +190,11 @@ class FvFmWidget(MyBoxLayout):
         self.d = None
         self.input_path = None
         self.app = App.get_running_app()
-        self.setup_thread = threading.Thread(target=self.setup_analysis)
-        self.setup_thread.start()
 
     def run(self):
         if self.input_path is None:
             self.show_error_popup('Select Fv/Fm result image.')
             return
-        #self.popup = self.show_progress_popup(
         self.show_progress_popup(
             self.cancel_process,
             'Read Fv/Fm value',
@@ -194,19 +203,10 @@ class FvFmWidget(MyBoxLayout):
         self.thread = WorkingThread(target=self.run_process)
         self.thread.start()
 
-    def setup_analysis(self):
-        from analyze.detect import Detect
-        from analyze.fvfm import Fvfm
-        self.d = Detect()
-        self.f = Fvfm()
-
     def run_process(self):
-        self.setup_thread.join()
         thr = self.ids.thresh_slider.value
-        self.d.set_param(bin_thr=thr)
         try:
-            self.app.fvfm_img, self.app.fvfm_obj = self.d.extr_leaf(self.input_path)
-            self.app.fvfm_list = self.f.get(self.input_path)
+            self.app.run_fvfm(self.input_path, thr=thr)
             Clock.schedule_once(self.update_texture, 0)
         except Exception as e:
             self.err_msg = str(e)
