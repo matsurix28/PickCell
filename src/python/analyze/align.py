@@ -1,19 +1,19 @@
-#!/usr/bin/env python3.11
-# -*- coding: utf-8 -*-
+
 """Align the size and tilt of images with each other."""
 
 import argparse
 import os
 import sys
 
-import analyze.detect as detect
 import cv2
 import numpy as np
+
+from .detect import Detect
 
 
 def main():
     in1, in2, m1, m2, out = args()
-    d = detect.Detect()
+    d = Detect()
     try:
         name1 = get_name(in1)
         name2 = get_name(in2)

@@ -19,7 +19,6 @@ from kivy.lang import Builder
 from kivy.properties import ObjectProperty
 from kivy.uix.tabbedpanel import TabbedPanel
 
-from src.python.analyze.detect import Detect
 from src.python.analyze.multi_graph import multi_graph
 from src.python.custom_widgets.myboxlayout import MyBoxLayout
 
@@ -53,6 +52,7 @@ class PickcellApp(App):
     fvfm_list = None
     res_leaf_img = None
     res_fvfm_img = None
+    overlay_img = None
     res_leaf_texture = ObjectProperty(None)
     res_fvfm_texture = ObjectProperty(None)
     res_leaf1_img = None
@@ -91,11 +91,15 @@ class PickcellApp(App):
         self.setup_fvfm_thread.join()
         self.fvfm_list = self.fvfm.get(path)
 
-
+    def run_align(self, args):
+        print('analyze')
+        if self.align is None:
+            print('import align')
+            from src.python.analyze.align import Align
+            print('import kanryo')
+            self.align = Align()
+        self.res_leaf_img, self.res_fvfm_img, self.overlay_img = self.align.run(*args)
         
-
-    def setup_align(self):
-        from src.python.analyze.align import Align
 
     def setup_pickcell(self):
         from src.python.analyze.create_graph import Graph
@@ -180,6 +184,9 @@ class DetectWidget(MyBoxLayout):
     def update_texture(self, dt):
         texture = self.cv2_to_texture(self.app.leaf_img)
         self.app.leaf_texture = texture
+
+    def set_default(self, dt):
+        self.ids.thresh_slider.value = default_threshold
         
 class FvFmWidget(MyBoxLayout):
     def __init__(self, **kwargs):
@@ -237,7 +244,6 @@ class AlignWidget(MyBoxLayout):
     def __init__(self, **kwargs):
         super(AlignWidget, self).__init__(**kwargs)
         self.src_dir = src_dir
-        self.a = None
         self.app = App.get_running_app()
 
     def run(self):
@@ -245,7 +251,6 @@ class AlignWidget(MyBoxLayout):
         fvfm_img = self.app.fvfm_img
         leaf_obj = self.app.leaf_obj
         fvfm_obj = self.app.fvfm_obj
-        self.args = [leaf_img, fvfm_img, leaf_obj, fvfm_obj]
         if (leaf_img is None) or (leaf_obj is None):
             if (fvfm_img is None) or (fvfm_obj is None):
                 self.show_error_popup('There is no input.\nPlease run "Detect" and "Fv/Fm" before align.')
@@ -256,17 +261,14 @@ class AlignWidget(MyBoxLayout):
         elif (fvfm_img is None) or (fvfm_obj is None):
             self.show_error_popup('There is no "Fv/Fm".\nPlease run "Fv/Fm" before align.')
             return
-        #self.popup = self.show_progress_popup(self.cancel_process, 'Align two images', 'Running...')
+        self.args = [leaf_img, fvfm_img, leaf_obj, fvfm_obj]
         self.show_progress_popup(self.cancel_process, 'Align two images', 'Running...')
         self.thread = WorkingThread(target=self.run_process)
         self.thread.start()
         
     def run_process(self):
-        if self.a is None:
-            from analyze.align import Align
-            self.a = Align()
         try:
-            self.app.res_leaf_img, self.app.res_fvfm_img, self.overlay_img = self.a.run(*self.args)
+            self.app.run_align(self.args)
             Clock.schedule_once(self.update_texture, 0)
         except Exception as e:
             self.err_msg = str(e)
@@ -276,7 +278,7 @@ class AlignWidget(MyBoxLayout):
     def update_texture(self, dt):
         self.app.res_leaf_texture = self.cv2_to_texture(self.app.res_leaf_img)
         self.res_fvfm_texture = self.cv2_to_texture(self.app.res_fvfm_img)
-        self.overlay_texture = self.cv2_to_texture(self.overlay_img)
+        self.overlay_texture = self.cv2_to_texture(self.app.overlay_img)
 
 class SplitColorWidget(MyBoxLayout):
     extr1_texture = ObjectProperty(None)
