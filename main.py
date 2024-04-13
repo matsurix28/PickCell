@@ -669,7 +669,7 @@ class AutoWidget(MyBoxLayout):
         img_name_list = [k for k, v in collections.Counter(img_names).items() if v > 1]
         print('img name list', img_name_list)
         self.img_list = []
-    
+        # file no list tsukuru
         for name in img_name_list:
             l = glob.glob(self.input_path + '/' + name + '-L.*')
             print(l)
