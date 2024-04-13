@@ -657,36 +657,40 @@ class AutoWidget(MyBoxLayout):
         print(self.input_path)
         if self.input_path is None:
             raise ValueError('There is no input. Please select directory.')
-        else:
-            files = []
-            for ext in self.exts:
-                files += glob.glob(self.input_path + '/*.' + ext)
-            print('files: ', files)
-            img_names = [re.sub('-(L|F)$', '', os.path.splitext(os.path.basename(f))[0]) for f in files]
-            img_name_list = [k for k, v in collections.Counter(img_names).items() if v > 1]
-            print('img name list', img_name_list)
-            self.img_list = []
-            for name in img_name_list:
-                l = glob.glob(self.input_path + '/' + name + '-L.*')
-                print(l)
-                f = glob.glob(self.input_path + '/' + name + '-F.*')
-                print(f)
-                if (len(l) == 0) or (len(f) == 0):
-                    break
-                if len(l) > 1:
-                    l = self.biggest_img(l)
-                if len(f) > 1:
-                    f = self.biggest_img(f)
-                self.img_list.append([name, l[0], f[0]])
-            if len(self.img_list) == 0:
-                raise ValueError('There is no pair images.')
-            output = self.output_path + '/images_list.csv'
-            header = ['Image title', 'Leaf image file', 'FvFm image file']
-            with open(output, 'w', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerow(header)
-                writer.writerows(self.img_list)
-            return
+        files = []
+        def add_input(path):
+            if os.path.isfile(path):
+                files += path
+            elif os.path.isdir(path):
+                for ext in self.exts:
+                    files += glob.glob(path + '/*.' + ext)
+        print('files: ', files)
+        img_names = [re.sub('-(L|F)$', '', os.path.splitext(os.path.basename(f))[0]) for f in files]
+        img_name_list = [k for k, v in collections.Counter(img_names).items() if v > 1]
+        print('img name list', img_name_list)
+        self.img_list = []
+    
+        for name in img_name_list:
+            l = glob.glob(self.input_path + '/' + name + '-L.*')
+            print(l)
+            f = glob.glob(self.input_path + '/' + name + '-F.*')
+            print(f)
+            if (len(l) == 0) or (len(f) == 0):
+                break
+            if len(l) > 1:
+                l = self.biggest_img(l)
+            if len(f) > 1:
+                f = self.biggest_img(f)
+            self.img_list.append([name, l[0], f[0]])
+        if len(self.img_list) == 0:
+            raise ValueError('There is no pair images.')
+        output = self.output_path + '/images_list.csv'
+        header = ['Image title', 'Leaf image file', 'FvFm image file']
+        with open(output, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(header)
+            writer.writerows(self.img_list)
+        return
 
     def biggest_img(self, img_list):
         max_size = 0
