@@ -27,6 +27,17 @@ class MyBoxLayout(BoxLayout):
                 self.show_error_popup('Please select directory or multiple files.')
         elif len(file) > 1:
             self.input_path = file
+
+    def input_dir(self, file):
+        print('input directory', file)
+        if len(file) == 1:
+            if os.path.isdir(file[0]):
+                self.input_path = file[0]
+                print(self.input_path)
+            else:
+                self.show_error_popup(f'{file[0]} is not directory. Please select directory.')
+        else:
+            self.show_error_popup(f'{len(file)} files were selected.')
                 
 
     def cv2_to_texture(self, cv2_img):

@@ -1,3 +1,5 @@
+#:kivy 2.3.0
+
 #:import Factory kivy.factory.Factory
 #:import RangeSlider src.python.custom_widgets.range_slider.RangeSlider
 
@@ -200,7 +202,6 @@
             anchor_x: 'left'
             Button:
                 text: 'New folder'
-                
         AnchorLayout:
             anchor_x: 'right'
             InnerBox:
@@ -845,11 +846,12 @@
             Word:
                 font_size: ana_btn
                 id: outdir_label
+                text: root.input_path
             Button:
                 font_size: ana_btn
                 height: self.texture_size[1] + dp(20)
                 text: '∨'
-                on_release: Factory.FolderOrFilesDialogPopup(select=app.outdir).open
+                on_release: Factory.OutdirDialogPopup(select=root.input_dir).open()
             Button:
                 font_size: ana_btn
                 height: self.texture_size[1] + dp(20)
@@ -857,6 +859,8 @@
                 text: 'Save'
                 disabled: True
                 on_press: root.save()
+            Button:
+                on_press: print(root.input_path)
     InnerBox:
         AnchorLayout:
             size_hint_x: 0.5

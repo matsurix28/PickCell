@@ -8,12 +8,14 @@ class FileDialogPopup(Popup):
     select = ObjectProperty(None)
     cancel = ObjectProperty(None)
 
-class FolderDialogPopup(Popup):
+class FolderOrFilesDialogPopup(Popup):
+    select = ObjectProperty(None)
+    cancel = ObjectProperty(None)
+
+class OutdirDialogPopup(Popup):
     select = ObjectProperty(None)
     cancel = ObjectProperty(None)
     
-    def is_dir(self, dirname, filename):
-        return os.path.isdir(os.path.join(dirname, filename))
 
 class ErrorPopup(Popup):
     title_text = StringProperty('Error')

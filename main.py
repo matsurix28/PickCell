@@ -49,7 +49,6 @@ class PickcellApp(App):
     res_leaf_texture = ObjectProperty(None)
     res_fvfm_texture = ObjectProperty(None)
     file_name = ''
-    outdir = StringProperty(home_dir + '/' + file_name)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -133,19 +132,6 @@ class PickcellApp(App):
         if (self.low2 is not None) and (self.high2 is not None):
             self.res_leaf2_img = self.extr_color(self.low2, self.high2)
 
-    def clear(self):
-        self.file_name = None
-        self.leaf_img = None
-        self.fvfm_img = None
-        self.leaf_obj = None
-        self.fvfm_obj = None
-        self.fvfm_list = None
-        self.res_leaf_img = None
-        self.res_fvfm_img = None
-        self.overlay_img = None
-        self.res_leaf1_img = None
-        self.res_leaf2_img = None
-
     def run_pickcell(self, leaf_img, fvfm_img, fvfm_list):
         if self.pickcell is None:
             from src.python.analyze.pickcell import Pickcell
@@ -172,6 +158,43 @@ class PickcellApp(App):
             from src.python.analyze.create_graph import Graph
             self.graph = Graph()
         self.graph.set_val(size_2d=size_2d, size_3d=size_3d)
+
+    def save(self, figures, outdir, name):
+        def make_res_dir(dir):
+            if os.path.exists(dir):
+                i = 1
+                while True:
+                    new_name = '{}_{}'.format(dir, i)
+                    if os.path.exists(new_name):
+                        i += 1
+                    else:
+                        os.makedirs(new_name)
+                        return new_name
+            else:
+                os.makedirs(dir)
+                return dir
+        print('app args', outdir, self.file_name, name)
+        res_dir = os.path.join(outdir, self.file_name, name)
+        res_dir = make_res_dir(res_dir)
+        print('hozon basho', res_dir)
+        fig_types = ['color3d', 'fvfm3d', 'scatter2d', 'all']
+        for i, fig in enumerate(figures):
+            print(f'{res_dir}: {fig_types[i]}')
+            fig.write_html(os.path.join(res_dir, fig_types[i] + '.html'))
+
+
+    def clear(self):
+        self.file_name = ''
+        self.leaf_img = None
+        self.fvfm_img = None
+        self.leaf_obj = None
+        self.fvfm_obj = None
+        self.fvfm_list = None
+        self.res_leaf_img = None
+        self.res_fvfm_img = None
+        self.overlay_img = None
+        self.res_leaf1_img = None
+        self.res_leaf2_img = None
 
     def build(self):
         if platform == 'android':
@@ -234,7 +257,7 @@ class DetectWidget(MyBoxLayout):
         if self.input_path is None:
             self.show_error_popup('Select leaf image.')
             return
-        self.app.file_name = os.path.splitext(self.input_path)[0]
+        self.app.file_name = os.path.splitext(os.path.basename(self.input_path))[0]
         self.show_progress_popup(self.cancel_process, 'Detect leaf', 'Running...')
         self.thread = WorkingThread(target=self.run_process)
         self.thread.start()
@@ -516,6 +539,7 @@ class AnalyzeWidget(MyBoxLayout):
         self.fig_all_2 = None
         self.size_2d = default_size2d
         self.size_3d = default_size3d
+        self.input_path = home_dir
         self.app = App.get_running_app()
         Clock.schedule_once(self.bind_func, 0)
 
@@ -527,7 +551,11 @@ class AnalyzeWidget(MyBoxLayout):
     def bind_func(self, dt):
         self.ids.size_2d.bind(value=self.set_size)
         self.ids.size_3d.bind(value=self.set_size)
-        self.ids.outdir_label.text = self.app.outdir
+        #self.ids.outdir_label.text = self.input_path
+    
+    def input_dir(self, file):
+        super().input_dir(file)
+        self.ids.outdir_label.text = self.input_path
 
     def set_size(self, *args):
         self.size_2d = self.ids.size_2d.value
@@ -589,45 +617,22 @@ class AnalyzeWidget(MyBoxLayout):
         self.thread.start()
 
     def save_process(self):
-        name = self.app.file_name
-        res_root_dir = name + '_PickCells'
-        os.makedirs(res_root_dir, exist_ok=True)
-        def make_res_dir(dir_name):
-            if os.path.exists(dir_name):
-                i = 1
-                while True:
-                    new_name = '{}_{}'.format(dir_name, i)
-                    if os.path.exists(new_name):
-                        i += 1
-                    else:
-                        os.makedirs(new_name)
-                        return new_name
-            else:
-                os.makedirs(dir_name)
-                return dir_name
-        if (self.fig_c3d is not None) and (self.fig_f3d is not None) and (self.fig_2d is not None):
-            dir_name = os.path.join(res_root_dir, 'All')
-            res_dir = make_res_dir(dir_name)
-            self.fig_c3d.write_html(os.path.join(res_dir, 'color3d.html'))
-            self.fig_f3d.write_html(os.path.join(res_dir, 'fvfm3d.html'))
-            self.fig_2d.write_html(os.path.join(res_dir, 'scatter2d.html'))
-            self.fig_all.write_html(os.path.join(res_dir, 'all.html'))
-        if (self.fig_c3d_1 is not None) and (self.fig_f3d_1 is not None) and (self.fig_2d_1 is not None):
-            dir_name = os.path.join(res_root_dir, 'Color1')
-            res_dir = make_res_dir(dir_name)
-            self.fig_c3d_1.write_html(os.path.join(res_dir, 'color1_color3d.html'))
-            self.fig_f3d_1.write_html(os.path.join(res_dir, 'color1_fvfm3d.html'))
-            self.fig_2d_1.write_html(os.path.join(res_dir, 'color1_scatter2d.html'))
-            self.fig_all_1.write_html(os.path.join(res_dir, 'color1_all.html'))
-        if (self.fig_c3d_2 is not None) and (self.fig_f3d_2 is not None) and (self.fig_2d_2 is not None):
-            dir_name = os.path.join(res_root_dir, 'Color2')
-            res_dir = make_res_dir(dir_name)
-            self.fig_c3d_2.write_html(os.path.join(res_dir, 'color2_color3d.html'))
-            self.fig_f3d_2.write_html(os.path.join(res_dir, 'color2_fvfm3d.html'))
-            self.fig_2d_2.write_html(os.path.join(res_dir, 'color2_scatter2dd.html'))
-            self.fig_all_2.write_html(os.path.join(res_dir, 'color2_all.html'))
+        print(self.input_path)
+        if self.fig is not None:
+            print('All save suruyo')
+            self.fig = self.app.update_marker_size(self.fig, self.size_2d, self.size_3d)
+            self.app.save(self.fig, self.input_path, 'All_color')
+        if self.fig is not None:
+            print('Color2 save suruyo')
+            self.fig1 = self.app.update_marker_size(self.fig1, self.size_2d, self.size_3d)
+            self.app.save(self.fig1, self.input_path, 'Color1')
+        if self.fig is not None:
+            print('Color2 save suruyo')
+            self.fig2 = self.app.update_marker_size(self.fig2, self.size_2d, self.size_3d)
+            self.app.save(self.fig2, self.input_path, 'Color2')
         self.popup.dismiss()
         Clock.schedule_once(lambda x: self.show_error_popup('Finished.', 'Save'))
+        
 
 class AutoWidget(MyBoxLayout):
     def __init__(self, **kwargs):
