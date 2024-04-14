@@ -17,7 +17,7 @@ from kivy.core.window import Window
 from kivy.graphics.texture import Texture
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty, StringProperty
-from kivy.uix.tabbedpanel import TabbedPanel
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelContent
 
 from src.python.analyze.multi_graph import multi_graph
 from src.python.custom_widgets.myboxlayout import MyBoxLayout
@@ -31,6 +31,8 @@ REQUEST_GALLERY = 1
 MediaStore_Images_Media_DATA = '_data'
 
 default_threshold = 60
+default_color1 = [[0, 0, 0], [30, 255, 255]]
+default_color2 = [[30, 0, 0], [60, 255, 255]]
 default_size2d = 5
 default_size3d = 1
 
@@ -54,7 +56,7 @@ class PickcellApp(App):
         super().__init__(**kwargs)
         self.set_var()
         self.setup_fvfm_thread = threading.Thread(target=self.setup_fvfm)
-        self.setup_fvfm_thread.start()
+        #self.setup_fvfm_thread.start()
 
     def set_var(self):
         self.leaf_img = None
@@ -77,6 +79,12 @@ class PickcellApp(App):
         self.high1 = None
         self.low2 = None
         self.high2 = None
+        self.leaf_thr = default_threshold
+        self.fvfm_thr = default_threshold
+        self.color1 = default_color1
+        self.color2 = default_color2
+        self.size_2d = default_size2d
+        self.size_3d = default_size3d
 
     def setup_fvfm(self):
         from src.python.analyze.fvfm import Fvfm
@@ -115,6 +123,16 @@ class PickcellApp(App):
         mask = cv2.inRange(img_hsv, low, high)
         extr_img = cv2.bitwise_and(img, img, mask=mask)
         return extr_img
+    
+    def run_extr_color1(self, low, high):
+        self.low1 = low
+        self.high1 = high
+        self.res_leaf1_img = self.extr_color(low, high)
+
+    def run_extr_color1(self, low, high):
+        self.low2 = low
+        self.high2 = high
+        self.res_leaf2_img = self.extr_color(low, high)
 
     def run_split_color(self):
         if (self.low1 is not None) and (self.high1 is not None):
@@ -147,8 +165,20 @@ class PickcellApp(App):
         if self.graph is None:
             from src.python.analyze.create_graph import Graph
             self.graph = Graph()
+        self.size_2d = size_2d
+        self.size_3d = size_3d
         self.graph.set_val(size_2d=size_2d, size_3d=size_3d)
 
+    def click(self):
+        auto = self.root.children[0].children[0]
+        print(type(auto))
+        if isinstance(auto, AutoWidget):
+            print('sou')
+        else:
+            print('chau')
+        #print(self.root.tab_list[1])
+        #print(self.root.ids)
+        
     def save(self, figures, outdir, name):
         def make_res_dir(dir):
             if os.path.exists(dir):
@@ -176,7 +206,34 @@ class PickcellApp(App):
             print(f'{res_dir}: {fig_types[i]}')
             fig.write_html(os.path.join(res_dir, fig_types[i] + '.html'))
 
+    def set_val(self):
+        try:
+            auto = self.root.children[0].children[0]
+        except:
+            return
+        if isinstance(auto, AutoWidget):
+            auto.set_val(self.leaf_thr, self.fvfm_thr, self.color1, self.color2, self.size_2d, self.size_3d)
 
+    def set_leaf_thr(self, thr):
+        if self.leaf_detect is None:
+            from src.python.analyze.detect import Detect
+            self.leaf_detect = Detect()
+        self.leaf_thr = thr
+        self.leaf_detect.set_param(bin_thr=thr)
+
+    def set_fvfm_thr(self, thr):
+        if self.fvfm_detect is None:
+            from src.python.analyze.detect import Detect
+            self.fvfm_detect = Detect()
+        self.fvfm_thr = thr
+        self.fvfm_detect.set_param(bin_thr=thr)
+
+    def set_color1(self, hl, sl, vl, hh, sh, vh):
+        self.color1 = [[hl, sl, vl], [hh, sh, vh]]
+
+    def set_color2(self, hl, sl, vl, hh, sh, vh):
+        self.color2 = [[hl, sl, vl], [hh, sh, vh]]
+        
     def clear(self):
         self.file_name = ''
         self.leaf_img = None
@@ -246,6 +303,13 @@ class DetectWidget(MyBoxLayout):
         self.input_path = None
         self.app = App.get_running_app()
         self.d = self.app
+        Clock.schedule_once(self.bind_func, 0)
+
+    def bind_func(self, dt):
+        self.ids.thresh_slider.bind(value=self.set_thr)
+
+    def set_thr(self, *args):
+        self.app.set_leaf_thr(self.ids.thresh_slider.value)
 
     def run(self):
         if self.input_path is None:
@@ -285,6 +349,13 @@ class FvFmWidget(MyBoxLayout):
         self.d = None
         self.input_path = None
         self.app = App.get_running_app()
+        Clock.schedule_once(self.bind_func, 0)
+
+    def bind_func(self, dt):
+        self.ids.thresh_slider.bind(value=self.set_thr)
+
+    def set_thr(self, *args):
+        self.app.set_fvfm_thr(self.ids.thresh_slider.value)
 
     def run(self):
         if self.input_path is None:
@@ -423,6 +494,7 @@ class SplitColorWidget(MyBoxLayout):
             self.v1l = int(value)
         elif val_type == 'v1h':
             self.v1h = int(value)
+        self.app.set_color1(self.h1l, self.s1l, self.v1l, self.h1h, self.s1h, self.v1h)
         self.update_texture(
             self.h1l, self.h1h,
             self.s1l, self.s1h,
@@ -443,6 +515,7 @@ class SplitColorWidget(MyBoxLayout):
             self.v2l = int(value)
         elif val_type == 'vh':
             self.v2h = int(value)
+        self.app.set_color2(self.h2l, self.s2l, self.v2l, self.h2h, self.s2h, self.v2h)
         self.update_texture(
             self.h2l, self.h2h,
             self.s2l, self.s2h,
@@ -636,7 +709,9 @@ class AutoWidget(MyBoxLayout):
         super(AutoWidget, self).__init__(**kwargs)
         self.input_path = None
         self.output_path = '.'
-        self.img_list = None
+        self.img_list = []
+        self.tetstext = 'aaa'
+        self.app = App.get_running_app()
         exts = ['jpg', 'jpeg', 'png', 'tiff', 'bmp']
         self.exts = sum([[ext.lower(), ext.upper()] for ext in exts], [])
 
@@ -645,10 +720,31 @@ class AutoWidget(MyBoxLayout):
         super().input_dir_files(path)
 
     def click(self):
+        self.app.click()
+        '''
         try:
             self.create_img_list()
         except ValueError as e:
             self.show_error_popup(str(e))
+        '''
+
+    def set_val(self, leaf_thr, fvfm_thr, color1, color2, size2d, size3d):
+        self.ids.leaf_thr_slider.value = leaf_thr
+        self.ids.fvfm_thr_slider.value = fvfm_thr
+        self.ids.h1_slider.value1 = color1[0][0]
+        self.ids.s1_slider.value1 = color1[0][1]
+        self.ids.v1_slider.value1 = color1[0][2]
+        self.ids.h1_slider.value2 = color1[1][0]
+        self.ids.s1_slider.value2 = color1[1][1]
+        self.ids.v1_slider.value2 = color1[1][2]
+        self.ids.h2_slider.value1 = color2[0][0]
+        self.ids.s2_slider.value1 = color2[0][1]
+        self.ids.v2_slider.value1 = color2[0][2]
+        self.ids.h2_slider.value2 = color2[1][0]
+        self.ids.s2_slider.value2 = color2[1][1]
+        self.ids.v2_slider.value2 = color2[1][2]
+        self.ids.size2d.value = size2d
+        self.ids.size3d.value = size3d
 
     def create_img_list(self):
         print(self.input_path)
@@ -664,8 +760,6 @@ class AutoWidget(MyBoxLayout):
         img_names = [re.sub('-(L|F)$', '', os.path.splitext(os.path.basename(f))[0]) for f in files]
         img_name_list = [k for k, v in collections.Counter(img_names).items() if v > 1]
         print('img name list', img_name_list)
-        self.img_list = []
-        # file no list tsukuru
         for name in img_name_list:
             l = glob.glob(self.input_path + '/' + name + '-L.*')
             print(l)
@@ -700,10 +794,24 @@ class AutoWidget(MyBoxLayout):
                 biggest = image
         return [biggest]
 
+    def run(self):
+        self.show_progress_popup(self.cancel_process, 'Auto Pickcell', 'Running...')
+        self.thread = WorkingThread(target=self.run_process)
+        self.thread.start()
+
+    def run_process(self):
+        try:
+            self.create_img_list()
+        except Exception as e:
+            self.err_msg = str(e)
+            Clock.schedule_once(self.thread_error, 0)
+            return
+        
 class Root(TabbedPanel):
     def __init__(self, **kwargs):
         super(Root, self).__init__(**kwargs)
         self.density = Window._density
+        self.app = App.get_running_app()
 
     def switch_to(self, header, do_scroll=False):
         width = Window.width
@@ -711,6 +819,21 @@ class Root(TabbedPanel):
         Window.size = ((width+1)/self.density, height/self.density)
         Window.size = (width/self.density, height/self.density)
         return super().switch_to(header, do_scroll)
+    '''
+    def switch_to_auto(self):
+        width = Window.width
+        height = Window.height
+        Window.size = ((width+1)/self.density, height/self.density)
+        Window.size = (width/self.density, height/self.density)
+        super().switch_to(self.ids.auto, False)
+        self.app.set_val()
+    '''
+
+    def switch_to(self, header, do_scroll=False):
+        super().switch_to(header, do_scroll)
+        if header == self.ids.auto:
+            self.app.set_val()
+            print('set!!')
 
 if __name__ == '__main__':
     PickcellApp().run()
