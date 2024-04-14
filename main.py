@@ -108,7 +108,7 @@ class PickcellApp(App):
         self.setup_fvfm_thread.join()
         self.fvfm_list = self.fvfm.get(path)
 
-    def run_align(self, *args):
+    def run_align(self, args):
         print('analyze')
         if self.align is None:
             print('import align')
@@ -195,7 +195,7 @@ class PickcellApp(App):
         try:
             self.run_detect(leaf_input, self.leaf_thr)
             self.run_fvfm(fvfm_input, self.fvfm_thr)
-            self.run_align(self.leaf_img, self.fvfm_img, self.leaf_obj, self.fvfm_obj)
+            self.run_align([self.leaf_img, self.fvfm_img, self.leaf_obj, self.fvfm_obj])
             if self.is_extr1:
                 self.run_extr_color1(self.color1[0], self.color1[1])
             if self.is_extr2:
