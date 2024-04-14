@@ -171,17 +171,23 @@ class PickcellApp(App):
 
     def set_params(self,
                  leaf_thr, fvfm_thr,
-                 is_extr, color1, color2,
+                 is_extr1, is_extr2,
+                 color1, color2,
                  size2d, size3d,
                  outdir):
         self.leaf_thr = leaf_thr
         self.fvfm_thr = fvfm_thr
-        self.is_extr = is_extr
+        self.is_extr1 = is_extr1
+        self.is_extr2 = is_extr2
         self.color1 = color1
         self.color2 = color2
         self.size_2d = size2d
         self.size_3d = size3d
         self.outdir = outdir
+
+    def run_auto_test(self, name, leaf, fvfm):
+        import time
+        time.sleep(5)
 
     def run_auto(self,name, leaf_input, fvfm_input):
         self.clear()
@@ -858,14 +864,47 @@ class AutoWidget(MyBoxLayout):
         size2d = self.ids.size2d.value
         size3d = self.ids.size3d.value
         outdir = self.ids.outdir.text
-        is_extr1 = self.ids.is_extr1
-        self.app.set_params(leaf_thr, fvfm_thr, color1, color2, size2d, size3d, outdir)
+        is_extr1 = self.ids.is_extr1.active
+        is_extr2 = self.ids.is_extr2.active
+        self.app.set_params(leaf_thr, fvfm_thr, is_extr1, is_extr2, color1, color2, size2d, size3d, outdir)
+        num_proc = len(self.img_list)
+        count = 1
         for file in self.img_list:
+            self.popup.dismiss()
+            Clock.schedule_once(lambda x: self.show_progress_popup(self.cancel_process, 'Auto Pickcell', f'Running... {count}/{num_proc}'), 0)
             name = file[0]
             leaf_img = file[1]
             fvfm_img = file[2]
-            self.app.run_auto(name, leaf_img, fvfm_img)
+            try:
+                self.app.run_auto(name, leaf_img, fvfm_img)
+            except Exception as e:
+                self.popup.dismiss()
+                self.err_msg = str(e)
+                Clock.schedule_once(self.thread_error, 0)
+            finally:
+                self.popup.dismiss()
+                count += 1
         self.popup.dismiss()
+
+    def active_extr1(self, state):
+        if state == 'down':
+            self.ids.h1_slider.disabled = False
+            self.ids.s1_slider.disabled = False
+            self.ids.v1_slider.disabled = False
+        elif state == 'normal':
+            self.ids.h1_slider.disabled = True
+            self.ids.s1_slider.disabled = True
+            self.ids.v1_slider.disabled = True
+
+    def active_extr2(self, state):
+        if state == 'down':
+            self.ids.h2_slider.disabled = False
+            self.ids.s2_slider.disabled = False
+            self.ids.v2_slider.disabled = False
+        elif state == 'normal':
+            self.ids.h2_slider.disabled = True
+            self.ids.s2_slider.disabled = True
+            self.ids.v2_slider.disabled = True
 
     def bind_func(self, dt):
         self.ids.h1_slider.bind(
@@ -892,9 +931,6 @@ class AutoWidget(MyBoxLayout):
             value1=lambda slider, value: self.set_value2(value, 'v2l'),
             value2=lambda slider, value: self.set_value2(value, 'v2h')
         )
-        #Window.bind(
-        #    on_resize=lambda window, size, size2: Clock.schedule_once(self.resize_widgets_auto, 0)
-        #)
 
     def set_value1(self, value, val_type):
         if val_type == 'h1l':

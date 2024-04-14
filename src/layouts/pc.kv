@@ -945,7 +945,8 @@
                             id: is_extr1
                             size_hint_x:None
                             width: self.height
-                            active: root.active_extr1()
+                            on_press: root.active_extr1(self.state)
+                            #active: root.active_extr1(self.state)
                         Word:
                             font_size: sp(20)
                             text: 'Color 1'
@@ -1025,6 +1026,7 @@
                             id: is_extr2
                             size_hint_x:None
                             width: self.height
+                            click: root.active_extr2(self.state)
                         Word:
                             font_size: sp(20)
                             text: 'Color 2'
