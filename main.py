@@ -108,7 +108,7 @@ class PickcellApp(App):
         self.setup_fvfm_thread.join()
         self.fvfm_list = self.fvfm.get(path)
 
-    def run_align(self, args):
+    def run_align(self, *args):
         print('analyze')
         if self.align is None:
             print('import align')
@@ -169,15 +169,40 @@ class PickcellApp(App):
         self.size_3d = size_3d
         self.graph.set_val(size_2d=size_2d, size_3d=size_3d)
 
-    def click(self):
-        auto = self.root.children[0].children[0]
-        print(type(auto))
-        if isinstance(auto, AutoWidget):
-            print('sou')
-        else:
-            print('chau')
-        #print(self.root.tab_list[1])
-        #print(self.root.ids)
+    def set_params(self,
+                 leaf_thr, fvfm_thr,
+                 is_extr, color1, color2,
+                 size2d, size3d,
+                 outdir):
+        self.leaf_thr = leaf_thr
+        self.fvfm_thr = fvfm_thr
+        self.is_extr = is_extr
+        self.color1 = color1
+        self.color2 = color2
+        self.size_2d = size2d
+        self.size_3d = size3d
+        self.outdir = outdir
+
+    def run_auto(self,name, leaf_input, fvfm_input):
+        self.clear()
+        self.file_name = name
+        self.run_detect(leaf_input, self.leaf_thr)
+        self.run_fvfm(fvfm_input, self.fvfm_thr)
+        self.run_align(self.leaf_img, self.fvfm_img, self.leaf_obj, self.fvfm_obj)
+        if self.is_extr1:
+            self.run_extr_color1(self.color1[0], self.color1[1])
+        if self.is_extr2:
+            self.run_extr_color2(self.color2[0], self.color2[1])
+        self.set_marker_size(self.size_2d, self.size_3d)
+        fig = self.run_pickcell(self.res_leaf_img, self.res_fvfm_img, self.fvfm_list)
+        self.save(fig, self.outdir, 'All_color')
+        if self.res_leaf1_img is not None:
+            fig1 = self.run_pickcell(self.res_leaf1_img, self.res_fvfm_img, self.fvfm_list)
+            self.save(fig1, self.outdir, 'Color1')
+        if self.res_leaf2_img is not None:
+            fig2 = self.run_pickcell(self.res_leaf2_img, self.res_fvfm_img, self.fvfm_list)
+            self.save(fig2, self.outdir, 'Color2')
+        
         
     def save(self, figures, outdir, name):
         def make_res_dir(dir):
@@ -738,12 +763,12 @@ class AutoWidget(MyBoxLayout):
 
     def input_dir(self, file):
         super().input_dir(file)
-        self.input_dir = self.input_path
+        self.indir = self.input_path
         self.ids.input_path.text = self.input_path
 
     def output_dir(self, file):
         super().input_dir(file)
-        self.output_dir = self.input_path
+        self.outdir = self.input_path
         self.ids.outdir.text = self.input_path
 
     def set_val(self, leaf_thr, fvfm_thr, color1, color2, size2d, size3d):
@@ -767,23 +792,22 @@ class AutoWidget(MyBoxLayout):
         #self.resize_widgets_auto(0)
 
     def create_img_list(self):
-        print(self.input_path)
-        if self.input_path is None:
+        if self.input_dir is None:
             raise ValueError('There is no input. Please select directory.')
         files = []
-        if os.path.isfile(self.input_path):
-            raise ValueError(f'{self.input_path} is file. Please select directory.')
-        elif os.path.isdir(self.input_path):
+        if os.path.isfile(self.indir):
+            raise ValueError(f'{self.indir} is file. Please select directory.')
+        elif os.path.isdir(self.indir):
             for ext in self.exts:
-                files += glob.glob(self.input_path + '/*.' + ext)
+                files += glob.glob(self.indir + '/*.' + ext)
         print('files: ', files)
         img_names = [re.sub('-(L|F)$', '', os.path.splitext(os.path.basename(f))[0]) for f in files]
         img_name_list = [k for k, v in collections.Counter(img_names).items() if v > 1]
         print('img name list', img_name_list)
         for name in img_name_list:
-            l = glob.glob(self.input_path + '/' + name + '-L.*')
+            l = glob.glob(self.indir + '/' + name + '-L.*')
             print(l)
-            f = glob.glob(self.input_path + '/' + name + '-F.*')
+            f = glob.glob(self.indir + '/' + name + '-F.*')
             print(f)
             if (len(l) == 0) or (len(f) == 0):
                 break
@@ -795,7 +819,7 @@ class AutoWidget(MyBoxLayout):
         if len(self.img_list) == 0:
             raise ValueError('There is no pair images.')
         print('img list', self.img_list)
-        output = self.output_path + '/images_list.csv'
+        output = self.outdir + '/images_list.csv'
         header = ['Name', 'Leaf image file', 'FvFm image file']
         with open(output, 'w', newline='') as f:
             writer = csv.writer(f)
@@ -823,10 +847,26 @@ class AutoWidget(MyBoxLayout):
         try:
             self.create_img_list()
         except Exception as e:
+            self.popup.dismiss()
             self.err_msg = str(e)
             Clock.schedule_once(self.thread_error, 0)
             return
-        
+        leaf_thr = self.ids.leaf_thr_slider.value
+        fvfm_thr = self.ids.fvfm_thr_slider.value
+        color1 = [[self.h1l, self.s1l, self.v1l], [self.h1h, self.s1h, self.v1h]]
+        color2 = [[self.h2l, self.s2l, self.v2l], [self.h2h, self.s2h, self.v2h]]
+        size2d = self.ids.size2d.value
+        size3d = self.ids.size3d.value
+        outdir = self.ids.outdir.text
+        is_extr1 = self.ids.is_extr1
+        self.app.set_params(leaf_thr, fvfm_thr, color1, color2, size2d, size3d, outdir)
+        for file in self.img_list:
+            name = file[0]
+            leaf_img = file[1]
+            fvfm_img = file[2]
+            self.app.run_auto(name, leaf_img, fvfm_img)
+        self.popup.dismiss()
+
     def bind_func(self, dt):
         self.ids.h1_slider.bind(
             value1=lambda slider, value: self.set_value1(value, 'h1l'),

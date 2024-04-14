@@ -887,7 +887,7 @@
             InnerBox:  # Select folder
                 orientation: 'vertical'
                 Word:
-                    font_size: sp(25)
+                    font_size: sp(20)
                     text: 'Select leaf images.'
                 InnerBox:
                     Word:
@@ -904,7 +904,7 @@
             InnerBox:  # Leaf
                 orientation: 'vertical'
                 Word:
-                    font_size: sp(25)
+                    font_size: sp(20)
                     text: 'Leaf threshold'
                 InnerBox:
                     Slider:
@@ -913,15 +913,15 @@
                         height: std_height
                         range: 0, 255
                         step: 1
-                        value: 0 if textin.text == '' else int(textin.text)
+                        value: 0 if leaf_textin.text == '' else int(leaf_textin.text)
                     IntInput:
-                        id: textin
+                        id: leaf_textin
                         text: '{:.0f}'.format(leaf_thr_slider.value)
                         on_text_validate: root.int_input(self, leaf_thr_slider.value)
             InnerBox:  # Fv/Fm
                 orientation: 'vertical'
                 Word:
-                    font_size: sp(25)
+                    font_size: sp(20)
                     text: 'Fv/Fm threshold'
                 InnerBox:
                     Slider:
@@ -930,9 +930,9 @@
                         height: std_height
                         range: 0, 255
                         step: 1
-                        value: 0 if textin.text == '' else int(textin.text)
+                        value: 0 if fvfm_textin.text == '' else int(fvfm_textin.text)
                     IntInput:
-                        id: textin
+                        id: fvfm_textin
                         text: '{:.0f}'.format(fvfm_thr_slider.value)
                         on_text_validate: root.int_input(self, fvfm_thr_slider.value)
             Space:
@@ -940,9 +940,15 @@
                 spacing: dp(50)
                 InnerBox:  # Color1
                     orientation: 'vertical'
-                    Word:
-                        font_size: sp(25)
-                        text: 'Color 1'
+                    InnerBox:
+                        CheckBox:
+                            id: is_extr1
+                            size_hint_x:None
+                            width: self.height
+                            active: root.active_extr1()
+                        Word:
+                            font_size: sp(20)
+                            text: 'Color 1'
                     Image:
                         id: range1_img
                         texture: root.range1_texture
@@ -962,6 +968,7 @@
                             text: '{:.0f}'.format(h1_slider.value1)
                         RangeSlider:
                             id: h1_slider
+                            disabled: True
                             range: 0, 180
                             value1: 0 if h1_text1.text == '' else h1_text1.text
                             value2: 0 if h1_text2.text == '' else h1_text2.text
@@ -982,6 +989,7 @@
                             text: '{:.0f}'.format(s1_slider.value1)
                         RangeSlider:
                             id: s1_slider
+                            disabled: True
                             range: 0, 255
                             value1: 0 if s1_text1.text == '' else s1_text1.text
                             value2: 0 if s1_text2.text == '' else s1_text2.text
@@ -1002,6 +1010,7 @@
                             text: '{:.0f}'.format(v1_slider.value1)
                         RangeSlider:
                             id: v1_slider
+                            disabled: True
                             range: 0, 255
                             value1: 0 if v1_text1.text == '' else v1_text1.text
                             value2: 0 if v1_text2.text == '' else v1_text2.text
@@ -1011,9 +1020,14 @@
                             text: '{:.0f}'.format(v1_slider.value2)
                 InnerBox:  # color2
                     orientation: 'vertical'
-                    Word:
-                        font_size: sp(25)
-                        text: 'Color 2'
+                    InnerBox:
+                        CheckBox:
+                            id: is_extr2
+                            size_hint_x:None
+                            width: self.height
+                        Word:
+                            font_size: sp(20)
+                            text: 'Color 2'
                     Image:
                         id: range2_img
                         texture: root.range2_texture
@@ -1032,6 +1046,7 @@
                             text: '{:.0f}'.format(h2_slider.value1)
                         RangeSlider:
                             id: h2_slider
+                            disabled: True
                             range: 0, 180
                             value1: 0 if h2_text1.text == '' else h2_text1.text
                             value2: 0 if h2_text2.text == '' else h2_text2.text
@@ -1052,6 +1067,7 @@
                             text: '{:.0f}'.format(s2_slider.value1)
                         RangeSlider:
                             id: s2_slider
+                            disabled: True
                             range: 0, 255
                             value1: 0 if s2_text1.text == '' else s2_text1.text
                             value2: 0 if s2_text2.text == '' else s2_text2.text
@@ -1072,6 +1088,7 @@
                             text: '{:.0f}'.format(v2_slider.value1)
                         RangeSlider:
                             id: v2_slider
+                            disabled: True
                             range: 0, 255
                             value1: 0 if v2_text1.text == '' else v2_text1.text
                             value2: 0 if v2_text2.text == '' else v2_text2.text
@@ -1085,7 +1102,7 @@
                     InnerBox:
                         orientation: 'vertical'
                         Word:
-                            font_size: sp(25)
+                            font_size: sp(20)
                             text: '2D Plot size'
                         AnchorLayout:
                             anchor_x: 'center'
@@ -1094,7 +1111,7 @@
                     InnerBox:
                         orientation: 'vertical'
                         Word:
-                            font_size: sp(25)
+                            font_size: sp(20)
                             text: '3D Plot size'
                         AnchorLayout:
                             anchor_x: 'center'
@@ -1104,7 +1121,7 @@
             InnerBox:  # Output
                 orientation: 'vertical'
                 Word:
-                    font_size: sp(25)
+                    font_size: sp(20)
                     text: 'Select output directory.'
                 InnerBox:
                     Word:
