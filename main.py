@@ -56,7 +56,7 @@ class PickcellApp(App):
         super().__init__(**kwargs)
         self.set_var()
         self.setup_fvfm_thread = threading.Thread(target=self.setup_fvfm)
-        #self.setup_fvfm_thread.start()
+        self.setup_fvfm_thread.start()
 
     def set_var(self):
         self.leaf_img = None
@@ -129,7 +129,7 @@ class PickcellApp(App):
         self.high1 = high
         self.res_leaf1_img = self.extr_color(low, high)
 
-    def run_extr_color1(self, low, high):
+    def run_extr_color2(self, low, high):
         self.low2 = low
         self.high2 = high
         self.res_leaf2_img = self.extr_color(low, high)
@@ -192,25 +192,31 @@ class PickcellApp(App):
     def run_auto(self,name, leaf_input, fvfm_input):
         self.clear()
         self.file_name = name
-        self.run_detect(leaf_input, self.leaf_thr)
-        self.run_fvfm(fvfm_input, self.fvfm_thr)
-        self.run_align(self.leaf_img, self.fvfm_img, self.leaf_obj, self.fvfm_obj)
-        if self.is_extr1:
-            self.run_extr_color1(self.color1[0], self.color1[1])
-        if self.is_extr2:
-            self.run_extr_color2(self.color2[0], self.color2[1])
+        try:
+            self.run_detect(leaf_input, self.leaf_thr)
+            self.run_fvfm(fvfm_input, self.fvfm_thr)
+            self.run_align(self.leaf_img, self.fvfm_img, self.leaf_obj, self.fvfm_obj)
+            if self.is_extr1:
+                self.run_extr_color1(self.color1[0], self.color1[1])
+            if self.is_extr2:
+                self.run_extr_color2(self.color2[0], self.color2[1])
+        except Exception as e:
+            self.save_imgs(self.outdir)
+            raise
+        self.save_imgs(self.outdir)
         self.set_marker_size(self.size_2d, self.size_3d)
         fig = self.run_pickcell(self.res_leaf_img, self.res_fvfm_img, self.fvfm_list)
-        self.save(fig, self.outdir, 'All_color')
+        self.save_figs(self.outdir, 'All_color', fig)
         if self.res_leaf1_img is not None:
             fig1 = self.run_pickcell(self.res_leaf1_img, self.res_fvfm_img, self.fvfm_list)
-            self.save(fig1, self.outdir, 'Color1')
+            self.save_figs(self.outdir, 'Color1', fig1)
         if self.res_leaf2_img is not None:
             fig2 = self.run_pickcell(self.res_leaf2_img, self.res_fvfm_img, self.fvfm_list)
-            self.save(fig2, self.outdir, 'Color2')
+            self.save_figs(self.outdir, 'Color2', fig2)
+        print('run auto owari')
         
         
-    def save(self, figures, outdir, name):
+    def save_figs(self, outdir, name, figures):
         def make_res_dir(dir):
             if os.path.exists(dir):
                 i = 1
@@ -228,14 +234,21 @@ class PickcellApp(App):
         res_dir = os.path.join(outdir, self.file_name, name)
         res_dir = make_res_dir(res_dir)
         print('hozon basho', res_dir)
-        cv2.imwrite(os.path.join(outdir, self.file_name, self.file_name + '_leaf.png'), self.res_leaf_img)
-        cv2.imwrite(os.path.join(outdir, self.file_name, self.file_name + '_color1.png'), self.res_leaf1_img)
-        cv2.imwrite(os.path.join(outdir, self.file_name, self.file_name + '_color2.png'), self.res_leaf2_img)
-        cv2.imwrite(os.path.join(outdir, self.file_name, self.file_name + '_fvfm.png'), self.res_fvfm_img)
         fig_types = ['color3d', 'fvfm3d', 'scatter2d', 'all']
         for i, fig in enumerate(figures):
             print(f'{res_dir}: {fig_types[i]}')
             fig.write_html(os.path.join(res_dir, fig_types[i] + '.html'))
+
+    def save_imgs(self, outdir):
+        os.makedirs(os.path.join(outdir, self.file_name), exist_ok=True)
+        if self.res_leaf_img is not None:
+            cv2.imwrite(os.path.join(outdir, self.file_name, self.file_name + '_leaf.png'), self.res_leaf_img)
+        if self.res_fvfm_img is not None:
+            cv2.imwrite(os.path.join(outdir, self.file_name, self.file_name + '_fvfm.png'), self.res_fvfm_img)
+        if self.res_leaf1_img is not None:
+            cv2.imwrite(os.path.join(outdir, self.file_name, self.file_name + '_color1.png'), self.res_leaf1_img)
+        if self.res_leaf2_img is not None:
+            cv2.imwrite(os.path.join(outdir, self.file_name, self.file_name + '_color2.png'), self.res_leaf2_img)
 
     def set_val(self):
         try:
@@ -801,6 +814,7 @@ class AutoWidget(MyBoxLayout):
         if self.input_dir is None:
             raise ValueError('There is no input. Please select directory.')
         files = []
+        self.img_list = []
         if os.path.isfile(self.indir):
             raise ValueError(f'{self.indir} is file. Please select directory.')
         elif os.path.isdir(self.indir):
@@ -825,6 +839,7 @@ class AutoWidget(MyBoxLayout):
         if len(self.img_list) == 0:
             raise ValueError('There is no pair images.')
         print('img list', self.img_list)
+        '''
         output = self.outdir + '/images_list.csv'
         header = ['Name', 'Leaf image file', 'FvFm image file']
         with open(output, 'w', newline='') as f:
@@ -832,6 +847,7 @@ class AutoWidget(MyBoxLayout):
             writer.writerow(header)
             writer.writerows(self.img_list)
         return
+        '''
 
     def biggest_img(self, img_list):
         max_size = 0
@@ -859,31 +875,47 @@ class AutoWidget(MyBoxLayout):
             return
         leaf_thr = self.ids.leaf_thr_slider.value
         fvfm_thr = self.ids.fvfm_thr_slider.value
-        color1 = [[self.h1l, self.s1l, self.v1l], [self.h1h, self.s1h, self.v1h]]
-        color2 = [[self.h2l, self.s2l, self.v2l], [self.h2h, self.s2h, self.v2h]]
+        color1 = [(self.h1l, self.s1l, self.v1l), (self.h1h, self.s1h, self.v1h)]
+        color2 = [(self.h2l, self.s2l, self.v2l), (self.h2h, self.s2h, self.v2h)]
         size2d = self.ids.size2d.value
         size3d = self.ids.size3d.value
         outdir = self.ids.outdir.text
         is_extr1 = self.ids.is_extr1.active
         is_extr2 = self.ids.is_extr2.active
+        print('extr1', is_extr1)
+        print('extr2', is_extr2)
         self.app.set_params(leaf_thr, fvfm_thr, is_extr1, is_extr2, color1, color2, size2d, size3d, outdir)
         num_proc = len(self.img_list)
         count = 1
+        report_file = outdir + '/report.csv'
+        f = open(report_file, 'w', newline='')
+        writer = csv.writer(f)
+        header = ['Name', 'Leaf_image', 'FvFm_image', 'Result']
+        writer.writerow(header)
         for file in self.img_list:
+            print(f'{count}/{num_proc}')
             self.popup.dismiss()
             Clock.schedule_once(lambda x: self.show_progress_popup(self.cancel_process, 'Auto Pickcell', f'Running... {count}/{num_proc}'), 0)
             name = file[0]
             leaf_img = file[1]
             fvfm_img = file[2]
+            print(name, leaf_img, fvfm_img)
             try:
                 self.app.run_auto(name, leaf_img, fvfm_img)
             except Exception as e:
-                self.popup.dismiss()
-                self.err_msg = str(e)
-                Clock.schedule_once(self.thread_error, 0)
-            finally:
+                res = [name, leaf_img, fvfm_img, str(e)]
+                writer.writerow(res)
+                print(e)
+                print('break suruyo')
                 self.popup.dismiss()
                 count += 1
+                continue
+            print('owari')
+            res = [name, leaf_img, fvfm_img, 'OK']
+            writer.writerow(res)
+            self.popup.dismiss()
+            count += 1
+        f.close()
         self.popup.dismiss()
 
     def active_extr1(self, state):
