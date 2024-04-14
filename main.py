@@ -115,16 +115,6 @@ class PickcellApp(App):
         mask = cv2.inRange(img_hsv, low, high)
         extr_img = cv2.bitwise_and(img, img, mask=mask)
         return extr_img
-    
-    def run_extr_color1(self, low, high):
-        self.low1 = low
-        self.high1 = high
-        self.res_leaf1_img = self.extr_color(low, high)
-
-    def run_extr_color2(self, low, high):
-        self.low2 = low
-        self.high2 = high
-        self.res_leaf2_img = self.extr_color(low, high)
 
     def run_split_color(self):
         if (self.low1 is not None) and (self.high1 is not None):
@@ -177,6 +167,10 @@ class PickcellApp(App):
         res_dir = os.path.join(outdir, self.file_name, name)
         res_dir = make_res_dir(res_dir)
         print('hozon basho', res_dir)
+        cv2.imwrite(os.path.join(outdir, self.file_name, self.file_name + '_leaf.png'), self.res_leaf_img)
+        cv2.imwrite(os.path.join(outdir, self.file_name, self.file_name + '_color1.png'), self.res_leaf1_img)
+        cv2.imwrite(os.path.join(outdir, self.file_name, self.file_name + '_color2.png'), self.res_leaf2_img)
+        cv2.imwrite(os.path.join(outdir, self.file_name, self.file_name + '_fvfm.png'), self.res_fvfm_img)
         fig_types = ['color3d', 'fvfm3d', 'scatter2d', 'all']
         for i, fig in enumerate(figures):
             print(f'{res_dir}: {fig_types[i]}')
@@ -257,7 +251,10 @@ class DetectWidget(MyBoxLayout):
         if self.input_path is None:
             self.show_error_popup('Select leaf image.')
             return
-        self.app.file_name = os.path.splitext(os.path.basename(self.input_path))[0]
+        name = os.path.splitext(os.path.basename(self.input_path))[0]
+        if re.fullmatch('.*-(L|F)$', name):
+            name = re.sub('-(L|F)$', '', name)
+        self.app.file_name = name
         self.show_progress_popup(self.cancel_process, 'Detect leaf', 'Running...')
         self.thread = WorkingThread(target=self.run_process)
         self.thread.start()
@@ -658,12 +655,11 @@ class AutoWidget(MyBoxLayout):
         if self.input_path is None:
             raise ValueError('There is no input. Please select directory.')
         files = []
-        def add_input(path):
-            if os.path.isfile(path):
-                files += path
-            elif os.path.isdir(path):
-                for ext in self.exts:
-                    files += glob.glob(path + '/*.' + ext)
+        if os.path.isfile(self.input_path):
+            raise ValueError(f'{self.input_path} is file. Please select directory.')
+        elif os.path.isdir(self.input_path):
+            for ext in self.exts:
+                files += glob.glob(self.input_path + '/*.' + ext)
         print('files: ', files)
         img_names = [re.sub('-(L|F)$', '', os.path.splitext(os.path.basename(f))[0]) for f in files]
         img_name_list = [k for k, v in collections.Counter(img_names).items() if v > 1]
@@ -684,8 +680,9 @@ class AutoWidget(MyBoxLayout):
             self.img_list.append([name, l[0], f[0]])
         if len(self.img_list) == 0:
             raise ValueError('There is no pair images.')
+        print('img list', self.img_list)
         output = self.output_path + '/images_list.csv'
-        header = ['Image title', 'Leaf image file', 'FvFm image file']
+        header = ['Name', 'Leaf image file', 'FvFm image file']
         with open(output, 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(header)

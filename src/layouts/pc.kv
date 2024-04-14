@@ -121,26 +121,26 @@
 <Root>:
     do_default_tab: False
     tab_width: dp(120)
-    TabbedPanelItem:
-        text: 'Detect'
-        id: detect
-        DetectWidget:
-    TabbedPanelItem:
-        text: 'Fv/Fm'
-        id: fvfm
-        FvFmWidget:
-    TabbedPanelItem:
-        text: 'Align'
-        id: align
-        AlignWidget:
-    TabbedPanelItem:
-        text: 'Split Color'
-        id: split_color
-        SplitColorWidget:
-    TabbedPanelItem:
-        text: 'Analyze'
-        id: analyze
-        AnalyzeWidget:
+#    TabbedPanelItem:
+#        text: 'Detect'
+#        id: detect
+#        DetectWidget:
+#    TabbedPanelItem:
+#        text: 'Fv/Fm'
+#        id: fvfm
+#        FvFmWidget:
+#    TabbedPanelItem:
+#        text: 'Align'
+#        id: align
+#        AlignWidget:
+#    TabbedPanelItem:
+#        text: 'Split Color'
+#        id: split_color
+#        SplitColorWidget:
+#    TabbedPanelItem:
+#        text: 'Analyze'
+#        id: analyze
+#        AnalyzeWidget:
     TabbedPanelItem:
         text: 'Auto'
         id: auto
@@ -886,7 +886,7 @@
         Button:
             size_hint: 1, 0.5
             text: 'Select'
-            on_press: Factory.FolderOrFilesDialogPopup(select=root.input_dir_files).open()
+            on_press: Factory.OutdirDialogPopup(select=root.input_dir).open()
         Button:
             size_hint: 1, 0.5
             text: 'buttttt'
