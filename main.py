@@ -526,6 +526,7 @@ class SplitColorWidget(MyBoxLayout):
     def update_texture(self, hl, hh, sl, sh, vl,vh, range_img):
         height = int(range_img.height)
         width = int(range_img.width)
+        print('spl', height, width)
         if width == 0:
             width = 1
         hue = np.linspace(hl, hh, width)
@@ -537,26 +538,29 @@ class SplitColorWidget(MyBoxLayout):
         range_img.texture = texture
 
     def set_default(self, dt):
-        self.h1l = 30
-        self.h1h = 60
-        self.s1l = 0
-        self.s1h = 255
-        self.v1l = 0
-        self.v1h = 255
+        color1 = self.app.color1
+        color2 = self.app.color2
+        self.h1l = color1[0][0]
+        self.h1h = color1[1][0]
+        self.s1l = color1[0][1]
+        self.s1h = color1[1][1]
+        self.v1l = color1[0][2]
+        self.v1h = color1[1][2]
         self.ids.h1_slider.value = (self.h1l, self.h1h)
         self.ids.s1_slider.value = (self.s1l, self.s1h)
         self.ids.v1_slider.value = (self.v1l, self.v1h)
-        self.h2l = 60
-        self.h2h = 90
-        self.s2l = 0
-        self.s2h = 255
-        self.v2l = 0
-        self.v2h = 255
+        self.h2l = color2[0][0]
+        self.h2h = color2[1][0]
+        self.s2l = color2[0][1]
+        self.s2h = color2[1][1]
+        self.v2l = color2[0][2]
+        self.v2h = color2[1][2]
         self.ids.h2_slider.value = (self.h2l, self.h2h)
         self.ids.s2_slider.value = (self.s2l, self.s2h)
         self.ids.v2_slider.value = (self.v2l, self.v2h)
 
     def resize_widgets(self, dt):
+        print('resize split')
         self.update_texture(
             self.h1l, self.h1h,
             self.s1l, self.s1h,
@@ -705,6 +709,9 @@ class AnalyzeWidget(MyBoxLayout):
         
 
 class AutoWidget(MyBoxLayout):
+    range1_texture = ObjectProperty(None)
+    range2_texture = ObjectProperty(None)
+
     def __init__(self, **kwargs):
         super(AutoWidget, self).__init__(**kwargs)
         self.input_path = None
@@ -714,6 +721,7 @@ class AutoWidget(MyBoxLayout):
         self.app = App.get_running_app()
         exts = ['jpg', 'jpeg', 'png', 'tiff', 'bmp']
         self.exts = sum([[ext.lower(), ext.upper()] for ext in exts], [])
+        Clock.schedule_once(self.bind_func, 0)
 
     def input_dir_files(self, path):
         print('input path: ', path)
@@ -727,6 +735,16 @@ class AutoWidget(MyBoxLayout):
         except ValueError as e:
             self.show_error_popup(str(e))
         '''
+
+    def input_dir(self, file):
+        super().input_dir(file)
+        self.input_dir = self.input_path
+        self.ids.input_path.text = self.input_path
+
+    def output_dir(self, file):
+        super().input_dir(file)
+        self.output_dir = self.input_path
+        self.ids.outdir.text = self.input_path
 
     def set_val(self, leaf_thr, fvfm_thr, color1, color2, size2d, size3d):
         self.ids.leaf_thr_slider.value = leaf_thr
@@ -745,6 +763,8 @@ class AutoWidget(MyBoxLayout):
         self.ids.v2_slider.value2 = color2[1][2]
         self.ids.size2d.value = size2d
         self.ids.size3d.value = size3d
+        Clock.schedule_once(self.resize_widgets_auto, 0)
+        #self.resize_widgets_auto(0)
 
     def create_img_list(self):
         print(self.input_path)
@@ -807,6 +827,138 @@ class AutoWidget(MyBoxLayout):
             Clock.schedule_once(self.thread_error, 0)
             return
         
+    def bind_func(self, dt):
+        self.ids.h1_slider.bind(
+            value1=lambda slider, value: self.set_value1(value, 'h1l'),
+            value2=lambda slider, value: self.set_value1(value, 'h1h')
+        )
+        self.ids.s1_slider.bind(
+            value1=lambda slider, value: self.set_value1(value, 's1l'),
+            value2=lambda slider, value: self.set_value1(value, 's1h')
+        )
+        self.ids.v1_slider.bind(
+            value1=lambda slider, value: self.set_value1(value, 'v1l'),
+            value2=lambda slider, value: self.set_value1(value, 'v1h')
+        )
+        self.ids.h2_slider.bind(
+            value1=lambda slider, value: self.set_value2(value, 'h2l'),
+            value2=lambda slider, value: self.set_value2(value, 'h2h')
+        )
+        self.ids.s2_slider.bind(
+            value1=lambda slider, value: self.set_value2(value, 's2l'),
+            value2=lambda slider, value: self.set_value2(value, 's2h')
+        )
+        self.ids.v2_slider.bind(
+            value1=lambda slider, value: self.set_value2(value, 'v2l'),
+            value2=lambda slider, value: self.set_value2(value, 'v2h')
+        )
+        #Window.bind(
+        #    on_resize=lambda window, size, size2: Clock.schedule_once(self.resize_widgets_auto, 0)
+        #)
+
+    def set_value1(self, value, val_type):
+        if val_type == 'h1l':
+            self.h1l = int(value)
+        elif val_type == 'h1h':
+            self.h1h = int(value)
+        elif val_type == 's1l':
+            self.s1l = int(value)
+        elif val_type == 's1h':
+            self.s1h = int(value)
+        elif val_type == 'v1l':
+            self.v1l = int(value)
+        elif val_type == 'v1h':
+            self.v1h = int(value)
+        self.app.set_color1(self.h1l, self.s1l, self.v1l, self.h1h, self.s1h, self.v1h)
+        self.update_texture(
+            self.h1l, self.h1h,
+            self.s1l, self.s1h,
+            self.v1l, self.v1h,
+            self.ids.range1_img
+        )
+        
+    def set_value2(self, value, val_type):
+        if val_type == 'h2l':
+            self.h2l = int(value)
+        elif val_type == 'h2h':
+            self.h2h = int(value)
+        elif val_type == 's2l':
+            self.s2l = int(value)
+        elif val_type == 's2h':
+            self.s2h = int(value)
+        elif val_type == 'v2l':
+            self.v2l = int(value)
+        elif val_type == 'vh':
+            self.v2h = int(value)
+        self.app.set_color2(self.h2l, self.s2l, self.v2l, self.h2h, self.s2h, self.v2h)
+        self.update_texture(
+            self.h2l, self.h2h,
+            self.s2l, self.s2h,
+            self.v2l, self.v2h,
+            self.ids.range2_img
+        )
+        
+    def update_texture(self, hl, hh, sl, sh, vl,vh, range_img):
+        height = int(range_img.height)
+        width = int(range_img.width)
+        print(height, width)
+        if width == 0:
+            width = 1
+        hue = np.linspace(hl, hh, width)
+        saturation = np.linspace(sl, sh, height)
+        value = np.linspace(vl, vh, height)
+        img_hsv = np.array([[h,s,v] for (s, v) in zip(saturation, value) for h in hue], np.uint8).reshape(height, width, 3)
+        img = cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR)
+        texture = self.cv2_to_texture(img)
+        range_img.texture = texture
+
+    def resize_widgets_auto(self, dt):
+        print('resize')
+        self.update_texture(
+            self.h1l, self.h1h,
+            self.s1l, self.s1h,
+            self.v1l, self.v1h,
+            self.ids.range1_img
+        )
+        self.update_texture(
+            self.h2l, self.h2h,
+            self.s2l, self.s2h,
+            self.v2l, self.v2h,
+            self.ids.range2_img
+        )
+    
+    def set_default(self, dt):
+        self.outdir = home_dir
+        self.ids.outdir.text = self.outdir
+        self.leaf_thr = self.app.leaf_thr
+        self.fvfm_thr = self.app.fvfm_thr
+        color1 = self.app.color1
+        color2 = self.app.color2
+        self.size_2d = self.app.size_2d
+        self.size_3d = self.app.size_3d
+        self.h1l = color1[0][0]
+        self.h1h = color1[1][0]
+        self.s1l = color1[0][1]
+        self.s1h = color1[1][1]
+        self.v1l = color1[0][2]
+        self.v1h = color1[1][2]
+        self.ids.leaf_thr_slider.value = self.leaf_thr
+        self.ids.fvfm_thr_slider.value = self.fvfm_thr
+        self.ids.h1_slider.value = (self.h1l, self.h1h)
+        self.ids.s1_slider.value = (self.s1l, self.s1h)
+        self.ids.v1_slider.value = (self.v1l, self.v1h)
+        self.h2l = color2[0][0]
+        self.h2h = color2[1][0]
+        self.s2l = color2[0][1]
+        self.s2h = color2[1][1]
+        self.v2l = color2[0][2]
+        self.v2h = color2[1][2]
+        self.ids.h2_slider.value = (self.h2l, self.h2h)
+        self.ids.s2_slider.value = (self.s2l, self.s2h)
+        self.ids.v2_slider.value = (self.v2l, self.v2h)
+        self.ids.size2d.value = self.size_2d
+        self.ids.size3d.value = self.size_3d
+        
 class Root(TabbedPanel):
     def __init__(self, **kwargs):
         super(Root, self).__init__(**kwargs)
@@ -814,26 +966,13 @@ class Root(TabbedPanel):
         self.app = App.get_running_app()
 
     def switch_to(self, header, do_scroll=False):
-        width = Window.width
-        height = Window.height
-        Window.size = ((width+1)/self.density, height/self.density)
-        Window.size = (width/self.density, height/self.density)
-        return super().switch_to(header, do_scroll)
-    '''
-    def switch_to_auto(self):
-        width = Window.width
-        height = Window.height
-        Window.size = ((width+1)/self.density, height/self.density)
-        Window.size = (width/self.density, height/self.density)
-        super().switch_to(self.ids.auto, False)
-        self.app.set_val()
-    '''
-
-    def switch_to(self, header, do_scroll=False):
         super().switch_to(header, do_scroll)
         if header == self.ids.auto:
             self.app.set_val()
-            print('set!!')
+        width = Window.width
+        height = Window.height
+        Window.size = ((width+1)/self.density, height/self.density)
+        Window.size = (width/self.density, height/self.density)
 
 if __name__ == '__main__':
     PickcellApp().run()

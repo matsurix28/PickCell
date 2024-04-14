@@ -121,22 +121,22 @@
 <Root>:
     do_default_tab: False
     tab_width: dp(120)
-#    TabbedPanelItem:
-#        text: 'Detect'
-#        id: detect
-#        DetectWidget:
-#    TabbedPanelItem:
-#        text: 'Fv/Fm'
-#        id: fvfm
-#        FvFmWidget:
-#    TabbedPanelItem:
-#        text: 'Align'
-#        id: align
-#        AlignWidget:
-#    TabbedPanelItem:
-#        text: 'Split Color'
-#        id: split_color
-#        SplitColorWidget:
+    TabbedPanelItem:
+        text: 'Detect'
+        id: detect
+        DetectWidget:
+    TabbedPanelItem:
+        text: 'Fv/Fm'
+        id: fvfm
+        FvFmWidget:
+    TabbedPanelItem:
+        text: 'Align'
+        id: align
+        AlignWidget:
+    TabbedPanelItem:
+        text: 'Split Color'
+        id: split_color
+        SplitColorWidget:
     TabbedPanelItem:
         text: 'Analyze'
         id: analyze
@@ -842,7 +842,7 @@
                 font_size: ana_btn
                 size_hint_x: None
                 width: self.texture_size[0] + dp(20)
-                text: 'Directory:'
+                text: 'Save folder:'
             Word:
                 font_size: ana_btn
                 id: outdir_label
@@ -878,191 +878,257 @@
 
 
 <AutoWidget>:
-    orientation: 'vertical'
-    InnerBox:  # Select folder
-        orientation: 'vertical'
-        size_hint: 1, 0.3
-        Word:
-            text: 'Select leaf images.'
-        Button:
-            size_hint: 1, 0.1
-            text: 'Select'
-            on_press: Factory.OutdirDialogPopup(select=root.input_dir).open()
-        Button:
-            size_hint: 1, 0.1
-            text: 'buttttt'
-            on_press: root.click()
-    InnerBox:  # Leaf
+    size_hint: 1, 1
+    ScrollView:
         InnerBox:
-            Slider:
-                id: leaf_thr_slider
-                size_hint_y: None
-                height: std_height
-                range: 0, 255
-                step: 1
-                value: 0 if textin.text == '' else int(textin.text)
-            IntInput:
-                id: textin
-                text: '{:.0f}'.format(leaf_thr_slider.value)
-                on_text_validate: root.int_input(self, leaf_thr_slider.value)
-    InnerBox:  # Fv/Fm
-        InnerBox:
-            Slider:
-                id: fvfm_thr_slider
-                size_hint_y: None
-                height: std_height
-                range: 0, 255
-                step: 1
-                value: 0 if textin.text == '' else int(textin.text)
-            IntInput:
-                id: textin
-                text: '{:.0f}'.format(fvfm_thr_slider.value)
-                on_text_validate: root.int_input(self, fvfm_thr_slider.value)
-    InnerBox:  # Split color
-        InnerBox:  # Step 1 select range of color1
+            padding: dp(100), dp(20), dp(100), dp(20)
+            spacing: dp(20)
             orientation: 'vertical'
-            Image:
-                id: range1_img
-                texture: root.range1_texture
-                size_hint_y: None
-                height: std_height
-                width: dp(476)
-            InnerBox:  # Hue slider frame
-                size_hint: 1, None
-                height: std_height
+            InnerBox:  # Select folder
+                orientation: 'vertical'
                 Word:
-                    text: 'H'
-                    size_hint: None, None
-                    size: std_height, std_height
-                IntInput:
-                    id: h1_text1
-                    width: self.minimum_height + dp(20)
-                    text: '{:.0f}'.format(h1_slider.value1)
-                RangeSlider:
-                    id: h1_slider
-                    range: 0, 180
-                    value1: 0 if h1_text1.text == '' else h1_text1.text
-                    value2: 0 if h1_text2.text == '' else h1_text2.text
-                IntInput:
-                    id: h1_text2
-                    width: self.minimum_height + dp(20)
-                    text: '{:.0f}'.format(h1_slider.value2)
-            InnerBox:  # Saturation slider frame
-                size_hint: 1, None
-                height: std_height
+                    font_size: sp(25)
+                    text: 'Select leaf images.'
+                InnerBox:
+                    Word:
+                        size_hint_x: None
+                        width: self.texture_size[0]
+                        text: 'Input folder:'
+                    Word:
+                        id: input_path
+                        text: '-'
+                    Button:
+                        text: 'Select'
+                        on_press: Factory.OutdirDialogPopup(select=root.input_dir).open()
+            Space:
+            InnerBox:  # Leaf
+                orientation: 'vertical'
                 Word:
-                    text: 'S'
-                    size_hint: None, None
-                    size: std_height, std_height
-                IntInput:
-                    id: s1_text1
-                    width: self.minimum_height + dp(20)
-                    text: '{:.0f}'.format(s1_slider.value1)
-                RangeSlider:
-                    id: s1_slider
-                    range: 0, 255
-                    value1: 0 if s1_text1.text == '' else s1_text1.text
-                    value2: 0 if s1_text2.text == '' else s1_text2.text
-                IntInput:
-                    id: s1_text2
-                    width: self.minimum_height + dp(20)
-                    text: '{:.0f}'.format(s1_slider.value2)
-            InnerBox:  # Value slider frame
-                size_hint: 1, None
-                height: std_height
+                    font_size: sp(25)
+                    text: 'Leaf threshold'
+                InnerBox:
+                    Slider:
+                        id: leaf_thr_slider
+                        size_hint_y: None
+                        height: std_height
+                        range: 0, 255
+                        step: 1
+                        value: 0 if textin.text == '' else int(textin.text)
+                    IntInput:
+                        id: textin
+                        text: '{:.0f}'.format(leaf_thr_slider.value)
+                        on_text_validate: root.int_input(self, leaf_thr_slider.value)
+            InnerBox:  # Fv/Fm
+                orientation: 'vertical'
                 Word:
-                    text: 'V'
-                    size_hint: None, None
-                    size: std_height, std_height
-                IntInput:
-                    id: v1_text1
-                    width: self.minimum_height + dp(20)
-                    text: '{:.0f}'.format(v1_slider.value1)
-                RangeSlider:
-                    id: v1_slider
-                    range: 0, 255
-                    value1: 0 if v1_text1.text == '' else v1_text1.text
-                    value2: 0 if v1_text2.text == '' else v1_text2.text
-                IntInput:
-                    id: v1_text2
-                    width: self.minimum_height + dp(20)
-                    text: '{:.0f}'.format(v1_slider.value2)
-        InnerBox:  # Step 2 select range of color1
-            orientation: 'vertical'
-            Image:
-                id: range2_img
-                texture: root.range2_texture
-                size_hint_y: None
-                height: std_height
-            InnerBox:  # Hue slider frame
-                size_hint: 1, None
-                height: std_height
+                    font_size: sp(25)
+                    text: 'Fv/Fm threshold'
+                InnerBox:
+                    Slider:
+                        id: fvfm_thr_slider
+                        size_hint_y: None
+                        height: std_height
+                        range: 0, 255
+                        step: 1
+                        value: 0 if textin.text == '' else int(textin.text)
+                    IntInput:
+                        id: textin
+                        text: '{:.0f}'.format(fvfm_thr_slider.value)
+                        on_text_validate: root.int_input(self, fvfm_thr_slider.value)
+            Space:
+            InnerBox:  # Split color
+                spacing: dp(50)
+                InnerBox:  # Color1
+                    orientation: 'vertical'
+                    Word:
+                        font_size: sp(25)
+                        text: 'Color 1'
+                    Image:
+                        id: range1_img
+                        texture: root.range1_texture
+                        size_hint_y: None
+                        height: std_height
+                        width: dp(476)
+                    InnerBox:  # Hue slider frame
+                        size_hint: 1, None
+                        height: std_height
+                        Word:
+                            text: 'H'
+                            size_hint: None, None
+                            size: std_height, std_height
+                        IntInput:
+                            id: h1_text1
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(h1_slider.value1)
+                        RangeSlider:
+                            id: h1_slider
+                            range: 0, 180
+                            value1: 0 if h1_text1.text == '' else h1_text1.text
+                            value2: 0 if h1_text2.text == '' else h1_text2.text
+                        IntInput:
+                            id: h1_text2
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(h1_slider.value2)
+                    InnerBox:  # Saturation slider frame
+                        size_hint: 1, None
+                        height: std_height
+                        Word:
+                            text: 'S'
+                            size_hint: None, None
+                            size: std_height, std_height
+                        IntInput:
+                            id: s1_text1
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(s1_slider.value1)
+                        RangeSlider:
+                            id: s1_slider
+                            range: 0, 255
+                            value1: 0 if s1_text1.text == '' else s1_text1.text
+                            value2: 0 if s1_text2.text == '' else s1_text2.text
+                        IntInput:
+                            id: s1_text2
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(s1_slider.value2)
+                    InnerBox:  # Value slider frame
+                        size_hint: 1, None
+                        height: std_height
+                        Word:
+                            text: 'V'
+                            size_hint: None, None
+                            size: std_height, std_height
+                        IntInput:
+                            id: v1_text1
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(v1_slider.value1)
+                        RangeSlider:
+                            id: v1_slider
+                            range: 0, 255
+                            value1: 0 if v1_text1.text == '' else v1_text1.text
+                            value2: 0 if v1_text2.text == '' else v1_text2.text
+                        IntInput:
+                            id: v1_text2
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(v1_slider.value2)
+                InnerBox:  # color2
+                    orientation: 'vertical'
+                    Word:
+                        font_size: sp(25)
+                        text: 'Color 2'
+                    Image:
+                        id: range2_img
+                        texture: root.range2_texture
+                        size_hint_y: None
+                        height: std_height
+                    InnerBox:  # Hue slider frame
+                        size_hint: 1, None
+                        height: std_height
+                        Word:
+                            text: 'H'
+                            size_hint: None, None
+                            size: std_height, std_height
+                        IntInput:
+                            id: h2_text1
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(h2_slider.value1)
+                        RangeSlider:
+                            id: h2_slider
+                            range: 0, 180
+                            value1: 0 if h2_text1.text == '' else h2_text1.text
+                            value2: 0 if h2_text2.text == '' else h2_text2.text
+                        IntInput:
+                            id: h2_text2
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(h2_slider.value2)
+                    InnerBox:  # Saturation slider frame
+                        size_hint: 1, None
+                        height: std_height
+                        Word:
+                            text: 'S'
+                            size_hint: None, None
+                            size: std_height, std_height
+                        IntInput:
+                            id: s2_text1
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(s2_slider.value1)
+                        RangeSlider:
+                            id: s2_slider
+                            range: 0, 255
+                            value1: 0 if s2_text1.text == '' else s2_text1.text
+                            value2: 0 if s2_text2.text == '' else s2_text2.text
+                        IntInput:
+                            id: s2_text2
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(s2_slider.value2)
+                    InnerBox:  # Value slider frame
+                        size_hint: 1, None
+                        height: std_height
+                        Word:
+                            text: 'V'
+                            size_hint: None, None
+                            size: std_height, std_height
+                        IntInput:
+                            id: v2_text1
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(v2_slider.value1)
+                        RangeSlider:
+                            id: v2_slider
+                            range: 0, 255
+                            value1: 0 if v2_text1.text == '' else v2_text1.text
+                            value2: 0 if v2_text2.text == '' else v2_text2.text
+                        IntInput:
+                            id: v2_text2
+                            width: self.minimum_height + dp(20)
+                            text: '{:.0f}'.format(v2_slider.value2)
+            Space:
+            InnerBox:  # Graph
+                InnerBox:
+                    InnerBox:
+                        orientation: 'vertical'
+                        Word:
+                            font_size: sp(25)
+                            text: '2D Plot size'
+                        AnchorLayout:
+                            anchor_x: 'center'
+                            SpinBox:
+                                id: size2d
+                    InnerBox:
+                        orientation: 'vertical'
+                        Word:
+                            font_size: sp(25)
+                            text: '3D Plot size'
+                        AnchorLayout:
+                            anchor_x: 'center'
+                            SpinBox:
+                                id: size3d
+            Space:
+            InnerBox:  # Output
+                orientation: 'vertical'
                 Word:
-                    text: 'H'
-                    size_hint: None, None
-                    size: std_height, std_height
-                IntInput:
-                    id: h2_text1
-                    width: self.minimum_height + dp(20)
-                    text: '{:.0f}'.format(h2_slider.value1)
-                RangeSlider:
-                    id: h2_slider
-                    range: 0, 180
-                    value1: 0 if h2_text1.text == '' else h2_text1.text
-                    value2: 0 if h2_text2.text == '' else h2_text2.text
-                IntInput:
-                    id: h2_text2
-                    width: self.minimum_height + dp(20)
-                    text: '{:.0f}'.format(h2_slider.value2)
-            InnerBox:  # Saturation slider frame
-                size_hint: 1, None
-                height: std_height
-                Word:
-                    text: 'S'
-                    size_hint: None, None
-                    size: std_height, std_height
-                IntInput:
-                    id: s2_text1
-                    width: self.minimum_height + dp(20)
-                    text: '{:.0f}'.format(s2_slider.value1)
-                RangeSlider:
-                    id: s2_slider
-                    range: 0, 255
-                    value1: 0 if s2_text1.text == '' else s2_text1.text
-                    value2: 0 if s2_text2.text == '' else s2_text2.text
-                IntInput:
-                    id: s2_text2
-                    width: self.minimum_height + dp(20)
-                    text: '{:.0f}'.format(s2_slider.value2)
-            InnerBox:  # Value slider frame
-                size_hint: 1, None
-                height: std_height
-                Word:
-                    text: 'V'
-                    size_hint: None, None
-                    size: std_height, std_height
-                IntInput:
-                    id: v2_text1
-                    width: self.minimum_height + dp(20)
-                    text: '{:.0f}'.format(v2_slider.value1)
-                RangeSlider:
-                    id: v2_slider
-                    range: 0, 255
-                    value1: 0 if v2_text1.text == '' else v2_text1.text
-                    value2: 0 if v2_text2.text == '' else v2_text2.text
-                IntInput:
-                    id: v2_text2
-                    width: self.minimum_height + dp(20)
-                    text: '{:.0f}'.format(v2_slider.value2)
-    InnerBox:  # Output
+                    font_size: sp(25)
+                    text: 'Select output directory.'
+                InnerBox:
+                    Word:
+                        size_hint_x: None
+                        width: self.texture_size[0]
+                        text: 'Output folder:'
+                    Word:
+                        id: outdir
+                    Button:
+                        text: 'Select'
+                        on_press: Factory.OutdirDialogPopup(select=root.output_dir).open()
+            Space:
+            InnerBox:  # Run
+                AnchorLayout:
+                    anchor_x: 'center'
+                    Button:
+                        text: 'RUN'
+                        on_press: root.run()
 
-    InnerBox:  # Run
-
-<Widget>:
-    canvas.after:
-        Color:
-            rgba: 1,0,1,1
-        Line:
-            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
-            dash_offset: 5
-            dash_length: 3
+#<Widget>:
+#    canvas.after:
+#        Color:
+#            rgba: 1,0,1,1
+#        Line:
+#            rectangle: self.x+1, self.y+1, self.width-1, self.height-1
+#            dash_offset: 5
+#            dash_length: 3
