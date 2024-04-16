@@ -1,3 +1,0 @@
-Name,Leaf_image,FvFm_image,Result
-5faiz,/workspaces/PickCell/test/src/python/5faiz-L.JPG,/workspaces/PickCell/test/src/python/5faiz-F.bmp,PickcellApp.run_align() takes 2 positional arguments but 5 were given
-1,/workspaces/PickCell/test/src/python/1-L.bmp,/workspaces/PickCell/test/src/python/1-F.bmp,PickcellApp.run_align() takes 2 positional arguments but 5 were given

@@ -277,7 +277,11 @@ class Detect:
         h, w = img.shape[:2]
         img_ellipse = np.zeros(img.shape[:3], np.uint8)
         img_cnts = img_ellipse.copy()
-        ellipse = cv2.fitEllipse(cnts)
+        try:
+            ellipse = cv2.fitEllipse(cnts)
+        except Exception as e:
+            print('error')
+            raise ValueError(str(e))
         x, y = ellipse[0]
         elp_h, elp_w = ellipse[1]
         cv2.ellipse(img_ellipse, ellipse, (255,255,255), -1)

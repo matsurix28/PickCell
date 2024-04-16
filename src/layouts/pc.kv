@@ -833,8 +833,8 @@
                     on_press: root.show_figure('color2')
     Space:
     AnchorLayout:  # Save button
-        size_hint: 1, None
-        height: save_btn.height
+        size_hint: 1, 0.1
+        #height: save_btn.height
         anchor_x: 'center'
         InnerBox:
             height: self.minimum_height
@@ -850,7 +850,7 @@
             Button:
                 font_size: ana_btn
                 height: self.texture_size[1] + dp(20)
-                text: '∨'
+                text: 'Select'
                 on_release: Factory.OutdirDialogPopup(select=root.input_dir).open()
             Button:
                 font_size: ana_btn
@@ -859,19 +859,25 @@
                 text: 'Save'
                 disabled: True
                 on_press: root.save()
-            Button:
-                on_press: print(root.input_path)
+    Space:
     InnerBox:
+        size_hint_y: 0.1
         AnchorLayout:
-            size_hint_x: 0.5
+            size_hint: 0.5, 1
             anchor_x: 'left'
+            anchor_y: 'center'
             Button:
+                font_size: ana_btn
+                height: self.texture_size[1] + dp(20)
                 text: '<-Back'
                 on_release: app.root.switch_to(app.root.ids.split_color)
         AnchorLayout:
-            size_hint_x: 0.5
+            size_hint: 0.5, 1
             anchor_x: 'right'
+            anchor_y: 'center'
             Button:
+                font_size: ana_btn
+                height: self.texture_size[1] + dp(20)
                 text: 'Auto->'
                 on_release: app.root.switch_to(app.root.ids.auto)
                 #on_release: app.click()
