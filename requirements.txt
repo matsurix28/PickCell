@@ -1,0 +1,7 @@
+opencv-python
+isort
+plotly
+easyocr
+kivy
+japanize-kivy
+pandas
