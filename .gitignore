@@ -1,2 +1,4 @@
 /test/src/img
 /venv
+/main.dist
+/main.build

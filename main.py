@@ -7,8 +7,11 @@ import re
 import threading
 from os.path import expanduser
 
+from kivy.core.text import LabelBase, DEFAULT_FONT
+from kivy.resources import resource_add_path
+
 import cv2
-import japanize_kivy
+#import japanize_kivy
 import numpy as np
 from kivy import platform
 from kivy.app import App
@@ -44,6 +47,9 @@ src_dir = os.path.normpath(
 )
 
 home_dir = os.path.expanduser('~')
+
+resource_add_path(os.path.join(src_dir, 'fonts'))
+LabelBase.register(DEFAULT_FONT, 'Mplus1-Regular.ttf')
 
 class PickcellApp(App):
     leaf_texture = ObjectProperty(None)

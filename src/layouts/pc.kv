@@ -42,6 +42,8 @@
 <IntInput@TextInput>:
     input_filter: 'int'
     multiline: False
+    size_hint_y: None
+    height: std_height
 
 <Word@Label>:
     size_hint_y: None
@@ -81,14 +83,14 @@
             width: std_height /2
             height: std_height / 2
             font_size: sp(10)
-            text: '∧'
+            text: '▲'
             on_press: if root.value < root.high: root.value += 1
         Button:
             size_hint: None, None
             width: std_height / 2
             height: std_height / 2
             font_size: sp(10)
-            text: '∨'
+            text: '▼'
             on_press: if root.value > root.low: root.value -= 1
 
 
