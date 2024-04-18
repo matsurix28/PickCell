@@ -221,6 +221,9 @@ class PickcellApp(App):
             self.save_figs(self.outdir, 'Color2', fig2)
         print('run auto owari')
         
+    def save(self, fig, outdir, name):
+        self.save_imgs(outdir)
+        self.save_figs(outdir, name, fig)
         
     def save_figs(self, outdir, name, figures):
         def make_res_dir(dir):
@@ -649,18 +652,9 @@ class AnalyzeWidget(MyBoxLayout):
         super(AnalyzeWidget, self).__init__(**kwargs)
         self.p = None
         self.g = None
-        self.fig_c3d = None
-        self.fig_f3d = None
-        self.fig_2d = None
-        self.fig_all = None
-        self.fig_c3d_1 = None
-        self.fig_f3d_1 = None
-        self.fig_2d_1 = None
-        self.fig_all_1 = None
-        self.fig_c3d_2 = None
-        self.fig_f3d_2 = None
-        self.fig_2d_2 = None
-        self.fig_all_2 = None
+        self.fig = None
+        self.fig1 = None
+        self.fig2 = None
         self.size_2d = default_size2d
         self.size_3d = default_size3d
         self.input_path = home_dir
@@ -746,11 +740,11 @@ class AnalyzeWidget(MyBoxLayout):
             print('All save suruyo')
             self.fig = self.app.update_marker_size(self.fig, self.size_2d, self.size_3d)
             self.app.save(self.fig, self.input_path, 'All_color')
-        if self.fig is not None:
+        if self.fig1 is not None:
             print('Color2 save suruyo')
             self.fig1 = self.app.update_marker_size(self.fig1, self.size_2d, self.size_3d)
             self.app.save(self.fig1, self.input_path, 'Color1')
-        if self.fig is not None:
+        if self.fig2 is not None:
             print('Color2 save suruyo')
             self.fig2 = self.app.update_marker_size(self.fig2, self.size_2d, self.size_3d)
             self.app.save(self.fig2, self.input_path, 'Color2')
