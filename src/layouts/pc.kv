@@ -3,7 +3,7 @@
 #:import Factory kivy.factory.Factory
 #:import RangeSlider src.python.custom_widgets.range_slider.RangeSlider
 
-#:set std_height dp(30)
+#:set std_height dp(35)
 #:set std_font_size sp(16)
 #:set default_thresh 60
 #:set ext ['jpg', 'jpeg', 'png', 'tiff', 'bmp']
@@ -44,6 +44,9 @@
     multiline: False
     size_hint_y: None
     height: std_height
+    text_size: self.size
+    halign: 'center'
+    valign: 'center'
 
 <Word@Label>:
     size_hint_y: None
