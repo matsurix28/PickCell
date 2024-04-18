@@ -280,7 +280,6 @@ class Detect:
         try:
             ellipse = cv2.fitEllipse(cnts)
         except Exception as e:
-            print('error')
             raise ValueError(str(e))
         x, y = ellipse[0]
         elp_h, elp_w = ellipse[1]

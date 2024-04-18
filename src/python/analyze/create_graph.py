@@ -105,14 +105,10 @@ class Graph():
     
     def update_size(self):
         if self.fig_color3d is not None:
-            print('change color 3d')
             self.fig_color3d['data'][0]['marker']['size'] = self.size_3d
         if self.fig_fvfm3d is not None:
-            print('change fvfm 3d')
             self.fig_fvfm3d['data'][0]['marker']['size'] = self.size_3d
         if self.fig_2d is not None:
-            print('change 2d')
-            print(self.size_2d)
             self.fig_2d['data'][0]['marker']['size'] = self.size_2d
 
     def input(self, px, fvfm):

@@ -29,11 +29,9 @@ class MyBoxLayout(BoxLayout):
             self.input_path = file
 
     def input_dir(self, file):
-        print('input directory', file)
         if len(file) == 1:
             if os.path.isdir(file[0]):
                 self.input_path = file[0]
-                print(self.input_path)
             else:
                 self.show_error_popup(f'{file[0]} is not directory. Please select directory.')
         else:
@@ -58,8 +56,6 @@ class MyBoxLayout(BoxLayout):
         try:
             self.thread.raise_exception()
         except Exception as e:
-            print('erorr dayooooo')
-            print(self.popup)
             self.popup.dismiss()
             self.show_error_popup(str(e))
 

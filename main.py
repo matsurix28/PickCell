@@ -115,11 +115,8 @@ class PickcellApp(App):
         self.fvfm_list = self.fvfm.get(path)
 
     def run_align(self, args):
-        print('analyze')
         if self.align is None:
-            print('import align')
             from src.python.analyze.align import Align
-            print('import kanryo')
             self.align = Align()
         self.res_leaf_img, self.res_fvfm_img, self.overlay_img = self.align.run(*args)
         
@@ -219,7 +216,6 @@ class PickcellApp(App):
         if self.res_leaf2_img is not None:
             fig2 = self.run_pickcell(self.res_leaf2_img, self.res_fvfm_img, self.fvfm_list)
             self.save_figs(self.outdir, 'Color2', fig2)
-        print('run auto owari')
         
     def save(self, fig, outdir, name):
         self.save_imgs(outdir)
@@ -239,13 +235,10 @@ class PickcellApp(App):
             else:
                 os.makedirs(dir)
                 return dir
-        print('app args', outdir, self.file_name, name)
         res_dir = os.path.join(outdir, self.file_name, name)
         res_dir = make_res_dir(res_dir)
-        print('hozon basho', res_dir)
         fig_types = ['color3d', 'fvfm3d', 'scatter2d', 'all']
         for i, fig in enumerate(figures):
-            print(f'{res_dir}: {fig_types[i]}')
             fig.write_html(os.path.join(res_dir, fig_types[i] + '.html'))
 
     def save_imgs(self, outdir):
@@ -579,7 +572,6 @@ class SplitColorWidget(MyBoxLayout):
     def update_texture(self, hl, hh, sl, sh, vl,vh, range_img):
         height = int(range_img.height)
         width = int(range_img.width)
-        print('spl', height, width)
         if width == 0:
             width = 1
         hue = np.linspace(hl, hh, width)
@@ -613,7 +605,6 @@ class SplitColorWidget(MyBoxLayout):
         self.ids.v2_slider.value = (self.v2l, self.v2h)
 
     def resize_widgets(self, dt):
-        print('resize split')
         self.update_texture(
             self.h1l, self.h1h,
             self.s1l, self.s1h,
@@ -720,7 +711,6 @@ class AnalyzeWidget(MyBoxLayout):
         if group == 'all':
             self.fig = self.app.update_marker_size(self.fig, self.size_2d, self.size_3d)
             self.fig[3].show()
-            print(self.fig[3])
         elif group == 'color1':
             self.fig1 = self.app.update_marker_size(self.fig1, self.size_2d, self.size_3d)
             self.fig1[3].show()
@@ -735,17 +725,13 @@ class AnalyzeWidget(MyBoxLayout):
         self.thread.start()
 
     def save_process(self):
-        print(self.input_path)
         if self.fig is not None:
-            print('All save suruyo')
             self.fig = self.app.update_marker_size(self.fig, self.size_2d, self.size_3d)
             self.app.save(self.fig, self.input_path, 'All_color')
         if self.fig1 is not None:
-            print('Color2 save suruyo')
             self.fig1 = self.app.update_marker_size(self.fig1, self.size_2d, self.size_3d)
             self.app.save(self.fig1, self.input_path, 'Color1')
         if self.fig2 is not None:
-            print('Color2 save suruyo')
             self.fig2 = self.app.update_marker_size(self.fig2, self.size_2d, self.size_3d)
             self.app.save(self.fig2, self.input_path, 'Color2')
         self.popup.dismiss()
@@ -768,7 +754,6 @@ class AutoWidget(MyBoxLayout):
         Clock.schedule_once(self.bind_func, 0)
 
     def input_dir_files(self, path):
-        print('input path: ', path)
         super().input_dir_files(path)
 
     def click(self):
@@ -820,15 +805,11 @@ class AutoWidget(MyBoxLayout):
         elif os.path.isdir(self.indir):
             for ext in self.exts:
                 files += glob.glob(self.indir + '/*.' + ext)
-        print('files: ', files)
         img_names = [re.sub('-(L|F)$', '', os.path.splitext(os.path.basename(f))[0]) for f in files]
         img_name_list = [k for k, v in collections.Counter(img_names).items() if v > 1]
-        print('img name list', img_name_list)
         for name in img_name_list:
             l = glob.glob(self.indir + '/' + name + '-L.*')
-            print(l)
             f = glob.glob(self.indir + '/' + name + '-F.*')
-            print(f)
             if (len(l) == 0) or (len(f) == 0):
                 break
             if len(l) > 1:
@@ -838,16 +819,6 @@ class AutoWidget(MyBoxLayout):
             self.img_list.append([name, l[0], f[0]])
         if len(self.img_list) == 0:
             raise ValueError('There is no pair images.')
-        print('img list', self.img_list)
-        '''
-        output = self.outdir + '/images_list.csv'
-        header = ['Name', 'Leaf image file', 'FvFm image file']
-        with open(output, 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(header)
-            writer.writerows(self.img_list)
-        return
-        '''
 
     def biggest_img(self, img_list):
         max_size = 0
@@ -882,8 +853,6 @@ class AutoWidget(MyBoxLayout):
         outdir = self.ids.outdir.text
         is_extr1 = self.ids.is_extr1.active
         is_extr2 = self.ids.is_extr2.active
-        print('extr1', is_extr1)
-        print('extr2', is_extr2)
         self.app.set_params(leaf_thr, fvfm_thr, is_extr1, is_extr2, color1, color2, size2d, size3d, outdir)
         num_proc = len(self.img_list)
         count = 1
@@ -893,24 +862,19 @@ class AutoWidget(MyBoxLayout):
         header = ['Name', 'Leaf_image', 'FvFm_image', 'Result']
         writer.writerow(header)
         for file in self.img_list:
-            print(f'{count}/{num_proc}')
             self.popup.dismiss()
             Clock.schedule_once(lambda x: self.show_progress_popup(self.cancel_process, 'Auto Pickcell', f'Running... {count}/{num_proc}'), 0)
             name = file[0]
             leaf_img = file[1]
             fvfm_img = file[2]
-            print(name, leaf_img, fvfm_img)
             try:
                 self.app.run_auto(name, leaf_img, fvfm_img)
             except Exception as e:
                 res = [name, leaf_img, fvfm_img, str(e)]
                 writer.writerow(res)
-                print(e)
-                print('break suruyo')
                 self.popup.dismiss()
                 count += 1
                 continue
-            print('owari')
             res = [name, leaf_img, fvfm_img, 'OK']
             writer.writerow(res)
             self.popup.dismiss()
@@ -1009,7 +973,6 @@ class AutoWidget(MyBoxLayout):
     def update_texture(self, hl, hh, sl, sh, vl,vh, range_img):
         height = int(range_img.height)
         width = int(range_img.width)
-        print(height, width)
         if width == 0:
             width = 1
         hue = np.linspace(hl, hh, width)
@@ -1021,7 +984,6 @@ class AutoWidget(MyBoxLayout):
         range_img.texture = texture
 
     def resize_widgets_auto(self, dt):
-        print('resize')
         self.update_texture(
             self.h1l, self.h1h,
             self.s1l, self.s1h,
