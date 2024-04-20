@@ -2,3 +2,5 @@
 /venv
 /main.dist
 /main.build
+/test.build
+/test.dist

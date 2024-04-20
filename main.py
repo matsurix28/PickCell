@@ -9,6 +9,7 @@ from os.path import expanduser
 
 from kivy.core.text import LabelBase, DEFAULT_FONT
 from kivy.resources import resource_add_path
+from kivy.uix.slider import Slider
 
 import cv2
 #import japanize_kivy
@@ -17,13 +18,13 @@ from kivy import platform
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.graphics.texture import Texture
 from kivy.lang import Builder
-from kivy.properties import ObjectProperty, StringProperty
-from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelContent
+from kivy.properties import ObjectProperty
+from kivy.uix.tabbedpanel import TabbedPanel
 
 from src.python.analyze.multi_graph import multi_graph
 from src.python.custom_widgets.myboxlayout import MyBoxLayout
+from src.python.custom_widgets.range_slider import RangeSlider
 
 currentActivity = None
 CLS_Activity = None
